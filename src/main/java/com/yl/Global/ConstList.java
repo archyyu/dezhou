@@ -88,15 +88,14 @@ public class ConstList
 	 */
 	public static String OneUserInfoFileTemplateName = "session/player/playerTemplate.xml";
 
-	public static final String companName = "南昌鼎安科技有限公司";
-	public static final String GameName = "梦幻德州扑克OL";
-	public static final String GameType = "手机客户端网游";
+	public static final String GameName = "德州扑克";
+	public static final String GameType = "网游";
 	public static final String cpid = "710525";
 	public static final String gameId = "652510052578";
-	public static final String TechName = "辛元";
-	public static final String TechPhone = "13407154199";
-	public static final String TechEmail = "bond@ok123.mobi";
-	public static final String IP = "112.25.14.117";
+	public static final String TechName = "";
+	public static final String TechPhone = "";
+	public static final String TechEmail = "";
+	public static final String IP = "";
 	public static final String SenderId = "760";
 	public static final String DefaultSenderId = "202";
 	public static final String ChannelId = "10002000";
