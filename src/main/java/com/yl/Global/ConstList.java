@@ -44,10 +44,7 @@ public class ConstList
 	
 	public static String gameVersion = null;
 	public static String gameInstallurl = null;
-	
-//	public static String HttpIp = null;
-//	public static String HttpPort = null;
-	
+
 	public static int LinkPoolSize = 20;
 	
 	
@@ -88,16 +85,12 @@ public class ConstList
 	 */
 	public static String OneUserInfoFileTemplateName = "session/player/playerTemplate.xml";
 
-	public static final String GameName = "德州扑克";
-	public static final String GameType = "网游";
+
 	public static final String cpid = "710525";
 	public static final String gameId = "652510052578";
-	public static final String TechName = "";
-	public static final String TechPhone = "";
-	public static final String TechEmail = "";
-	public static final String IP = "";
+
 	public static final String SenderId = "760";
-	public static final String DefaultSenderId = "202";
+
 	public static final String ChannelId = "10002000";
 	public static final String DefaultChannelId = "15077000";
 
@@ -110,108 +103,71 @@ public class ConstList
 	public static final String CMD_STANDUP = "7"; // 站起
 	public static final String CMD_LEAVE = "106"; // 离开大厅
 	public static final String CMD_ROOMINFO = "9"; // 获取桌面信息
-	
-	public static final int DROPCARDTIMEEXPIRED = 16 * 1000;
-
 	public static final String CMD_ROUND_OVER = "rover"; // 结束
 	public static final String CMD_WHO_TURN = "wt"; // 轮到谁！
 	public static final String CMD_SBOT = "sbot"; // 游戏发底牌
 	public static final String CMD_DBT = "dbt"; // 结束分配筹码
-	public static final String CMD_CREATROOM = "creatroom"; // 创建临时房间
-	public static final String CMD_ADDROOM = "addroom"; // 添加房间
-	public static final String CMD_DELROOM = "delroom"; // 创删除房间
-	public static final String CMD_VIEWROOM = "viewroom"; // 预览房间
-	public static final String CMD_TIMEPLAN = "tp"; // 30分钟计划
-	public static final String CMD_ADDPKFRIEND = "apkf"; // 添加牌友
-	public static final String CMD_FLUSHPKFRIEND = "fpkf"; // 刷新牌友
-	public static final String CMD_RECPKFRIEND = "rpkf"; // 接受邀请
-	public static final String CMD_REFUSEFRIEND = "ref"; // 拒绝牌友
-	public static final String CMD_BUYDJ = "bdj"; // 购买道具
-	public static final String CMD_SENDDJ = "sdj"; // 赠送礼品
-	public static final String CMD_USEDJ = "udj"; // 使用道具
-	public static final String CMD_EXGOLDANDBET = "edj"; // 兑换金币，筹码
-	public static final String CMD_MYDJ = "mdg"; // 道具和礼品列表
-	public static final String CMD_TOPMSG = "tmsg"; // 消息置顶
-	public static final String CMD_DELFRIEND = "dlf"; // 删除牌友
-	public static final String CMD_FQTZ = "fqtz"; // 发起挑战
-	public static final String CMD_FQZF = "fqzf"; // 发起征服
-	public static final String CMD_RECTZ = "rectz"; // 接受挑战并进入挑战房间
-	public static final String CMD_REFTZ = "reftz"; // 拒绝挑战
-	public static final String CMD_JOINGAME = "join"; // 加入游戏
-	public static final String CMD_C_ROOMINFO = "rinfo"; // 获取桌面信息
-	public static final String CMD_STARTGAME = "start"; // 开始游戏
-
-	public static final String CMD_LOOK = "look"; // 看牌
-	public static final String CMD_FOLLOW = "follow"; // 跟注
-	public static final String CMD_DROP = "drop"; // 弃牌
-	public static final String CMD_ALLIN = "allin"; // 全下
-	public static final String CMD_ADD = "add"; // 加注
-
-	public static final String CMD_C_ROUNDOVER = "crover"; // 每一轮结束
-	public static final String CMD_C_WHOTURN = "cwt"; // 轮到谁！
-	public static final String CMD_C_TZOVER = "tzover"; // 挑战结束
-	public static final String CMD_BACK = "back"; // 返回大厅
-	public static final String CMD_C_TZLIST = "tzl"; // 列举出可以挑战的对象
-	public static final String CMD_C_ZFLIST = "zfl"; // 列举擂台场可以征服的对象
-	public static final String CMD_C_ZFMSG = "zfm"; // 列举出自己征服的信息
-	public static final String CMD_C_PTQ = "ptq"; // 监听用户进入普通区
-	public static final String CMD_C_ZFOVER = "zfover"; // 征服比赛结束
-	public static final String CMD_UINFO = "uinfo"; // 单个的用户信息
-	public static final String CMD_MPS = "mps"; // 冷却加速
-	public static final String CMD_LEVELUP = "lvlup"; // 升级
-	public static final String CMD_CANCEL = "cancel"; // 取消
-	public static final String CMD_GETFRL = "gfrl"; // 获取第四轮 扑克等级
-	public static final String CMD_SENDBET = "sbet"; // 每天赠送4000筹码
-	public static final String CMD_C_DBT = "cdbt"; // 结束分配筹码
 	public static final String CMD_FLUSHACH = "rach"; // 刷新成就列表
-	public static final String CMD_TZERROR = "tze"; // 挑战 错误信息
-	public static final String CMD_CHECKSBOT = "csg"; // 是否满足游戏开始条件
-	public static final String CMD_STORE = "store"; // 商店
-	public static final String CMD_STOREMSG = "spg"; // 商店信息
 
-	// 金币场命令集合
-	public static final String CMD_GD_ROOMINFO = "gd_ri";
-	public static final String CMD_GD_LOOK_CARD = "gd_lc";
-	public static final String CMD_GD_FOLLOW_BET = "gd_fb";
-	public static final String CMD_GD_DROP_CARD = "gd_dc";
-	public static final String CMD_GD_ALL_IN = "gd_ai";
-	public static final String CMD_GD_ADD_BET = "gd_ab";
-	public static final String CMD_GD_SITDOWN = "gd_sd";
-	public static final String CMD_GD_STANDUP = "gd_su";
-	public static final String CMD_GD_LEAVE = "gd_lev";
-	public static final String CMD_GD_LOST = "gd_lost";
-	public static final String CMD_GD_VIEWROOM = "gd_vr";
-	public static final String CMD_GD_ROUNDOVER = "gd_ro";
-	public static final String CMD_GD_WHOTURN = "gd_wt";
-	public static final String CMD_GD_DBT = "gd_dbt";
-	public static final String CMD_GD_SBOT = "gd_sbot";
-	/**
-	 * 牌组状态
-	 */
-	public static final int GAME_STATE_CARD_LEVEL_9 = 19; // 皇家同花顺
-	public static final int GAME_STATE_CARD_LEVEL_8 = 18; // 同花顺
-	public static final int GAME_STATE_CARD_LEVEL_7 = 17; // 四条
-	public static final int GAME_STATE_CARD_LEVEL_6 = 16; // 葫芦
-	public static final int GAME_STATE_CARD_LEVEL_5 = 15; // 同花
-	public static final int GAME_STATE_CARD_LEVEL_4 = 14; // 顺子
-	public static final int GAME_STATE_CARD_LEVEL_3 = 13; // 三条
-	public static final int GAME_STATE_CARD_LEVEL_2 = 12; // 两对
-	public static final int GAME_STATE_CARD_LEVEL_1 = 11; // 一对
-	public static final int GAME_STATE_CARD_LEVEL_0 = 10; // 高牌
+    public enum CMD
+    {
+        CMD_LOOK_CARD("1"),
+        CMD_ADD_BET("2"),
+        CMD_FOLLOW_BET("3"),
+        CMD_DROP_CARD("4"),
+        CMD_ALL_IN("5"),
+        CMD_SITDOWN("6"),
+        CMD_STANDUP("7"),
+        CMD_LEAVE("8"),
+        CMD_ROOMINFO("9"),
+        CMD_ROUND_OVER("10"),
+        CMD_WHO_TURN("wt"),
+        CMD_SBOT("sbot"),
+        CMD_DBT("dbt"),
+        CMD_FLUSHACH("rach"),
+        CMD_END("end");
+        private String cmd;
+        private CMD(String c)
+        {
+            this.cmd = c;
+        }
+        public String value()
+        {
+            return this.cmd;
+        }
+    }
 
-	
-	/**
-	 *玩家游戏状态 
-	 **/
-	public static final int GAME_STATE_LOOK_CARD = 1; // 看牌
-	public static final int GAME_STATE_ADD_BET = 2; // 加注
-	public static final int GAME_STATE_FOLLOW_BET = 3; // 跟注
-	public static final int GAME_STATE_DROP_CARD = 4; // 弃牌
-	public static final int GAME_STATE_ALL_END = 5; // 全下
-	public static final int GAME_STATE_SITDOWN = 6; // 坐下
-	public static final int GAME_STATE_STANDUP = 7; // 站起
-	public static final int GAME_STATE_LEAVE = 8; // 离开大厅
-	public static final int GAME_STATE_ROOMINFO = 9; // 获取桌面信息
+
+
+    public static final int DROPCARDTIMEEXPIRED = 16 * 1000;
+
+
+	public enum CardState
+	{
+
+        GAME_STATE_CARD_LEVEL_9(19),
+        GAME_STATE_CARD_LEVEL_8(18),
+        GAME_STATE_CARD_LEVEL_7(17),
+        GAME_STATE_CARD_LEVEL_6(16),
+        GAME_STATE_CARD_LEVEL_5(15),
+        GAME_STATE_CARD_LEVEL_4(14),
+        GAME_STATE_CARD_LEVEL_3(13),
+        GAME_STATE_CARD_LEVEL_2(12),
+        GAME_STATE_CARD_LEVEL_1(11),
+        GAME_STATE_CARD_LEVEL_0(10),
+        GAME_STATE_CARD_LEVEL_END(-1);
+
+		private int value = 0;
+		private CardState(int v)
+        {
+            this.value = v;
+        }
+        public int value()
+        {
+            return this.value;
+        }
+	}
+
 
 	public enum PlayerGameState
 	{
@@ -239,18 +195,7 @@ public class ConstList
 			return this.value;
 		}
 	}
-	
-	/**
-	 * 用户状态
-	 */
-	public static final int PLAYER_STATE_WAIT = 100; // 等待状态
-	public static final int PLAYER_STATE_LEAVE = 106; // 离开游戏桌面
-	public static final int PLAYER_STATE_LEAVEL = 106; // 离开游戏桌面
-	public static final int PLAYER_STATE_PLAYER = 102; // 玩家状态
-	public static final int PLAYER_STATE_BANKER = 103; // 游戏庄家
-	public static final int PLAYER_STATE_SMALLBLIND = 104; // 游戏小盲注
-	public static final int PLAYER_STATE_BIGBLIND = 105; // 游戏大盲注
-	
+
 
 	/**
 	 * 玩家状态 

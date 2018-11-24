@@ -43,7 +43,7 @@ public class AchievementServiceImp implements AchievementService
 			achlist.add(AchValue.CHENJIU_WIN_LADIES);
 		}
 
-		if (pms.getLevel(pkmap) == ConstList.GAME_STATE_CARD_LEVEL_1)// extra--ok
+		if (pms.getLevel(pkmap) == ConstList.CardState.GAME_STATE_CARD_LEVEL_1.value())// extra--ok
 		{
 			// 一对赢，成双成对
 			achlist.add(AchValue.CHENJIU_WIN_LOW_ROCKETS);
@@ -54,7 +54,7 @@ public class AchievementServiceImp implements AchievementService
 
 		}
 
-		if (pms.getLevel(pkmap) == ConstList.GAME_STATE_CARD_LEVEL_2)// extra--ok
+		if (pms.getLevel(pkmap) == ConstList.CardState.GAME_STATE_CARD_LEVEL_2.value())// extra--ok
 		{
 			// 50次两对
 			achlist.add(AchValue.CHENJIU_WIN_TWO_PAIRS50);
@@ -110,7 +110,7 @@ public class AchievementServiceImp implements AchievementService
 			// 25次顺子
 			achlist.add(AchValue.CHENJIU_WIN_STRAIGHT25);
 		}
-		if (pms.getLevel(pkmap) == ConstList.GAME_STATE_CARD_LEVEL_3
+		if (pms.getLevel(pkmap) == ConstList.CardState.GAME_STATE_CARD_LEVEL_3.value()
 				&& (pkmap.get(2).getNum() == 14 || pkmap.get(2).getNum() == 1))// --extra--ok
 		{
 			// 10次三条A
@@ -357,7 +357,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isFOUR_ACES(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_7)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_7.value())
 		{
 			Puke puke = (Puke) pk.get(new Integer(pk.size() - 2));
 			if (puke.getNum() == 14 || puke.getNum() == 1)
@@ -377,7 +377,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isFOUR_KINDS(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_7)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_7.value())
 		{
 			Puke puke = (Puke) pk.get(new Integer(pk.size() - 2));
 			if (puke.getNum() == 13)
@@ -397,7 +397,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isALL_WHEEL_DRIVE(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_7)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_7.value())
 		{
 			b = true;
 		}
@@ -413,7 +413,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isAK_FULL_HOUSE(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_6)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_6.value())
 		{
 			Puke puke1 = pk.get(new Integer(2));
 			Puke puke2 = pk.get(new Integer(0));
@@ -435,7 +435,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isQS_FULL_JS(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_6)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_6.value())
 		{
 			Puke puke1 = pk.get(new Integer(2));
 			Puke puke2 = pk.get(new Integer(0));
@@ -457,7 +457,7 @@ public class AchievementServiceImp implements AchievementService
 	private boolean isFULL_HOUSE(HashMap<Integer, Puke> pk)
 	{
 		boolean b = false;
-		if (pms.getLevel(pk) == ConstList.GAME_STATE_CARD_LEVEL_6)
+		if (pms.getLevel(pk) == ConstList.CardState.GAME_STATE_CARD_LEVEL_6.value())
 		{
 			b = true;
 			return b;

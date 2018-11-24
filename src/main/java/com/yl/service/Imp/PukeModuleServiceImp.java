@@ -196,7 +196,7 @@ public class PukeModuleServiceImp implements PukeModuleService
 	 */
 	public int getLevel(HashMap map)
 	{
-		int Pukelevel = -1;
+		ConstList.CardState Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_END;
 		int flag = 0;
 		for (int i = 0; i < map.size(); i++)
 		{
@@ -212,44 +212,44 @@ public class PukeModuleServiceImp implements PukeModuleService
 		switch (flag)
 		{
 		case 6:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_7;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_7;
 			break;
 		case 4:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_6;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_6;
 			break;
 		case 3:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_3;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_3;
 			break;
 		case 2:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_2;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_2;
 			break;
 		case 1:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_1;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_1;
 			break;
 		case 0:
 			if (isBigFive(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_9;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_9;
 			}
 			else if (isFive(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_8;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_8;
 			}
 			else if (isFiveTag(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_5;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_5;
 			}
 			else if (isStraight(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_4;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_4;
 			}
 			else
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_0;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_0;
 			}
 			break;
 		}
-		return Pukelevel;
+		return Pukelevel.value();
 	}
 
 	/**

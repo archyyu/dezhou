@@ -21,6 +21,8 @@ import com.yl.service.Imp.PukeModuleServiceImp;
 import com.yl.vo.Player;
 import com.yl.vo.Puke;
 
+import static com.yl.Global.ConstList.CardState;
+
 public class PukerKit
 {
 	
@@ -311,15 +313,15 @@ public class PukerKit
 	{
 		if (isBigFive(map))
 		{
-			return ConstList.GAME_STATE_CARD_LEVEL_9;
+			return ConstList.CardState.GAME_STATE_CARD_LEVEL_9.value();
 		}
 		
 		if (isFive(map))
 		{
-			return ConstList.GAME_STATE_CARD_LEVEL_8;
+			return ConstList.CardState.GAME_STATE_CARD_LEVEL_8.value();
 		}
-		
-		int Pukelevel = -1;
+
+		ConstList.CardState Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_END;
 		int flag = 0;
 		for (int i = 0; i < map.size(); i++)
 		{
@@ -335,57 +337,58 @@ public class PukerKit
 		switch (flag)
 		{
 		case 6:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_7;
+			Pukelevel = CardState.GAME_STATE_CARD_LEVEL_7;
 			break;
 		case 4:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_6;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_6;
 			break;
 		case 3:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_3;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_3;
 			if (isFiveTag(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_5;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_5;
 			}
 			break;
 		case 2:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_2;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_2;
 			if (isFiveTag(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_5;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_5;
 			}
 			break;
 		case 1:
-			Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_1;
+			Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_1;
 			if (isFiveTag(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_5;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_5;
 			}
 			break;
 		case 0:
 			if (isFiveTag(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_5;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_5;
 			}
 			else if (isStraight(map))
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_4;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_4;
 			}
 			else
 			{
-				Pukelevel = ConstList.GAME_STATE_CARD_LEVEL_0;
+				Pukelevel = ConstList.CardState.GAME_STATE_CARD_LEVEL_0;
 			}
 			break;
 		}
-		return Pukelevel;
+		return Pukelevel.value();
 	}
 	
 	public static boolean needDuplicateSort(int level)
 	{
-		if(level == ConstList.GAME_STATE_CARD_LEVEL_7 ||
-				level == ConstList.GAME_STATE_CARD_LEVEL_6 ||
-				level == ConstList.GAME_STATE_CARD_LEVEL_3 ||
-				level == ConstList.GAME_STATE_CARD_LEVEL_2 || 
-				level == ConstList.GAME_STATE_CARD_LEVEL_1)
+
+		if(level == CardState.GAME_STATE_CARD_LEVEL_7.value() ||
+				level == CardState.GAME_STATE_CARD_LEVEL_6.value() ||
+				level == CardState.GAME_STATE_CARD_LEVEL_3.value() ||
+				level == CardState.GAME_STATE_CARD_LEVEL_2.value() ||
+				level == CardState.GAME_STATE_CARD_LEVEL_1.value())
 		{
 			return true;
 		}
@@ -394,8 +397,8 @@ public class PukerKit
 	
 	public static boolean needResort(int level)
 	{
-		if(level == ConstList.GAME_STATE_CARD_LEVEL_4 ||
-				level == ConstList.GAME_STATE_CARD_LEVEL_8)
+		if(level == CardState.GAME_STATE_CARD_LEVEL_4.value() ||
+				level == CardState.GAME_STATE_CARD_LEVEL_8.value())
 		{
 			return true;
 		}
