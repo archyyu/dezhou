@@ -3,8 +3,6 @@ package com.yl.dao;
 import java.util.List;
 
 import com.yl.vo.UserInfo;
-import com.yl.web.po.DaoJu;
-import com.yl.web.po.PKFriend;
 
 public interface CommonDao
 {
@@ -77,13 +75,6 @@ public interface CommonDao
 	 */
 	public void updateUinfoLost(UserInfo uinfo);
 
-	/**
-	 * 成就列表
-	 * 
-	 * @param uinfo
-	 * @param db
-	 */
-	public List<DaoJu> reflushAch(String uid);
 
 	/**
 	 * 添加牌友
@@ -101,13 +92,6 @@ public interface CommonDao
 	 */
 	public void TimePlan(String uid, int time);
 
-	/**
-	 * 获取牌友列表
-	 * 
-	 * @param uinfo
-	 * @param db
-	 */
-	public List<PKFriend> getPKFriends(String uid);
 
 	/**
 	 * 用户离开

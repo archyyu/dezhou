@@ -9,7 +9,6 @@ import com.yl.service.DaoJuService;
 import com.yl.util.Utils;
 import com.yl.vo.Prop;
 import com.yl.vo.UserInfo;
-import com.yl.web.po.DaoJu;
 import com.yl.container.AbstractExtension;
 
 public class DaoJuServiceImp extends AbstractExtension implements DaoJuService
@@ -112,16 +111,6 @@ public class DaoJuServiceImp extends AbstractExtension implements DaoJuService
 		}
 		return usecount;
 
-	}
-
-	public List<DaoJu> getDaoJu(String uid, String queryType)
-	{
-		return djdao.queryMyProp(uid, queryType);
-	}
-
-	public List<DaoJu> getGift(String uid, String queryType)
-	{
-		return djdao.queryMyGift(uid, queryType);
 	}
 
 }

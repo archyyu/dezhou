@@ -1,14 +1,16 @@
 package com.yl.thread;
 
 import com.yl.container.*;
-import ndb.DBServer;
 
+import com.yl.ndb.DBServer;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import com.yl.Global.*;
 import com.yl.vo.UserInfo;
+
+import static com.yl.ndb.DBServer.*;
 
 public class MemberRemoveBind extends AbstractExtension implements Runnable
 {
@@ -37,7 +39,7 @@ public class MemberRemoveBind extends AbstractExtension implements Runnable
 											
 					if(uInfo.isSaveUpdate())
 					{
-						SqlSessionFactory	sqlMapper	= DBServer.getInstance().getSqlMapper();
+						SqlSessionFactory	sqlMapper	= getInstance().getSqlMapper();
 						SqlSession session = sqlMapper.openSession();
 						session.update("ndb.updateUserInfo", uInfo);
 						session.commit();

@@ -1,5 +1,9 @@
 package com.yl.util;
 
+import com.yl.jzlib.JZlib;
+import com.yl.jzlib.ZInputStream;
+import com.yl.jzlib.ZOutputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -7,9 +11,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.jcraft.jzlib.JZlib;
-import com.jcraft.jzlib.ZInputStream;
-import com.jcraft.jzlib.ZOutputStream;
 
 public class ComPressUtil
 {

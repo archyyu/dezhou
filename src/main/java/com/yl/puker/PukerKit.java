@@ -132,38 +132,6 @@ public class PukerKit
 	 */
 	private static Map<Integer, List<Puke>> SevenToFiveGroups(List<Puke> map)
 	{
-//		Map<Integer, List<Puke>> group = new HashMap<Integer, List<Puke>>();
-//		int num = 0;
-//		
-//		for(int i = 0 ; i < map.size() ; i++)
-//		{
-//			for(int j = 0;j < map.size() ; j++)
-//			{
-//				if (i == j) continue;
-//				for(int k = 0;k < map.size(); k++)
-//				{
-//					if ((i == k)||(j == k)) continue;
-//					for(int m = 0; m < map.size(); m++)
-//					{
-//						if ((i == m)||(j == m)||(k == m)) continue;
-//						for(int n = 0;n < map.size(); n++ )
-//						{
-//							if ((i == n)||(j == n)||(k == n)||(m == n)) continue;
-//							
-//							List<Puke> pukeGroup = new ArrayList<Puke>();
-//							pukeGroup.add(map.get(i));
-//							pukeGroup.add(map.get(j));
-//							pukeGroup.add(map.get(k));
-//							pukeGroup.add(map.get(m));
-//							pukeGroup.add(map.get(n));
-//							group.put(num++, pukeGroup);
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		return group;
 		Map<Integer, List<Puke>> group = new HashMap<Integer, List<Puke>>();
 		int num = 0;
 		for (int a = 0; a < 3; a++)

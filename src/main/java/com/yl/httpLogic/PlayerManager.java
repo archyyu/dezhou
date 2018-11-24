@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import ndb.DBServer;
 
+import com.yl.ndb.DBServer;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
@@ -45,10 +45,10 @@ public class PlayerManager
 	public static UserInfo NewUserInfoFromDb(String uid)
 	{
 		SqlSession session = sqlMapper.openSession();
-		List<UserInfo> getUserInfo = null;
+		List<Object> getUserInfo = null;
 		try
 		{
-			getUserInfo = (List<UserInfo>) session.selectList("ndb.getUserInfo", uid);
+			getUserInfo =   session.selectList("ndb.getUserInfo", uid);
 			session.commit();
 		}
 		catch (Exception e)
@@ -63,7 +63,7 @@ public class PlayerManager
 
 		if(getUserInfo != null && getUserInfo.size() > 0)
 		{
-			UserInfo usInfo = getUserInfoData(getUserInfo.get(0));
+			UserInfo usInfo = getUserInfoData((UserInfo) getUserInfo.get(0));
 			return usInfo;
 		}
 		else 
@@ -189,10 +189,10 @@ public class PlayerManager
 		ActionscriptObject rankList = new ActionscriptObject();
 
 		SqlSession sessionRank = sqlMapper.openSession();
-		List<UserInfo> userInfoRankList = null;
+		List<Object> userInfoRankList = null;
 		try
 		{
-			userInfoRankList = (List<UserInfo>) sessionRank.selectList("ndb.rank");
+			userInfoRankList =  sessionRank.selectList("ndb.rank");
 			sessionRank.commit();
 		}
 		catch (Exception t)
@@ -212,11 +212,11 @@ public class PlayerManager
 			{
 				ActionscriptObject oneUser = new ActionscriptObject();
 				
-				oneUser.put("pic", (userInfoRankList.get(i).getPic()));
-				oneUser.put("name", (userInfoRankList.get(i).getName()));
-				oneUser.put("uid", (userInfoRankList.get(i).getUid()));
-				oneUser.put("level", (userInfoRankList.get(i).getLevel()));
-				oneUser.put("allmoney", (userInfoRankList.get(i).getAMoney()));
+				oneUser.put("pic", (((UserInfo)userInfoRankList.get(i)).getPic()));
+				oneUser.put("name", (((UserInfo)userInfoRankList.get(i)).getName()));
+				oneUser.put("uid", (((UserInfo)userInfoRankList.get(i)).getUid()));
+				oneUser.put("level", (((UserInfo)userInfoRankList.get(i)).getLevel()));
+				oneUser.put("allmoney", (((UserInfo)userInfoRankList.get(i)).getAMoney()));
 				
 				rankList.put(i, oneUser);			
 			}
@@ -246,7 +246,7 @@ public class PlayerManager
 			mobileUserId = "-1";
 		}
 	
-		List<UserInfo> userInfoList = null;
+		List<Object> userInfoList = null;
 		
 		if (loginType == 0)
 		{
@@ -259,7 +259,7 @@ public class PlayerManager
 			
 			try
 			{
-				userInfoList = (List<UserInfo>) sessionUserLogin.selectList("ndb.userLogin", map);
+				userInfoList = sessionUserLogin.selectList("ndb.userLogin", map);
 				sessionUserLogin.commit();
 			}
 			catch (Exception t)
@@ -276,7 +276,7 @@ public class PlayerManager
 			SqlSession sessionUserLoginMobile = sqlMapper.openSession();
 			try
 			{
-				userInfoList =  (List<UserInfo>) sessionUserLoginMobile.selectList("ndb.userLoginMobile", mobileUserId);
+				userInfoList = sessionUserLoginMobile.selectList("ndb.userLoginMobile", mobileUserId);
 				sessionUserLoginMobile.commit();
 			}
 			catch (Exception t)
@@ -295,7 +295,7 @@ public class PlayerManager
 
 		if(userInfoList != null && userInfoList.size() > 0)
 		{
-			uid = Integer.parseInt(userInfoList.get(0).getUid());
+			uid = Integer.parseInt(((UserInfo)userInfoList.get(0)).getUid());
 			log.warn("正常登陆查询数据库uid=" + uid);
 		}
 
@@ -622,11 +622,11 @@ public class PlayerManager
 	public static boolean isvalidEmail(String email, String[] userinfo)
 	{
 		SqlSession session = sqlMapper.openSession();
-		List<UserInfo> userEmailList = null;
+		List<Object> userEmailList = null;
 		
 		try
 		{
-			userEmailList = (List<UserInfo>) session.selectList("ndb.userValidEmail", email);
+			userEmailList = session.selectList("ndb.userValidEmail", email);
 			session.commit();
 		}
 		catch (Exception t)
@@ -642,8 +642,8 @@ public class PlayerManager
 		{
 			if(userEmailList != null && userEmailList.size() > 0)
 			{
-				userinfo[0] = userEmailList.get(0).getUid();
-				userinfo[1] = userEmailList.get(0).getName();
+				userinfo[0] = ((UserInfo)userEmailList.get(0)).getUid();
+				userinfo[1] = ((UserInfo)userEmailList.get(0)).getName();
 				return true;
 			}
 			return false;
@@ -1104,11 +1104,11 @@ public class PlayerManager
 		String uid = "-1";
 
 		SqlSession session = sqlMapper.openSession();
-		List<UserInfo> userInfoList = null;
+		List<Object> userInfoList = null;
 		
 		try
 		{
-			userInfoList = (List<UserInfo>) session.selectList("ndb.userLoginMobile", mobileUserId);
+			userInfoList = session.selectList("ndb.userLoginMobile", mobileUserId);
 			session.commit();
 		}
 		catch(Exception t)
@@ -1122,7 +1122,7 @@ public class PlayerManager
 		
 		if(userInfoList != null && userInfoList.size() > 0)
 		{
-			uid = userInfoList.get(0).getUid();
+			uid = ((UserInfo)userInfoList.get(0)).getUid();
 			log.warn("正常登陆查询数据库,找到了该用户伪码的用户ID不为空，uid="+ uid);
 		}
 		return uid;

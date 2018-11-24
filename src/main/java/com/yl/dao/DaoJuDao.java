@@ -2,7 +2,6 @@ package com.yl.dao;
 
 import java.util.List;
 
-import com.yl.web.po.DaoJu;
 
 public interface DaoJuDao
 {
@@ -21,8 +20,4 @@ public interface DaoJuDao
 	public String deleteDaoJu(String suid, int id);
 
 	public String deleteGift(String suid, int id);
-
-	public List<DaoJu> queryMyProp(String uid, String queryType);
-
-	public List<DaoJu> queryMyGift(String uid, String queryType);
 }

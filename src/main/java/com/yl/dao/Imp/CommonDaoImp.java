@@ -9,8 +9,6 @@ import com.yl.Global.*;
 import com.yl.dao.CommonDao;
 import com.yl.util.Utils;
 import com.yl.vo.UserInfo;
-import com.yl.web.po.DaoJu;
-import com.yl.web.po.PKFriend;
 
 public class CommonDaoImp implements CommonDao
 {
@@ -252,25 +250,6 @@ public class CommonDaoImp implements CommonDao
 		db.executeCommand(sql);
 	}
 
-	public List<DaoJu> reflushAch(String uid)
-	{
-		String sql = "select ctype,num FROM achievement where uid='" + uid
-				+ "'";
-		List<DaoJu> retList = new ArrayList<DaoJu>();
-		ArrayList<?> queryRes = db.executeQuery(sql);
-		if (queryRes != null && queryRes.size() > 0)
-		{
-			for (int i = 0; i < queryRes.size(); i++)
-			{
-				DataRow row = (DataRow) queryRes.get(i);
-				DaoJu dj = new DaoJu();
-				dj.setType(row.getItem("ctype"));
-				dj.setNum(Integer.parseInt(row.getItem("num")));
-				retList.add(dj);
-			}
-		}
-		return retList;
-	}
 
 	public void addPKFriend(UserInfo muinfo, UserInfo fuinfo)
 	{
@@ -304,30 +283,6 @@ public class CommonDaoImp implements CommonDao
 
 	}
 
-	public List<PKFriend> getPKFriends(String uid)
-	{
-
-		String sql = "select mid,mname,mpic,fid,fname,fpic FROM pkfriend where mid='"
-				+ uid + "' or fid='" + uid + "'";
-		List<PKFriend> retList = new ArrayList<PKFriend>();
-		ArrayList<?> queryRes = db.executeQuery(sql);
-		if (queryRes != null && queryRes.size() > 0)
-		{
-			for (int i = 0; i < queryRes.size(); i++)
-			{
-				DataRow row = (DataRow) queryRes.get(i);
-				PKFriend pkf = new PKFriend();
-				pkf.setMuid(row.getItem("mid"));
-				pkf.setFuid(row.getItem("fid"));
-				pkf.setFname(row.getItem("fname"));
-				pkf.setMname(row.getItem("mname"));
-				pkf.setMpic(row.getItem("mpic"));
-				pkf.setFpic(row.getItem("fpic"));
-				retList.add(pkf);
-			}
-		}
-		return retList;
-	}
 
 	public void updateUserWhenLevel(UserInfo uinfo)
 	{

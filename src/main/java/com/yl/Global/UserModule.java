@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 
-import ndb.DBServer;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -26,7 +25,6 @@ import com.yl.service.DaoJuService;
 import com.yl.service.PukeModuleService;
 import com.yl.service.Imp.DaoJuServiceImp;
 import com.yl.service.Imp.PukeModuleServiceImp;
-import com.yl.testcase.testData;
 import com.yl.thread.MemberRemoveBind;
 import com.yl.thread.roomUnit.OfflineDealUnit;
 import com.yl.thread.roomUnit.RoomDealUnit;
@@ -34,7 +32,6 @@ import com.yl.util.*;
 import com.yl.vo.Prop;
 import com.yl.vo.Puke;
 import com.yl.vo.UserInfo;
-import com.yl.web.po.DaoJu;
 import com.yl.container.*;
 
 public class UserModule extends AbstractExtension

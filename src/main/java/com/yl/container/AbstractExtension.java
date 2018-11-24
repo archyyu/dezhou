@@ -1,9 +1,10 @@
 package com.yl.container;
 
 import java.util.LinkedList;
+
+import com.yl.org.json.JSONException;
+import com.yl.org.json.JSONObject;
 import net.n3.nanoxml.IXMLElement;
-import org.json.JSONException;
-import org.json.JSONObject;
 import com.yl.Global.ConstList;
 
 public abstract class AbstractExtension
@@ -127,23 +128,4 @@ public abstract class AbstractExtension
 		}
 	}
 
-	public void sendResponse(net.sf.json.JSONObject jso, int fromRoom,
-			User sender, LinkedList<?> recipients)
-	{
-		try
-		{
-			net.sf.json.JSONObject jsoBody = new net.sf.json.JSONObject();
-			jsoBody.put("r", Integer.valueOf(fromRoom));
-			jsoBody.put("o", jso);
-			net.sf.json.JSONObject jsoMsg = new net.sf.json.JSONObject();
-			jsoMsg.put("t", "xt");
-			jsoMsg.put("b", jsoBody);
-		}
-		catch (net.sf.json.JSONException jsoEx)
-		{
-			ConstList.config.logger
-					.error((new StringBuilder("Error creating JSON response: "))
-							.append(jsoEx).toString());
-		}
-	}
 }

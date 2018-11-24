@@ -10,8 +10,7 @@ import com.yl.container.TimerMessageQuene;
 import com.yl.container.User;
 import com.yl.httpLogic.ConnectInstance;
 
-import com.yl.mail.MailSenderInfo;
-import com.yl.mail.SimpleMailSender;
+import com.yl.ndb.DBServer;
 import com.yl.room.base.IRoom;
 
 import com.yl.util.Utils;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ndb.DBServer;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -1039,29 +1037,7 @@ public class AsynchronousModule implements Runnable
 		
 		if (isvalidEmail(email, userID))
 		{
-//			sql = sql.replace("$uid", userID[0]);
-//			sql = sql.replace("$password", password);
-//			sql = sql.replace("$email", email);
-//			ConstList.config.logger.debug(sql);
-//			db.executeCommand(sql);
-			MailSenderInfo mailInfo = new MailSenderInfo();
-			mailInfo.setMailServerHost("smtp.163.com");
-			mailInfo.setMailServerPort("25");
-			mailInfo.setValidate(true);
-			mailInfo.setUserName("wang735164515@163.com");
-			mailInfo.setPassword("wang86821455");// 您的邮箱密码
-			mailInfo.setFromAddress("wang735164515@163.com");
 
-			mailInfo.setToAddress(email);
-			mailInfo.setSubject("【德州扑克】密码重置");
-			mailInfo.setContent("尊敬的用户" + userID[0] + "【" + userID[1]
-					+ "】，你的密码被重置为【" + password + "】，请妥善保管，避免遗失。");
-			ConstList.config.logger.debug("这个类主要来发送邮件");
-			SimpleMailSender sms = new SimpleMailSender();
-			sms.sendTextMail(mailInfo);// 发送文体格式
-			sms.sendHtmlMail(mailInfo);
-			EchoUserInfo = BackletKit.okXml(
-					"sendEMailOk");
 		}
 		else
 		{

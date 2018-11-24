@@ -29,13 +29,6 @@ public class NettyHttpHandler extends SimpleChannelInboundHandler<Object>
 	
 	private static Logger log = Logger.getLogger(NettyHttpHandler.class);
 
-	@Override
-	protected void messageReceived(ChannelHandlerContext context, Object object)
-			throws Exception
-	{
-		HttpResponse response = handle(object);
-		context.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-	}
 	
 	public HttpResponse handle(Object obj)
 	{
@@ -95,4 +88,9 @@ public class NettyHttpHandler extends SimpleChannelInboundHandler<Object>
         ctx.close();
     }
 
+	@Override
+	protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object object) throws Exception {
+		HttpResponse response = handle(object);
+		channelHandlerContext.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+	}
 }
