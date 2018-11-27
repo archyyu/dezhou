@@ -1,8 +1,6 @@
 package com.yl.dao;
 
-import java.util.List;
-
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public interface CommonDao
 {

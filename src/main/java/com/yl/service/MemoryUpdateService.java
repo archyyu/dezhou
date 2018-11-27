@@ -1,7 +1,6 @@
 package com.yl.service;
 
-import com.yl.vo.Player;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public interface MemoryUpdateService
 {

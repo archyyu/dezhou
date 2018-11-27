@@ -1,4 +1,4 @@
-package com.yl.vo;
+package com.yl.entity;
 
 /**
  * 类GameRecord String userId 当前玩家的uid int sid 当前玩家的座位号 int roomId 当前玩家的房间号 int

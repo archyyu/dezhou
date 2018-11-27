@@ -1,18 +1,15 @@
 package com.yl.thread;
 
-import com.yl.container.*;
-
-import com.yl.ndb.DBServer;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import com.yl.Global.*;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 import static com.yl.ndb.DBServer.*;
 
-public class MemberRemoveBind extends AbstractExtension implements Runnable
+public class MemberRemoveBind  implements Runnable
 {
 	public Thread mrbThread;
 	public String handleName = "";

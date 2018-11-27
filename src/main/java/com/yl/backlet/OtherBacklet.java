@@ -9,8 +9,7 @@ import com.yl.Global.UserInfoMemoryCache;
 import com.yl.backlet.base.DataBacklet;
 import com.yl.container.ActionscriptObject;
 import com.yl.container.SFSObjectSerializer;
-import com.yl.httpLogic.PlayerManager;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class OtherBacklet extends DataBacklet
 {

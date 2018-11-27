@@ -1,4 +1,4 @@
-package com.yl.vo;
+package com.yl.entity;
 
 import java.util.HashMap;
 
@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.yl.Global.ConstList;
-import com.yl.Global.Formula;
 import com.yl.Global.UserModule;
 import com.yl.container.ActionscriptObject;
 import com.yl.util.Config;

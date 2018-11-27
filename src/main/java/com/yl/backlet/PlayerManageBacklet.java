@@ -18,7 +18,7 @@ import com.yl.container.ActionscriptObject;
 import com.yl.container.SFSObjectSerializer;
 import com.yl.httpLogic.PlayerManager;
 import com.yl.thread.AsynchronousModule;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class PlayerManageBacklet extends DataBacklet
 {

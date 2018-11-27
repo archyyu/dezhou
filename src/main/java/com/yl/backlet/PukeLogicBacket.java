@@ -13,8 +13,8 @@ import com.yl.container.SFSObjectSerializer;
 import com.yl.container.User;
 import com.yl.room.base.IPukerGame;
 import com.yl.room.base.IRoom;
-import com.yl.vo.Player;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Player;
+import com.yl.entity.UserInfo;
 
 public class PukeLogicBacket extends DataBacklet
 {

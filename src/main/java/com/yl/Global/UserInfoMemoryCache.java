@@ -3,8 +3,8 @@ package com.yl.Global;
 import java.util.HashMap;
 
 import com.yl.container.ActionscriptObject;
-import com.yl.vo.Campaign;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Campaign;
+import com.yl.entity.UserInfo;
 
 public class UserInfoMemoryCache
 {

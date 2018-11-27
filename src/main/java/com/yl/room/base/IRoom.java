@@ -4,7 +4,7 @@ import com.yl.Global.ConstList.MessageType;
 import com.yl.container.ActionscriptObject;
 import com.yl.container.RoomVariable;
 import com.yl.container.User;
-import com.yl.vo.Player;
+import com.yl.entity.Player;
 
 import java.util.Map;
 

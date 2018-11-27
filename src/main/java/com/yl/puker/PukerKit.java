@@ -18,8 +18,8 @@ import java.util.Set;
 import com.yl.Global.ConstList;
 import com.yl.service.PukeModuleService;
 import com.yl.service.Imp.PukeModuleServiceImp;
-import com.yl.vo.Player;
-import com.yl.vo.Puke;
+import com.yl.entity.Player;
+import com.yl.entity.Puke;
 
 import static com.yl.Global.ConstList.CardState;
 

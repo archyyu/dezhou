@@ -15,8 +15,8 @@ import com.yl.room.base.IRoom;
 
 import com.yl.util.Utils;
 import com.yl.util.XmlReaderUtils;
-import com.yl.vo.Prop;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Prop;
+import com.yl.entity.UserInfo;
 
 import java.io.BufferedReader;
 

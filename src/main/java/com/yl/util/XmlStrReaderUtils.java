@@ -10,7 +10,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 
-import com.yl.vo.MyCard;
+import com.yl.entity.MyCard;
 
 public class XmlStrReaderUtils
 {

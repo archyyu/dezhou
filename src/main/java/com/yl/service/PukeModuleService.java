@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-import com.yl.vo.Player;
-import com.yl.vo.Puke;
+import com.yl.entity.Player;
+import com.yl.entity.Puke;
 
 public interface PukeModuleService
 {

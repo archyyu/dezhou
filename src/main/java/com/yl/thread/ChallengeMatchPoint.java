@@ -4,13 +4,11 @@ import com.yl.db.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import com.yl.Global.UserInfoMemoryCache;
-import com.yl.Global.UserModule;
 import com.yl.util.PayFinalValue;
 import com.yl.util.Utils;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class ChallengeMatchPoint extends java.util.TimerTask
 {

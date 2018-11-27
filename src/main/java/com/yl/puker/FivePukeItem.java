@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.yl.container.ActionscriptObject;
-import com.yl.vo.Puke;
+import com.yl.entity.Puke;
 
 public class FivePukeItem
 {

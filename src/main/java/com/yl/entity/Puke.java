@@ -1,4 +1,4 @@
-package com.yl.vo;
+package com.yl.entity;
 
 import com.yl.container.ActionscriptObject;
 

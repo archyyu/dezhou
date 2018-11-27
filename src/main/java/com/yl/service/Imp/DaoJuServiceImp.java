@@ -1,14 +1,12 @@
 package com.yl.service.Imp;
 
-import java.util.List;
-
 import com.yl.Global.*;
 import com.yl.dao.DaoJuDao;
 import com.yl.dao.Imp.DaoJuDaoImp;
 import com.yl.service.DaoJuService;
 import com.yl.util.Utils;
-import com.yl.vo.Prop;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Prop;
+import com.yl.entity.UserInfo;
 import com.yl.container.AbstractExtension;
 
 public class DaoJuServiceImp extends AbstractExtension implements DaoJuService

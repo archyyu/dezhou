@@ -4,7 +4,7 @@ package com.yl.room.base;
 
 import com.yl.container.ActionscriptObject;
 import com.yl.container.User;
-import com.yl.vo.Player;
+import com.yl.entity.Player;
 
 public interface IPukerGame
 {

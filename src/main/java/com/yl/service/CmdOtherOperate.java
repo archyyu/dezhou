@@ -3,7 +3,7 @@ package com.yl.service;
 import java.util.HashMap;
 
 import com.yl.container.ActionscriptObject;
-import com.yl.vo.Prop;
+import com.yl.entity.Prop;
 
 public interface CmdOtherOperate
 {

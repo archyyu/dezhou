@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.yl.Global.ConstList;
-import com.yl.vo.PukeType;
+import com.yl.entity.PukeType;
 
 /**
  * 2010年4月29日0:03:16

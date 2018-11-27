@@ -8,7 +8,7 @@ import com.yl.Global.AchValue;
 import com.yl.Global.ConstList;
 import com.yl.service.AchievementService;
 import com.yl.service.PukeModuleService;
-import com.yl.vo.Puke;
+import com.yl.entity.Puke;
 
 public class AchievementServiceImp implements AchievementService
 {

@@ -1,9 +1,10 @@
-package com.yl.startup;
-
-import org.apache.log4j.Logger;
+package com.yl;
 
 import com.yl.Global.ConstList;
 import com.yl.Global.UserModule;
+import org.apache.log4j.Logger;
+
+
 import com.yl.backlet.BackletKit;
 import com.yl.httplink.WebService;
 import com.yl.netty.HttpServerKit;
@@ -15,6 +16,13 @@ import com.yl.netty.HttpServerKit;
 public class GsStartup
 {
 	private static Logger log = Logger.getLogger(GsStartup.class);
+
+
+	public static void main()
+	{
+		GsStartup.startUp();
+	}
+
 	
 	public static void startUp()
 	{

@@ -13,25 +13,19 @@ import java.util.Map;
 import java.util.List;
 
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-import com.yl.dao.Imp.DaoJuDaoImp;
+
 import com.yl.room.Room;
 import com.yl.room.base.IRoom;
-import com.yl.service.CmdOtherOperate;
-import com.yl.service.DaoJuService;
 import com.yl.service.PukeModuleService;
-import com.yl.service.Imp.DaoJuServiceImp;
 import com.yl.service.Imp.PukeModuleServiceImp;
 import com.yl.thread.MemberRemoveBind;
 import com.yl.thread.roomUnit.OfflineDealUnit;
 import com.yl.thread.roomUnit.RoomDealUnit;
 import com.yl.util.*;
-import com.yl.vo.Prop;
-import com.yl.vo.Puke;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Prop;
+import com.yl.entity.Puke;
 import com.yl.container.*;
 
 public class UserModule extends AbstractExtension
@@ -41,10 +35,7 @@ public class UserModule extends AbstractExtension
 	private HashMap<String, HashMap<String, String>> roomset;// 房间设置信息
 	private HashMap<String, Prop> propMap;
 
-
-	public DaoJuDaoImp djImp = null;
-	
-	private Logger log = Logger.getLogger(getClass());
+ 	private Logger log = Logger.getLogger(getClass());
 
 	private static UserModule instance = null;
 	
@@ -167,7 +158,7 @@ public class UserModule extends AbstractExtension
 		propMap = XmlReaderUtils.retXmlReaderByProp(ConstList.PropertyFileName);
 		log.info("**propMap init Ok");
 		
-		ConstList.blackWordList = XmlReaderUtils.retXmlReaderByBW(ConstList.BWConfigFileName);
+		ConstList.blackWordList = new HashMap<Integer, String>();
 		log.info("**blackWordList init Ok");
 	}
 	

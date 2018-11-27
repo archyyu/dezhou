@@ -52,39 +52,11 @@ public class ConstList
 	
 	public static HashMap<Integer, String> blackWordList; // 黑话列表
 
-	public static String httpConfigFileName = "session/httpserver/httpserver.xml";
-	
-	public static String dbConfigFileName = "session/version/version.xml";
-	
-	/**
-	 * 
-	 * 指向文件：session/config/common.xml
-	 */
-	public static String roomConfigFileName = "session/config/common.xml";
+	public static String httpConfigFileName = "server.json";
 
-	/**
-	 * 
-	 * 黑名单文件：session/config/common.xml
-	 */
-	public static String BWConfigFileName = "session/global/blackWords.xml";
+	public static String roomConfigFileName = "room.json";
 
-	/**
-	 * 指向文件：session/roomlist/roomlist.xml
-	 */
-	public static String roomOutFileName = "session/roomlist/roomlist.xml";
-	/**
-	 * 指向文件：session/config/prop.xml
-	 */
-	public static String PropertyFileName = "session/config/prop.xml";
-	/**
-	 * 指向文件：session/global/userInfo.xml
-	 */
-
-	/**
-	 * 指向文件：session/player/playerTemplate.xml
-	 */
-	public static String OneUserInfoFileTemplateName = "session/player/playerTemplate.xml";
-
+	public static String dbConfigFileName = "db-config.xml";
 
 	public static final String cpid = "710525";
 	public static final String gameId = "652510052578";

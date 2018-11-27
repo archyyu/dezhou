@@ -25,7 +25,7 @@ import com.yl.container.SFSObjectSerializer;
 import com.yl.container.User;
 import com.yl.util.PayFinalValue;
 import com.yl.util.Utils;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 /**
  * 用户实体对象共分为3类： user_info 用户的属性信息，为用户注册的信息汇总。 user 用户之间互动的信息。 player 用户玩德州扑克的信息。

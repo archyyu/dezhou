@@ -5,10 +5,9 @@ import java.util.HashMap;
 import com.yl.Global.UserInfoMemoryCache;
 import com.yl.service.MemoryUpdateService;
 import com.yl.util.Utils;
-import com.yl.vo.Campaign;
-import com.yl.vo.GoldMatchInfo;
-import com.yl.vo.Player;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Campaign;
+import com.yl.entity.GoldMatchInfo;
+import com.yl.entity.UserInfo;
 
 public class MemoryUpdateServiceImp implements MemoryUpdateService
 {

@@ -7,8 +7,8 @@ import com.yl.Global.PropValues;
 import com.yl.Global.UserInfoMemoryCache;
 import com.yl.dao.InitDao;
 import com.yl.util.Utils;
-import com.yl.vo.Campaign;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Campaign;
+import com.yl.entity.UserInfo;
 
 import com.yl.db.DataRow;
 import com.yl.db.DbManager;

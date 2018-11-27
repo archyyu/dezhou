@@ -1,7 +1,7 @@
 package com.yl.Global;
 
 import java.util.Hashtable;
-import com.yl.vo.Puke;
+import com.yl.entity.Puke;
 
 public class Formula
 {

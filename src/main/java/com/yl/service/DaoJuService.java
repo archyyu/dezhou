@@ -1,9 +1,7 @@
 package com.yl.service;
 
-import java.util.List;
-
-import com.yl.vo.Prop;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Prop;
+import com.yl.entity.UserInfo;
 
 public interface DaoJuService
 {

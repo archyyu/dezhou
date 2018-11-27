@@ -3,12 +3,11 @@ package com.yl.dao.Imp;
 import com.yl.db.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import com.yl.Global.*;
 import com.yl.dao.CommonDao;
 import com.yl.util.Utils;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class CommonDaoImp implements CommonDao
 {

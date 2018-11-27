@@ -2,7 +2,7 @@ package com.yl.service;
 
 import java.util.HashMap;
 
-import com.yl.vo.RoundBet;
+import com.yl.entity.RoundBet;
 
 public interface DispatchBetService
 {

@@ -13,7 +13,7 @@ import com.yl.container.User;
 import com.yl.httpLogic.PlayerManager;
 import com.yl.httplink.RequestHttp;
 import com.yl.util.ChargeUtil;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class BizcontrolBacklet extends DataBacklet
 {

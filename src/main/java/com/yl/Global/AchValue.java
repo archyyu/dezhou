@@ -2,8 +2,6 @@ package com.yl.Global;
 
 import java.util.HashMap;
 
-import com.yl.vo.UserInfo;
-
 public class AchValue
 {
 

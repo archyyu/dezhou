@@ -3,7 +3,7 @@ package com.yl.service;
 import java.util.Map;
 
 import com.yl.container.ActionscriptObject;
-import com.yl.vo.Puke;
+import com.yl.entity.Puke;
 
 
 public interface CmdPukeOperate

@@ -13,13 +13,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import com.yl.Global.*;
+import com.yl.Global.ConstList;
 import com.yl.puker.PukerKit;
 import com.yl.service.PukeModuleService;
 import com.yl.util.Utils;
-import com.yl.vo.Player;
-import com.yl.vo.Puke;
-import com.yl.vo.PukeType;
+import com.yl.entity.Player;
+import com.yl.entity.Puke;
 
 public class PukeModuleServiceImp implements PukeModuleService
 {

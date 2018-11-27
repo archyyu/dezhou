@@ -24,9 +24,9 @@ import com.yl.puker.PukerKit;
 import com.yl.room.base.IPukerGame;
 import com.yl.room.base.IRoom;
 import com.yl.util.Utils;
-import com.yl.vo.Player;
-import com.yl.vo.Puke;
-import com.yl.vo.UserInfo;
+import com.yl.entity.Player;
+import com.yl.entity.Puke;
+import com.yl.entity.UserInfo;
 
 
 public class PukerGame implements IPukerGame

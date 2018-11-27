@@ -1,0 +1,738 @@
+{
+  "roomCollection": {
+    "updateTime": "1330912019780",
+    "rooms": {
+      "room": [{
+        "id": "0",
+        "mixbuy": "200000",
+        "bbet": "20000",
+        "sbet": "10000",
+        "maxbuy": "4000000",
+        "roomtype": "rg",
+        "name": "r77",
+        "showname": "大堡礁"
+      },
+        {
+          "id": "1",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r78",
+          "showname": "皇后镇"
+        },
+        {
+          "id": "2",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r75",
+          "showname": "黄石公园"
+        },
+        {
+          "id": "3",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r76",
+          "showname": "莱茵河"
+        },
+        {
+          "id": "4",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r39",
+          "showname": "阿里山"
+        },
+        {
+          "id": "5",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r79",
+          "showname": "尼罗河"
+        },
+        {
+          "id": "6",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r34",
+          "showname": "颐和园"
+        },
+        {
+          "id": "7",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r33",
+          "showname": "雅鲁藏布江"
+        },
+        {
+          "id": "8",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r38",
+          "showname": "神龙架"
+        },
+        {
+          "id": "9",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r37",
+          "showname": "莫高窟"
+        },
+        {
+          "id": "10",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r36",
+          "showname": "青海湖"
+        },
+        {
+          "id": "11",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r35",
+          "showname": "趵突泉"
+        },
+        {
+          "id": "12",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r04",
+          "showname": "黄山"
+        },
+        {
+          "id": "13",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r05",
+          "showname": "水立方"
+        },
+        {
+          "id": "14",
+          "mixbuy": "40",
+          "bbet": "4",
+          "sbet": "2",
+          "maxbuy": "800",
+          "roomtype": "rg",
+          "name": "r02",
+          "showname": "九寨沟"
+        },
+        {
+          "id": "15",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r03",
+          "showname": "长白山天池"
+        },
+        {
+          "id": "16",
+          "mixbuy": "20",
+          "bbet": "2",
+          "sbet": "1",
+          "maxbuy": "400",
+          "roomtype": "rg",
+          "name": "r01",
+          "showname": "新手乐园"
+        },
+        {
+          "id": "17",
+          "mixbuy": "40000",
+          "bbet": "4000",
+          "sbet": "2000",
+          "maxbuy": "800000",
+          "roomtype": "rg",
+          "name": "r70",
+          "showname": "欢乐谷"
+        },
+        {
+          "id": "18",
+          "mixbuy": "4000",
+          "bbet": "400",
+          "sbet": "200",
+          "maxbuy": "80000",
+          "roomtype": "rg",
+          "name": "r08",
+          "showname": "城隍庙"
+        },
+        {
+          "id": "19",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r74",
+          "showname": "亚马逊"
+        },
+        {
+          "id": "20",
+          "mixbuy": "10000",
+          "bbet": "1000",
+          "sbet": "500",
+          "maxbuy": "200000",
+          "roomtype": "rg",
+          "name": "r09",
+          "showname": "世界之窗"
+        },
+        {
+          "id": "21",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r73",
+          "showname": "金宇塔"
+        },
+        {
+          "id": "22",
+          "mixbuy": "1000",
+          "bbet": "100",
+          "sbet": "50",
+          "maxbuy": "20000",
+          "roomtype": "rg",
+          "name": "r06",
+          "showname": "布达拉宫"
+        },
+        {
+          "id": "23",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r72",
+          "showname": "马尔代夫"
+        },
+        {
+          "id": "24",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r71",
+          "showname": "黄金海岸"
+        },
+        {
+          "id": "25",
+          "mixbuy": "2000",
+          "bbet": "200",
+          "sbet": "100",
+          "maxbuy": "40000",
+          "roomtype": "rg",
+          "name": "r07",
+          "showname": "黄鹤楼"
+        },
+        {
+          "id": "26",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r86",
+          "showname": "多瑙河"
+        },
+        {
+          "id": "27",
+          "mixbuy": "1000000",
+          "bbet": "100000",
+          "sbet": "50000",
+          "maxbuy": "20000000",
+          "roomtype": "rg",
+          "name": "r87",
+          "showname": "香格里拉"
+        },
+        {
+          "id": "28",
+          "mixbuy": "1000000",
+          "bbet": "100000",
+          "sbet": "50000",
+          "maxbuy": "20000000",
+          "roomtype": "rg",
+          "name": "r88",
+          "showname": "好望角"
+        },
+        {
+          "id": "29",
+          "mixbuy": "1000000",
+          "bbet": "100000",
+          "sbet": "50000",
+          "maxbuy": "20000000",
+          "roomtype": "rg",
+          "name": "r89",
+          "showname": "东非大裂谷"
+        },
+        {
+          "id": "30",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r43",
+          "showname": "贺兰山"
+        },
+        {
+          "id": "31",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r42",
+          "showname": "景德镇"
+        },
+        {
+          "id": "32",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r45",
+          "showname": "千岛湖"
+        },
+        {
+          "id": "33",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r44",
+          "showname": "可可西里"
+        },
+        {
+          "id": "34",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r47",
+          "showname": "澳门"
+        },
+        {
+          "id": "35",
+          "mixbuy": "200",
+          "bbet": "20",
+          "sbet": "10",
+          "maxbuy": "4000",
+          "roomtype": "rg",
+          "name": "r46",
+          "showname": "云冈石窟"
+        },
+        {
+          "id": "36",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r49",
+          "showname": "鸟巢"
+        },
+        {
+          "id": "37",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r48",
+          "showname": "武当山"
+        },
+        {
+          "id": "38",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r40",
+          "showname": "楼兰古城"
+        },
+        {
+          "id": "39",
+          "mixbuy": "100",
+          "bbet": "10",
+          "sbet": "5",
+          "maxbuy": "2000",
+          "roomtype": "rg",
+          "name": "r41",
+          "showname": "庐山"
+        },
+        {
+          "id": "40",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r81",
+          "showname": "罗马竞技场"
+        },
+        {
+          "id": "41",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r80",
+          "showname": "雅典卫城"
+        },
+        {
+          "id": "42",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r83",
+          "showname": "巴比伦"
+        },
+        {
+          "id": "43",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r82",
+          "showname": "耶路撒冷"
+        },
+        {
+          "id": "44",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r85",
+          "showname": "大西洋城"
+        },
+        {
+          "id": "45",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r84",
+          "showname": "撒哈拉沙漠"
+        },
+        {
+          "id": "46",
+          "mixbuy": "4000",
+          "bbet": "400",
+          "sbet": "200",
+          "maxbuy": "80000",
+          "roomtype": "rg",
+          "name": "r59",
+          "showname": "富士山"
+        },
+        {
+          "id": "47",
+          "mixbuy": "2000",
+          "bbet": "200",
+          "sbet": "100",
+          "maxbuy": "40000",
+          "roomtype": "rg",
+          "name": "r57",
+          "showname": "桂林山水"
+        },
+        {
+          "id": "48",
+          "mixbuy": "2000",
+          "bbet": "200",
+          "sbet": "100",
+          "maxbuy": "40000",
+          "roomtype": "rg",
+          "name": "r58",
+          "showname": "井冈山"
+        },
+        {
+          "id": "49",
+          "mixbuy": "1000",
+          "bbet": "100",
+          "sbet": "50",
+          "maxbuy": "20000",
+          "roomtype": "rg",
+          "name": "r55",
+          "showname": "杭州西湖"
+        },
+        {
+          "id": "50",
+          "mixbuy": "2000",
+          "bbet": "200",
+          "sbet": "100",
+          "maxbuy": "40000",
+          "roomtype": "rg",
+          "name": "r56",
+          "showname": "长江三峡"
+        },
+        {
+          "id": "51",
+          "mixbuy": "1000",
+          "bbet": "100",
+          "sbet": "50",
+          "maxbuy": "20000",
+          "roomtype": "rg",
+          "name": "r53",
+          "showname": "泰山"
+        },
+        {
+          "id": "52",
+          "mixbuy": "1000",
+          "bbet": "100",
+          "sbet": "50",
+          "maxbuy": "20000",
+          "roomtype": "rg",
+          "name": "r54",
+          "showname": "蓬莱阁"
+        },
+        {
+          "id": "53",
+          "mixbuy": "2000000",
+          "bbet": "200000",
+          "sbet": "100000",
+          "maxbuy": "40000000",
+          "roomtype": "rg",
+          "name": "r16",
+          "showname": "拉斯维加斯"
+        },
+        {
+          "id": "54",
+          "mixbuy": "1000000",
+          "bbet": "100000",
+          "sbet": "50000",
+          "maxbuy": "20000000",
+          "roomtype": "rg",
+          "name": "r15",
+          "showname": "阿尔卑斯山"
+        },
+        {
+          "id": "55",
+          "mixbuy": "400000",
+          "bbet": "40000",
+          "sbet": "20000",
+          "maxbuy": "8000000",
+          "roomtype": "rg",
+          "name": "r14",
+          "showname": "珠穆朗玛峰"
+        },
+        {
+          "id": "56",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r13",
+          "showname": "故宫"
+        },
+        {
+          "id": "57",
+          "mixbuy": "100000",
+          "bbet": "10000",
+          "sbet": "5000",
+          "maxbuy": "2000000",
+          "roomtype": "rg",
+          "name": "r12",
+          "showname": "万里长城"
+        },
+        {
+          "id": "58",
+          "mixbuy": "40000",
+          "bbet": "4000",
+          "sbet": "2000",
+          "maxbuy": "800000",
+          "roomtype": "rg",
+          "name": "r11",
+          "showname": "少林寺"
+        },
+        {
+          "id": "59",
+          "mixbuy": "20000",
+          "bbet": "2000",
+          "sbet": "1000",
+          "maxbuy": "400000",
+          "roomtype": "rg",
+          "name": "r10",
+          "showname": "日月潭"
+        },
+        {
+          "id": "60",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r52",
+          "showname": "香港"
+        },
+        {
+          "id": "61",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r51",
+          "showname": "圆明园"
+        },
+        {
+          "id": "62",
+          "mixbuy": "400",
+          "bbet": "40",
+          "sbet": "20",
+          "maxbuy": "8000",
+          "roomtype": "rg",
+          "name": "r50",
+          "showname": "华山"
+        },
+        {
+          "id": "63",
+          "mixbuy": "40000",
+          "bbet": "4000",
+          "sbet": "2000",
+          "maxbuy": "800000",
+          "roomtype": "rg",
+          "name": "r68",
+          "showname": "滕王阁"
+        },
+        {
+          "id": "64",
+          "mixbuy": "40000",
+          "bbet": "4000",
+          "sbet": "2000",
+          "maxbuy": "800000",
+          "roomtype": "rg",
+          "name": "r69",
+          "showname": "岳阳楼"
+        },
+        {
+          "id": "65",
+          "mixbuy": "10000",
+          "bbet": "1000",
+          "sbet": "500",
+          "maxbuy": "200000",
+          "roomtype": "rg",
+          "name": "r64",
+          "showname": "夏威夷"
+        },
+        {
+          "id": "66",
+          "mixbuy": "20000",
+          "bbet": "2000",
+          "sbet": "1000",
+          "maxbuy": "400000",
+          "roomtype": "rg",
+          "name": "r65",
+          "showname": "克里特"
+        },
+        {
+          "id": "67",
+          "mixbuy": "20000",
+          "bbet": "2000",
+          "sbet": "1000",
+          "maxbuy": "400000",
+          "roomtype": "rg",
+          "name": "r66",
+          "showname": "罗托鲁阿"
+        },
+        {
+          "id": "68",
+          "mixbuy": "20000",
+          "bbet": "2000",
+          "sbet": "1000",
+          "maxbuy": "400000",
+          "roomtype": "rg",
+          "name": "r67",
+          "showname": "蒙地卡罗"
+        },
+        {
+          "id": "70",
+          "mixbuy": "4000",
+          "bbet": "400",
+          "sbet": "200",
+          "maxbuy": "80000",
+          "roomtype": "rg",
+          "name": "r61",
+          "showname": "北海道"
+        },
+        {
+          "id": "71",
+          "mixbuy": "4000",
+          "bbet": "400",
+          "sbet": "200",
+          "maxbuy": "80000",
+          "roomtype": "rg",
+          "name": "r60",
+          "showname": "巴厘岛"
+        },
+        {
+          "id": "72",
+          "mixbuy": "10000",
+          "bbet": "1000",
+          "sbet": "500",
+          "maxbuy": "200000",
+          "roomtype": "rg",
+          "name": "r63",
+          "showname": "普罗旺斯"
+        },
+        {
+          "id": "73",
+          "mixbuy": "10000",
+          "bbet": "1000",
+          "sbet": "500",
+          "maxbuy": "200000",
+          "roomtype": "rg",
+          "name": "r62",
+          "showname": "复活节岛"
+        }
+      ]
+    }
+  }
+}

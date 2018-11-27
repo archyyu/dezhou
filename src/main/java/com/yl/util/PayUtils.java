@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import com.yl.vo.Mol;
+import com.yl.entity.Mol;
 
 public class PayUtils
 {

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-import com.yl.vo.Prop;
+import com.yl.entity.Prop;
 
 import net.n3.nanoxml.IXMLElement;
 import net.n3.nanoxml.IXMLParser;

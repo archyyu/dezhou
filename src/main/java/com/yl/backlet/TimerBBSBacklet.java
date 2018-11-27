@@ -10,7 +10,7 @@ import com.yl.backlet.base.DataBacklet;
 import com.yl.container.SFSObjectSerializer;
 import com.yl.container.User;
 import com.yl.httpLogic.ConnectInstance;
-import com.yl.vo.UserInfo;
+import com.yl.entity.UserInfo;
 
 public class TimerBBSBacklet extends DataBacklet
 {
