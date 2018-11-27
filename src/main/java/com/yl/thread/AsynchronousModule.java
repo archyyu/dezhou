@@ -1119,8 +1119,7 @@ public class AsynchronousModule implements Runnable
 			ActionscriptObject response = new ActionscriptObject();
 
 			if (ConstList.blackWordList == null)
-				ConstList.blackWordList = XmlReaderUtils
-						.retXmlReaderByBW(ConstList.BWConfigFileName);
+				ConstList.blackWordList = new HashMap<Integer, String>();
 			if (msg == null)
 				return false;
 			boolean ifValid = false;

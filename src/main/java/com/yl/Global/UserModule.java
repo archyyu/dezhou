@@ -155,7 +155,7 @@ public class UserModule extends AbstractExtension
 	{
 		PukeModuleService pms = new PukeModuleServiceImp();
 		randomPuke = pms.Puke();
-		propMap = XmlReaderUtils.retXmlReaderByProp(ConstList.PropertyFileName);
+		//propMap = XmlReaderUtils.retXmlReaderByProp(ConstList.PropertyFileName);
 		log.info("**propMap init Ok");
 		
 		ConstList.blackWordList = new HashMap<Integer, String>();
