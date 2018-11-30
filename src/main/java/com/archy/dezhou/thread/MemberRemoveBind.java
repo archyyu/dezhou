@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-import com.yl.Global.*;
+import com.archy.dezhou.Global.*;
 
 public class MemberRemoveBind  implements Runnable
 {

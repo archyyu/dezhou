@@ -1,7 +1,7 @@
 package com.archy.dezhou.service.Imp;
 
 import com.archy.dezhou.Global.PropValues;
-import com.yl.Global.*;
+import com.archy.dezhou.Global.*;
 import com.archy.dezhou.dao.DaoJuDao;
 import com.archy.dezhou.dao.Imp.DaoJuDaoImp;
 import com.archy.dezhou.service.DaoJuService;

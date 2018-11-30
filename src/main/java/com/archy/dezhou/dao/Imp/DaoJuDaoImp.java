@@ -3,7 +3,7 @@ package com.archy.dezhou.dao.Imp;
 import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.dao.DaoJuDao;
 import com.archy.dezhou.db.DbManager;
-import com.yl.db.*;
+import com.archy.dezhou.db.*;
 
 public class DaoJuDaoImp implements DaoJuDao
 {
