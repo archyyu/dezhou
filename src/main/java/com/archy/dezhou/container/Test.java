@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.httpLogic.ConnectInstance;
+import com.archy.dezhou.entity.ConnectInstance;
 
 // test the prosider to getting a msg from a queque 
 public class Test

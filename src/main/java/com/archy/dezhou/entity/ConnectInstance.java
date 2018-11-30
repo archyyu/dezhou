@@ -1,4 +1,4 @@
-package com.archy.dezhou.httpLogic;
+package com.archy.dezhou.entity;
 
 import com.archy.dezhou.container.ActionscriptObject;
 

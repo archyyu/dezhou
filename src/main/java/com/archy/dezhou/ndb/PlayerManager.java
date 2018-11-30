@@ -1,4 +1,4 @@
-package com.archy.dezhou.httpLogic;
+package com.archy.dezhou.ndb;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -14,7 +14,6 @@ import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.MD5;
 import com.archy.dezhou.container.User;
-import com.archy.dezhou.ndb.DBServer;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;

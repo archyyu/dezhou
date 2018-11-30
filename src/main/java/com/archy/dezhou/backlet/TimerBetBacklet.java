@@ -4,7 +4,7 @@ import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.User;
-import com.archy.dezhou.httpLogic.ConnectInstance;
+import com.archy.dezhou.entity.ConnectInstance;
 import com.archy.dezhou.entity.room.base.IRoom;
 import io.netty.handler.codec.http.FullHttpResponse;
 

@@ -6,7 +6,7 @@ import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.httpLogic.ConnectInstance;
+import com.archy.dezhou.entity.ConnectInstance;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;

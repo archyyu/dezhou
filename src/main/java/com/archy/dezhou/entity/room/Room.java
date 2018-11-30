@@ -10,7 +10,7 @@ import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.httpLogic.ConnectInstance;
+import com.archy.dezhou.entity.ConnectInstance;
 import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 

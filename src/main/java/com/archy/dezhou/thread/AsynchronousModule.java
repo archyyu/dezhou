@@ -5,7 +5,7 @@ import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.httpLogic.ConnectInstance;
+import com.archy.dezhou.entity.ConnectInstance;
 import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.Global.UserInfoMemoryCache;
 import com.archy.dezhou.container.SFSObjectSerializer;

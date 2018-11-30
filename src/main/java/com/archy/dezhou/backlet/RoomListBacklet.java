@@ -7,10 +7,14 @@ package com.archy.dezhou.backlet;
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.User;
-import com.archy.dezhou.httpLogic.RoomListLevel;
 import com.archy.dezhou.entity.room.base.IRoom;
 import io.netty.handler.codec.http.FullHttpResponse;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
+import java.util.List;
 import java.util.Map;
 
 public class RoomListBacklet extends DataBacklet
@@ -39,7 +43,7 @@ public class RoomListBacklet extends DataBacklet
 			httpResponse.headers().set("ts", "-1");
 			httpResponse.headers().set("num", "0");
 			
-			xmlByteA = RoomListLevel.getRoomListFromMemory(rt, bb, sb).getBytes();
+			xmlByteA = this.getRoomListFromMemory(rt, bb, sb).getBytes();
 		}
 		else if(subCmd.equals(JOIN))
 		{
@@ -126,6 +130,50 @@ public class RoomListBacklet extends DataBacklet
 					.getBytes();
 		}
 		return xmlByteA;
+	}
+
+	public String getRoomListFromMemory(String roomtype, String bb,
+											   String sb)
+	{
+		List<IRoom> roomlist = UserModule.getInstance().getRoomList();
+		String xmlString = "";
+		Element root = new Element("roomCollection");
+		Element child = new Element("rooms");
+		for (int i = 0; i < roomlist.size(); i++)
+		{
+			IRoom room = roomlist.get(i);
+			Element subchild = new Element("room");
+			subchild.setAttribute("id", "" + room.getRoomId());
+			subchild.setAttribute("name", room.getName());
+			subchild.setAttribute("mu", "" + room.getMaxUsers());
+			int[] usercount = UserModule.getInstance().getplayerNum(room.getName());
+			subchild.setAttribute("uc", "" + usercount[1]);
+			subchild.setAttribute("sc", "" + usercount[2]);
+
+			subchild.setAttribute("mix_buy",room.getValueByKey("mixbuy"));
+			subchild.setAttribute("big_bet",room.getValueByKey("bbet"));
+			subchild.setAttribute("ts",room.getValueByKey("ts"));
+			subchild.setAttribute("small_bet",room.getValueByKey("sbet"));
+			subchild.setAttribute("max_buy",room.getValueByKey("maxbuy"));
+			subchild.setAttribute("roomtype",room.getValueByKey("roomtype"));
+			subchild.setAttribute("creater",room.getValueByKey("creater"));
+			subchild.setAttribute("show_name",room.getValueByKey("showname"));
+
+			if(  roomlist.get(i).getBBet() >= Integer.parseInt(sb)
+					&& roomlist.get(i).getBBet() <= Integer.parseInt(bb))
+			{
+				child.addContent(subchild);
+			}
+		}
+
+		root.addContent(child);
+		Document doc = new Document(root);
+		Format format = Format.getPrettyFormat();
+		format.setEncoding("UTF-8");
+		XMLOutputter outputter = new XMLOutputter();
+		outputter.setFormat(format);
+		xmlString = outputter.outputString(doc);
+		return xmlString;
 	}
 
 }

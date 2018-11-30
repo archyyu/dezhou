@@ -10,7 +10,7 @@ import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.httpLogic.PlayerManager;
+import com.archy.dezhou.ndb.PlayerManager;
 import com.archy.dezhou.thread.AsynchronousModule;
 import io.netty.handler.codec.http.FullHttpResponse;
 
