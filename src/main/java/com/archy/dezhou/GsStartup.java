@@ -32,7 +32,7 @@ public class GsStartup
 			UserModule.getInstance().init();
 			log.warn("UserModule init ok");
 
-			HttpServerKit.initConfig("");
+			HttpServerKit.initConfig();
 			log.warn("Http Server init ok");
 			
 			HttpServerKit.lanuchAllHttpServer();

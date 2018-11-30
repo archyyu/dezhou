@@ -1,17 +1,14 @@
 {
-  "roomCollection": {
-    "updateTime": "1330912019780",
-    "rooms": {
       "room": [{
-        "id": "0",
-        "mixbuy": "200000",
-        "bbet": "20000",
-        "sbet": "10000",
-        "maxbuy": "4000000",
-        "roomtype": "rg",
-        "name": "r77",
-        "showname": "大堡礁"
-      },
+          "id": "0",
+          "mixbuy": "200000",
+          "bbet": "20000",
+          "sbet": "10000",
+          "maxbuy": "4000000",
+          "roomtype": "rg",
+          "name": "r77",
+          "showname": "大堡礁"
+        },
         {
           "id": "1",
           "mixbuy": "200000",
@@ -733,6 +730,4 @@
           "showname": "复活节岛"
         }
       ]
-    }
-  }
 }

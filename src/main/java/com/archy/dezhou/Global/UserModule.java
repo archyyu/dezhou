@@ -18,7 +18,6 @@ import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.service.Imp.PukeModuleServiceImp;
-import com.archy.dezhou.util.XmlReaderUtils;
 import org.apache.log4j.Logger;
 
 
@@ -131,7 +130,7 @@ public class UserModule extends AbstractExtension
 
 		userInfoInit();
 		roomMsgInit();
-		achieveInit(); // edited by ai 2014-7-15
+
 		threadStartInit();
 		this.startRoomThread();
 		
@@ -171,7 +170,7 @@ public class UserModule extends AbstractExtension
 	
 	private void roomMsgInit()
 	{
-		roomset = XmlReaderUtils.retXmlReaderByRoom(ConstList.roomConfigFileName);
+		//roomset = XmlReaderUtils.retXmlReaderByRoom(ConstList.roomConfigFileName);
 		for (String rkey : roomset.keySet())
 		{
 			HashMap<String, String> roomConfig = roomset.get(rkey);
@@ -188,13 +187,6 @@ public class UserModule extends AbstractExtension
 		log.warn("room created ok");
 	}
 
-	private void achieveInit()
-	{
-		
-		new AchValue().init();
-	}
-
-
 	private void threadStartInit()
 	{
 		// 定时永久写入数据库文件。
@@ -207,12 +199,6 @@ public class UserModule extends AbstractExtension
 
 	}
 
-	public void handleRequest(String cmd, String[] params, User who, int roomId)
-	{
-		
-	}
-
-
 
 	// 发数据包给客户
 	public void sendMessageBag(ActionscriptObject aObj, Room r)
@@ -224,87 +210,6 @@ public class UserModule extends AbstractExtension
 	public HashMap<String, Prop> getPropMap()
 	{
 		return propMap;
-	}
-
-	public boolean isValidDaoju(int djid)
-	{
-		int[] djlist = new int[]
-		{ 3, 10, 13, 17, 19, 21, 22, 23, 25, 33, 34, 39, 47, 57, 61, 79, 91,
-				95, 96, 102, 104, 106, 108, 109, 110, 111, 112, 113, 116, 118,
-				119, 120, 121, 122, 123, 126, 127, 128, 129, 130, };
-		for (int i = 0; i < djlist.length; i++)
-		{
-			if (djlist[i] == djid)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String GetConsumeId(int djid)
-	{
-		if (djid < 1 || djid > 131)
-			return "";
-
-		String key = "" + djid;
-		HashMap<String, Prop> propMapList = getPropMap();
-		Prop prop = propMapList.get(key);
-		String consumeIdString = prop.getConsumeCode();
-		try
-		{
-			long consumeId = Long.parseLong(consumeIdString);
-			if (consumeId > 0)
-				return consumeIdString;
-			else
-				return "";
-		}
-		catch (Exception e)
-		{
-			return "";
-		}
-	}
-
-	public int GetConsumeGold(int djid)
-	{
-		log.warn("GetConsumeGold(int " + djid + ") called!");
-		if (djid < 1 || djid > 131)
-			return -2;
-		String key = "" + djid;
-		HashMap<String, Prop> propMapList = getPropMap();
-		log.warn("propMapList.size=" + propMapList.size());
-		for (String myKey : propMapList.keySet())
-		{
-			log.warn("" + myKey + ":"
-					+ propMapList.get(myKey).getName());
-		}
-		Prop prop = propMapList.get(key);
-		int CurrencyAmount = prop.getAmount();
-		log.warn("CurrencyAmount=" + CurrencyAmount);
-		try
-		{
-			if (CurrencyAmount > 0)
-				return CurrencyAmount;
-			else
-				return -3;
-		}
-		catch (Exception e)
-		{
-			return -4;
-		}
-	}
-
-	public int getAdminRoomId()
-	{
-		IRoom room = this.getRoomByName("admin");
-		if (room != null)
-		{
-			return room.getRoomId();
-		}
-		else
-		{
-			return 1;
-		}
 	}
 
 

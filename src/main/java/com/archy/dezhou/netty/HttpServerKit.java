@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -28,25 +30,27 @@ public class HttpServerKit
 	
 	private static List<IHttpServer> httpServerList = new ArrayList<IHttpServer>();
 	
-	public static void initConfig(String folder)
+	public static void initConfig()
 	{
 		try
 		{
-			byte[] bytes = XLoad.getResource(ConstList.httpConfigFileName);
-			SAXReader reader = new SAXReader(); 
-        	StringReader read = new StringReader(new String(bytes));
-        	Document document = reader.read(read);
-        	Element root = document.getRootElement();
-        	
-        	List<Element> list = root.elements();
-        	for(Element subItem : list)
-        	{
-        		String host = subItem.element("host").getText();
-        		int port = Integer.parseInt( subItem.element("port").getText() );
-        		int cnt = Integer.parseInt( subItem.element("threadCnt").getText() );
-        		HttpServer server = new HttpServer(host, port, cnt);
-        		httpServerList.add(server);
-        	}
+
+            String content = new String(XLoad.getResource("server.json"));
+
+            JSONArray list = JSONArray.parseArray(content);
+
+            for(int i=0;i<list.size();i++){
+
+                JSONObject subItem = list.getJSONObject(i);
+
+                String host = subItem.getString("host");
+                int port = Integer.parseInt( subItem.getString("port") );
+                int cnt = Integer.parseInt( subItem.getString("threadCnt") );
+                HttpServer server = new HttpServer("", port, cnt);
+                httpServerList.add(server);
+
+            }
+
 			
 		}
 		catch (Exception e)
