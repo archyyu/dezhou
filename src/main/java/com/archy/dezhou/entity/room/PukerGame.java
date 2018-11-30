@@ -1,4 +1,4 @@
-package com.archy.dezhou.room;
+package com.archy.dezhou.entity.room;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,13 +16,13 @@ import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.Global.PropValues;
 import com.archy.dezhou.Global.UserInfoMemoryCache;
-import com.archy.dezhou.puker.PukerKit;
-import com.archy.dezhou.room.base.IPukerGame;
+import com.archy.dezhou.entity.puker.PukerKit;
+import com.archy.dezhou.entity.room.base.IPukerGame;
 import com.archy.dezhou.util.Utils;
 
 

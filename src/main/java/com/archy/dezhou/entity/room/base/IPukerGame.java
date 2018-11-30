@@ -1,5 +1,5 @@
 
-package com.archy.dezhou.room.base;
+package com.archy.dezhou.entity.room.base;
 
 
 import com.archy.dezhou.container.ActionscriptObject;

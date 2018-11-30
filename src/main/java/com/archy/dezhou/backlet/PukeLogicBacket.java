@@ -11,8 +11,8 @@ import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.User;
-import com.archy.dezhou.room.base.IPukerGame;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IPukerGame;
+import com.archy.dezhou.entity.room.base.IRoom;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.UserInfo;
 

@@ -11,7 +11,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import com.archy.dezhou.Global.UserModule;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 
 public class RoomListLevel
 {

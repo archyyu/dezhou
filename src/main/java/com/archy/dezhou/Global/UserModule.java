@@ -22,15 +22,13 @@ import com.archy.dezhou.util.XmlReaderUtils;
 import org.apache.log4j.Logger;
 
 
-import com.archy.dezhou.room.Room;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.Room;
+import com.archy.dezhou.entity.room.base.IRoom;
 import com.archy.dezhou.service.PukeModuleService;
 import com.archy.dezhou.thread.MemberRemoveBind;
 import com.archy.dezhou.thread.roomUnit.OfflineDealUnit;
 import com.archy.dezhou.thread.roomUnit.RoomDealUnit;
-import com.archy.dezhou.util.*;
 import com.archy.dezhou.entity.Prop;
-import com.archy.dezhou.container.*;
 
 public class UserModule extends AbstractExtension
 {

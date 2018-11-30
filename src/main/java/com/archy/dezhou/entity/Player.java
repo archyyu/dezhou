@@ -11,8 +11,8 @@ import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.Global.ConstList.PlayerCareerState;
 import com.archy.dezhou.Global.ConstList.PlayerGameState;
 import com.archy.dezhou.Global.UserInfoMemoryCache;
-import com.archy.dezhou.puker.FivePukeItem;
-import com.archy.dezhou.puker.PukerKit;
+import com.archy.dezhou.entity.puker.FivePukeItem;
+import com.archy.dezhou.entity.puker.PukerKit;
 import com.archy.dezhou.util.Config;
 
 public class Player

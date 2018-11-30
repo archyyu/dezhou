@@ -1,4 +1,4 @@
-package com.archy.dezhou.room.base;
+package com.archy.dezhou.entity.room.base;
 
 public interface IRoomState
 {

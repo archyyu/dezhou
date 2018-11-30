@@ -1,6 +1,6 @@
 package com.archy.dezhou.thread.roomUnit;
 
-import com.archy.dezhou.room.CommonRoom;
+import com.archy.dezhou.entity.room.CommonRoom;
 import com.archy.dezhou.thread.roomUnit.base.IRoomDealUnit;
 import org.apache.log4j.Logger;
 

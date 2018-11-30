@@ -1,4 +1,4 @@
-package com.archy.dezhou.room;
+package com.archy.dezhou.entity.room;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,7 +11,7 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.UserInfo;
 import com.archy.dezhou.httpLogic.ConnectInstance;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.util.HeartTimer;
@@ -19,8 +19,8 @@ import com.archy.dezhou.Global.PropValues;
 import com.archy.dezhou.Global.UserInfoMemoryCache;
 import com.archy.dezhou.container.RoomVariable;
 import com.archy.dezhou.container.TimerMessageQuene;
-import com.archy.dezhou.room.base.IPukerGame;
-import com.archy.dezhou.room.base.IRoomState;
+import com.archy.dezhou.entity.room.base.IPukerGame;
+import com.archy.dezhou.entity.room.base.IRoomState;
 import com.archy.dezhou.util.Utils;
 
 public class Room implements IRoom

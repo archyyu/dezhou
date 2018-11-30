@@ -8,7 +8,7 @@ import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.httpLogic.RoomListLevel;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;

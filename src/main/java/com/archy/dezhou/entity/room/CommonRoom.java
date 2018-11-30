@@ -1,4 +1,4 @@
-package com.archy.dezhou.room;
+package com.archy.dezhou.entity.room;
 
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.container.User;

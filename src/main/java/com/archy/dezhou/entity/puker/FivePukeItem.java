@@ -1,4 +1,4 @@
-package com.archy.dezhou.puker;
+package com.archy.dezhou.entity.puker;
 
 import java.util.ArrayList;
 import java.util.Collections;

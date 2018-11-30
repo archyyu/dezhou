@@ -1,4 +1,4 @@
-package com.archy.dezhou.puker;
+package com.archy.dezhou.entity.puker;
 
 /**
  *@author archy_yu 

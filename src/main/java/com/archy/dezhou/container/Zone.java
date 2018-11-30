@@ -1,6 +1,6 @@
 package com.archy.dezhou.container;
 
-import com.archy.dezhou.room.Room;
+import com.archy.dezhou.entity.room.Room;
 
 import java.util.*;
 

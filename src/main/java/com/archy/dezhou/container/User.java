@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.httpLogic.ConnectInstance;
-import com.archy.dezhou.room.Room;
+import com.archy.dezhou.entity.room.Room;
 
 public class User
 {

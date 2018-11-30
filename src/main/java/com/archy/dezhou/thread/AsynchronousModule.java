@@ -12,7 +12,7 @@ import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.TimerMessageQuene;
 
 import com.archy.dezhou.ndb.DBServer;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 
 import com.archy.dezhou.util.Utils;
 import com.archy.dezhou.entity.Prop;

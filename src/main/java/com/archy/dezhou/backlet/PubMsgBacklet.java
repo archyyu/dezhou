@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.container.User;
-import com.archy.dezhou.room.base.IRoom;
+import com.archy.dezhou.entity.room.base.IRoom;
 import com.archy.dezhou.thread.AsynchronousModule;
 
 public class PubMsgBacklet extends DataBacklet
