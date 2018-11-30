@@ -19,7 +19,7 @@ import sun.misc.BASE64Decoder;
 
 import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.netty.base.IHttpServer;
-import com.archy.dezhou.xload.XLoad;
+import com.archy.dezhou.util.XLoad;
 
 
 public class HttpServerKit

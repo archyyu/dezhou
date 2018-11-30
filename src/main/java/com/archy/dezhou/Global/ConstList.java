@@ -9,7 +9,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.archy.dezhou.util.Config;
-import com.archy.dezhou.xload.XLoad;
+import com.archy.dezhou.util.XLoad;
 
 public class ConstList
 {

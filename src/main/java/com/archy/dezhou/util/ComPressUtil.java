@@ -1,14 +1,13 @@
 package com.archy.dezhou.util;
 
-import com.archy.dezhou.jzlib.JZlib;
-import com.archy.dezhou.jzlib.ZInputStream;
-import com.archy.dezhou.jzlib.ZOutputStream;
+import com.archy.dezhou.util.jzlib.JZlib;
+import com.archy.dezhou.util.jzlib.ZInputStream;
+import com.archy.dezhou.util.jzlib.ZOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 
