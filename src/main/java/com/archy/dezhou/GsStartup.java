@@ -3,7 +3,6 @@ package com.archy.dezhou;
 import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.backlet.BackletKit;
-import com.archy.dezhou.httplink.WebService;
 import com.archy.dezhou.netty.HttpServerKit;
 import org.apache.log4j.Logger;
 
@@ -32,10 +31,7 @@ public class GsStartup
 			
 			UserModule.getInstance().init();
 			log.warn("UserModule init ok");
-			
-			WebService.init();
-			log.warn("WebService init ok");
-			
+
 			HttpServerKit.initConfig("");
 			log.warn("Http Server init ok");
 			

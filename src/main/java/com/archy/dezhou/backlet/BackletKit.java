@@ -25,7 +25,6 @@ public class BackletKit
 		backlets.put("TimerBBS", new TimerBBSBacklet());
 		backlets.put("other", new OtherBacklet());
 		backlets.put("scriptName", new ScriptNameBacklet());
-		backlets.put("bizcontrol", new BizcontrolBacklet());
 		backlets.put("pubMsg", new PubMsgBacklet());
 	}
 	
