@@ -5,7 +5,6 @@ package com.archy.dezhou.backlet;
  **/
 
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.User;
 import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
@@ -70,12 +69,12 @@ public class RoomListBacklet extends DataBacklet
 //				{
 //					return BackletKit.infoXml("haveBeenEntered").getBytes();
 //				}
-				oldRoom.userLeave(user);
+				oldRoom.playerLeave(user);
 				
 //				ConstList.config.logger.info(" leave oldroom: "  + oldRoom.getRoomId() +  " user:" +user);
 			}
 			
-			if(room.isUserInRoom(user))
+			if(room.isPlayerInRoom(user))
 			{
 				//TODO error
 			}
@@ -112,7 +111,7 @@ public class RoomListBacklet extends DataBacklet
 			}
 			
 			
-			int lea = room.userLeave(user);
+			int lea = room.playerLeave(user);
 			
 			if(lea == 0)
 			{

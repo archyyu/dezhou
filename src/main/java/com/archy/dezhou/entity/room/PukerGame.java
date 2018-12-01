@@ -17,9 +17,7 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import org.apache.log4j.Logger;
 
-import com.archy.dezhou.global.PropValues;
 import com.archy.dezhou.entity.puker.PukerKit;
-import com.archy.dezhou.util.Utils;
 
 
 public class PukerGame
@@ -97,7 +95,7 @@ public class PukerGame
                     {
                         log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId()
                                 + " userId: " + tempPlayer.getUid() + " 两次弃牌，导致被站起 ");
-                        room.userStandUp(tempPlayer.getUid(),true);
+                        room.playerStandUp(tempPlayer.getUid(),true);
                     }
 				}
 			}
@@ -150,7 +148,7 @@ public class PukerGame
 		{
 			if(entry.getValue().getRmoney() < this.room.getBbet())
 			{
-				this.room.userStandUp(entry.getValue().getUid(),true);
+				this.room.playerStandUp(entry.getValue().getUid(),true);
 			}
 		}
 	}

@@ -12,7 +12,6 @@ import com.archy.dezhou.entity.Puke;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.util.HeartTimer;
-import com.archy.dezhou.global.PropValues;
 import com.archy.dezhou.util.Utils;
 
 public class Room
@@ -30,15 +29,11 @@ public class Room
 	private boolean isLimbo;
 	private String zone;
 
-	public boolean isUserInRoom(Player user)
+	public boolean isPlayerInRoom(Player user)
 	{
 		return this.playerMap.containsValue(user);
 	}
 
-	public boolean isUserSitdown(Player user)
-	{
-		return this.spectatorList.contains(user);
-	}
 
 	public int getMaxSpectator()
 	{
@@ -55,7 +50,7 @@ public class Room
 		this.playerMap.remove(seatId);
 	}
 	
-	public ActionscriptObject userSitDown(int seatId,Player player, int cb)
+	public ActionscriptObject playerSitDown(int seatId, Player player, int cb)
 	{
 		ActionscriptObject response = new ActionscriptObject();
 		ActionscriptObject userAobj = new ActionscriptObject();
@@ -90,6 +85,9 @@ public class Room
 		log.info("roomName: " + this.getName() + "  " + player.getUid() + " try to sitdown at seatId: " + seatId);
 		this.spectatorList.remove(player);
 
+		player.clearRoomMoney();
+		player.addRmoney(cb);
+		player.deductAmoney(cb);
 
 		this.addPlayer(seatId,player);
 
@@ -122,12 +120,12 @@ public class Room
 		response.put("user", userAobj);
 		response.put("issit", "no");
 
-		this.addUser(seatId,player);
+		this.addPlayer(seatId,player);
 		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		return response;
 	}
 	
-	public ActionscriptObject userStandUp(Integer uid, boolean notifyMySelf)
+	public ActionscriptObject playerStandUp(Integer uid, boolean notifyMySelf)
 	{
 
 		log.info("roomName: " + this.getName() + " try standup users: "  + uid);
@@ -234,15 +232,9 @@ public class Room
 		}
 	}
 
-	public int userLeave(Player user)
+	public int playerLeave(Player user)
 	{
 		this.forceRemoveUser(user);
-		return 0;
-	}
-
-	public int addUser(int seatId,Player u)
-	{
-		this.playerMap.put(seatId,u);
 		return 0;
 	}
 
@@ -287,7 +279,7 @@ public class Room
 			if(user.isStandUpExpired(now))
 			{
 				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " standUp expired");
-				this.userStandUp(user.getUid(),true);
+				this.playerStandUp(user.getUid(),true);
 			}
 		}
 
@@ -302,7 +294,7 @@ public class Room
 					continue;
 				}
 				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " leave room expired");
-				this.userLeave(user);
+				this.playerLeave(user);
 			}
 		}
 
@@ -391,7 +383,7 @@ public class Room
 	{
 		if(this.isPlayerSitDown(u.getUid()))
 		{
-			this.userStandUp(u.getUid(),true);
+			this.playerStandUp(u.getUid(),true);
 		}
 
 		this.spectatorList.remove(u);

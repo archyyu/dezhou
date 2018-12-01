@@ -12,7 +12,6 @@ import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.User;
 
 public class PukeLogicBacket extends DataBacklet
 {
@@ -90,11 +89,11 @@ public class PukeLogicBacket extends DataBacklet
 					{
 						return BackletKit.infoXml("UserManagerParmsIsValid").getBytes();
 					}
-					asObj = room.userSitDown(seatId,user,cb);
+					asObj = room.playerSitDown(seatId,user,cb);
 				}
 				else if(cmd.equals(ConstList.CMD_STANDUP))
 				{
-					asObj = room.userStandUp(user.getUid(),false);
+					asObj = room.playerStandUp(user.getUid(),false);
 					if(game != null)
 					{
 						if(room.isGame() && game.isGameOverWhenDropCard())
@@ -105,7 +104,7 @@ public class PukeLogicBacket extends DataBacklet
 				}
 				else if(cmd.equals(ConstList.CMD_LEAVE))
 				{
-					room.userLeave(user);
+					room.playerLeave(user);
 					
 					log.info("room : " + room + "   leave user: " + user + "   player:" + player);
 					asObj = game.playerLeave(player);
