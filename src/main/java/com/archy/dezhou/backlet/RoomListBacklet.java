@@ -4,7 +4,7 @@ package com.archy.dezhou.backlet;
  *@author archy_yu 
  **/
 
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.room.base.IRoom;

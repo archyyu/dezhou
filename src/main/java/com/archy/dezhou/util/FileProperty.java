@@ -4,7 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 
 public class FileProperty
 {

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.util.Config;

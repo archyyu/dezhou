@@ -3,7 +3,7 @@ package com.archy.dezhou.thread.roomUnit;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 

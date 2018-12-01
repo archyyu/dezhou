@@ -9,8 +9,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
@@ -19,8 +19,8 @@ import com.archy.dezhou.entity.UserInfo;
 import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
-import com.archy.dezhou.Global.PropValues;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
+import com.archy.dezhou.global.PropValues;
+import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.entity.puker.PukerKit;
 import com.archy.dezhou.entity.room.base.IPukerGame;
 import com.archy.dezhou.util.Utils;

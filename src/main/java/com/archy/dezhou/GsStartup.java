@@ -1,7 +1,7 @@
 package com.archy.dezhou;
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.netty.HttpServerKit;
 import org.apache.log4j.Logger;

@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.entity.PukeType;
 
 /**

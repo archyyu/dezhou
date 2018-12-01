@@ -1,4 +1,4 @@
-package com.archy.dezhou.Global;
+package com.archy.dezhou.global;
 
 import java.util.HashMap;
 

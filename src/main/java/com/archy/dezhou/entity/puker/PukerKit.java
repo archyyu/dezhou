@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.service.Imp.PukeModuleServiceImp;

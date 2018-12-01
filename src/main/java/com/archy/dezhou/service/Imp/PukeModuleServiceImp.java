@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.entity.puker.PukerKit;
 import com.archy.dezhou.service.PukeModuleService;
 import com.archy.dezhou.util.Utils;

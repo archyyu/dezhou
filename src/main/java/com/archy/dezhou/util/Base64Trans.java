@@ -1,6 +1,6 @@
 package com.archy.dezhou.util;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 

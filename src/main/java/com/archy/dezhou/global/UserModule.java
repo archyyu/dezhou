@@ -1,4 +1,4 @@
-package com.archy.dezhou.Global;
+package com.archy.dezhou.global;
 
 /**
  * @author archy_yu

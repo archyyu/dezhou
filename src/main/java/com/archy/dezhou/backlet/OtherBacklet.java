@@ -1,7 +1,7 @@
 package com.archy.dezhou.backlet;
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
@@ -91,7 +91,7 @@ public class OtherBacklet extends DataBacklet
 					response.put("info", "教程完毕，赠送1000筹码！");
 					uinfo.isTeachFinished = "1";
 					StringBuffer sb = new StringBuffer();
-//					PlayerManager.writeUserInfo2XmlFile(uinfo, HANDLENAME);
+//					PlayerService.writeUserInfo2XmlFile(uinfo, HANDLENAME);
 					sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 					xmlByteA = SFSObjectSerializer.obj2xml(
 							response, 0, "", sb);

@@ -4,7 +4,6 @@ package com.archy.dezhou.netty;
  *@author archy_yu 
  **/
 
-import java.io.StringReader;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +12,9 @@ import java.util.ArrayList;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 
 import sun.misc.BASE64Decoder;
 
-import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.netty.base.IHttpServer;
 import com.archy.dezhou.util.XLoad;
 

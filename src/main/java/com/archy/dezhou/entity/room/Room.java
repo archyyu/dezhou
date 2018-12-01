@@ -4,8 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSONObject;
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
@@ -15,9 +14,8 @@ import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.util.HeartTimer;
-import com.archy.dezhou.Global.PropValues;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
-import com.archy.dezhou.container.RoomVariable;
+import com.archy.dezhou.global.PropValues;
+import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.entity.room.base.IPukerGame;
 import com.archy.dezhou.entity.room.base.IRoomState;
 import com.archy.dezhou.util.Utils;

@@ -3,7 +3,7 @@ package com.archy.dezhou.container;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 
 public class KickedUser
 {

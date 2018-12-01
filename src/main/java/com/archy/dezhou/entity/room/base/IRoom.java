@@ -1,10 +1,9 @@
 package com.archy.dezhou.entity.room.base;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.container.RoomVariable;
 
 import java.util.Map;
 

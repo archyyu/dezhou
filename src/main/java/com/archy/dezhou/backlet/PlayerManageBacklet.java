@@ -4,13 +4,13 @@ package com.archy.dezhou.backlet;
  *@author archy_yu 
  **/
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.ndb.PlayerManager;
+import com.archy.dezhou.service.PlayerService;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.HashMap;
@@ -55,7 +55,7 @@ public class PlayerManageBacklet extends DataBacklet
 			}
 			else
 			{
-				xmlByteA = PlayerManager.UserLogin(userName,
+				xmlByteA = PlayerService.UserLogin(userName,
 						userPassword, false,
 						userid, key, 0, false);
 				xmlByteA = BackletKit.SimpleObjectXml(xmlByteA);
@@ -70,7 +70,7 @@ public class PlayerManageBacklet extends DataBacklet
 			String userid = parms.get("userid");
 			String key = parms.get("key");
 
-			String uid = PlayerManager
+			String uid = PlayerService
 					.getUidFromMobileUserid(userid);
 			if (userid.length() > 0 && !uid.equals("-1"))
 			{
@@ -80,7 +80,7 @@ public class PlayerManageBacklet extends DataBacklet
 			}
 			if (auto.equals("yes"))
 			{
-				HashMap<String, String> userinfoList = PlayerManager
+				HashMap<String, String> userinfoList = PlayerService
 						.AutoRegister(userid, key);
 				if (userinfoList != null
 						&& userinfoList.get("name") != null
@@ -89,7 +89,7 @@ public class PlayerManageBacklet extends DataBacklet
 					response.headers().set("cmd", "autoregister");
 					response.headers().set("ts", "-1");
 					response.headers().set("num", "0");
-					xmlByteA = PlayerManager.UserLogin( userinfoList.get("name"),
+					xmlByteA = PlayerService.UserLogin( userinfoList.get("name"),
 							userinfoList.get("password"),true,
 							userid, key, 0, false);
 					
@@ -98,7 +98,7 @@ public class PlayerManageBacklet extends DataBacklet
 				else if (userid != null
 						&& !userid.trim().equals(""))
 				{
-					xmlByteA = PlayerManager.UserLogin("", "", false,
+					xmlByteA = PlayerService.UserLogin("", "", false,
 							 userid, key, 1,
 							false);
 					xmlByteA = BackletKit.SimpleObjectXml(xmlByteA);
@@ -120,7 +120,7 @@ public class PlayerManageBacklet extends DataBacklet
 				response.headers().set("cmd", "register");
 				response.headers().set("ts", "-1");
 				response.headers().set("num", "0");
-				xmlByteA = PlayerManager.Register(userName, password, email, gendar, birthday, userid, key);
+				xmlByteA = PlayerService.Register(userName, password, email, gendar, birthday, userid, key);
 			}
 		}
 		else if(subCmd.equals(REGISTERUPDATE))
@@ -154,7 +154,7 @@ public class PlayerManageBacklet extends DataBacklet
 				XmlError = BackletKit.errorXml("UserNotLogined");
 				xmlByteA = XmlError.getBytes();
 			}
-			else if (PlayerManager.ifRegistered(name, ""))
+			else if (PlayerService.ifRegistered(name, ""))
 			{
 				XmlError = BackletKit.errorXml("userNameIsRepeat");
 				xmlByteA = XmlError.getBytes();
@@ -183,10 +183,10 @@ public class PlayerManageBacklet extends DataBacklet
 					PassWordInfo.put("np", newPassword);
 				}
 				
-				ActionscriptObject upodatetatus = PlayerManager.UpdateUserInfo(uinfo, PassWordInfo);
+				ActionscriptObject upodatetatus = PlayerService.UpdateUserInfo(uinfo, PassWordInfo);
 				ActionscriptObject asResponse = null;
 
-				asResponse = PlayerManager.getUinfo(uinfo, true);
+				asResponse = PlayerService.getUinfo(uinfo, true);
 
 				if (upodatetatus == null)
 				{
@@ -222,7 +222,7 @@ public class PlayerManageBacklet extends DataBacklet
 				xmlByteA = BackletKit.errorXml("parmsInInvalid")
 						.getBytes();
 			}
-			else if (!PlayerManager.isvalidEmail(email, userID))
+			else if (!PlayerService.isvalidEmail(email, userID))
 			{
 				xmlByteA = BackletKit.errorXml("EmailIsinValid")
 						.getBytes();
@@ -263,11 +263,11 @@ public class PlayerManageBacklet extends DataBacklet
 					ActionscriptObject asResponse = null;
 					if (uid.equals(cuid)) // edited by 2014-8-2
 					{
-						asResponse = PlayerManager.getUinfo(uinfo, true);
+						asResponse = PlayerService.getUinfo(uinfo, true);
 					}
 					else
 					{
-						asResponse = PlayerManager.getUinfo(cuinfo, false);
+						asResponse = PlayerService.getUinfo(cuinfo, false);
 					}
 					StringBuffer sb = new StringBuffer();
 					sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -301,14 +301,14 @@ public class PlayerManageBacklet extends DataBacklet
 					String destFilename = "session/player/"
 							+ subFolderName + "/" + uid
 							+ "_info.xml";
-//					PlayerManager.writeUserInfo2XmlFile(uinfo, HANDLENAME);
+//					PlayerService.writeUserInfo2XmlFile(uinfo, HANDLENAME);
 					SAXBuilder builder = new SAXBuilder(false);
 					ActionscriptObject PassWordInfo = new ActionscriptObject();
 
-					ActionscriptObject upodatetatus = PlayerManager.UpdateUserInfo(uinfo, PassWordInfo);
+					ActionscriptObject upodatetatus = PlayerService.UpdateUserInfo(uinfo, PassWordInfo);
 					ActionscriptObject asResponse = null;
 
-					asResponse = PlayerManager.getUinfo(uinfo, true);
+					asResponse = PlayerService.getUinfo(uinfo, true);
 
 					if (upodatetatus == null)
 					{

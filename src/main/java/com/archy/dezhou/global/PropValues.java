@@ -1,4 +1,4 @@
-package com.archy.dezhou.Global;
+package com.archy.dezhou.global;
 
 /**
  * 该类表示道具的一些属性值

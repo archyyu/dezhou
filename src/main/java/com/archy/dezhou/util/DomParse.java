@@ -8,11 +8,10 @@ import java.io.PrintWriter;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class DomParse extends DefaultHandler

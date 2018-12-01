@@ -1,14 +1,14 @@
 package com.archy.dezhou.backlet;
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserInfoMemoryCache;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.ndb.PlayerManager;
+import com.archy.dezhou.service.PlayerService;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class ScriptNameBacklet extends DataBacklet
 			String key = parms.get("key") == null ? "": parms.get("key");
 			//1 ：真实手机  2：模拟器
 			String uid = "-1";
-			uid = PlayerManager.getUidFromMobileUserid(userid);
+			uid = PlayerService.getUidFromMobileUserid(userid);
 			User user = null;
 			//该用户已经注册了，判断他是否在线
 			if(!uid.equals("-1"))
@@ -46,13 +46,13 @@ public class ScriptNameBacklet extends DataBacklet
 			//新用户，还没有注册过
 			if(user == null && userid.length() >4 && key.length() >25 && uid.equals("-1"))
 			{
-				HashMap<String, String> userinfoList = PlayerManager.AutoRegister(userid, key);
+				HashMap<String, String> userinfoList = PlayerService.AutoRegister(userid, key);
 				if(userinfoList.get("name") != null && userinfoList.get("password") != null)
 				{
 					httpResponse.headers().set("cmd", "autoregister");
 					httpResponse.headers().set("ts", "-1");
 					httpResponse.headers().set("num", "0");
-					xmlByteA = PlayerManager.UserLogin(userinfoList.get("name"),userinfoList.get("password"),true,userid,key,1,false);
+					xmlByteA = PlayerService.UserLogin(userinfoList.get("name"),userinfoList.get("password"),true,userid,key,1,false);
 					xmlByteA = BackletKit.SimpleObjectXml(xmlByteA);
 				}
 				else 
@@ -66,11 +66,11 @@ public class ScriptNameBacklet extends DataBacklet
 			{
 				if(resetPassword.equals("yes"))
 				{
-					xmlByteA =  PlayerManager.UserLogin("","",false,userid,key,1,true);
+					xmlByteA =  PlayerService.UserLogin("","",false,userid,key,1,true);
 				}
 				else
 				{
-					xmlByteA =  PlayerManager.UserLogin("","",false,userid,key,1,false);
+					xmlByteA =  PlayerService.UserLogin("","",false,userid,key,1,false);
 				}
 				
 				log.info("老用户并且没有登陆");
@@ -82,21 +82,21 @@ public class ScriptNameBacklet extends DataBacklet
 				user.bbx_mobile = mobile;
 				user.bbx_userId = userid;
 				user.bbx_userkey = key;
-//				PlayerManager.writeUserStatus2XmlFile(user,"nosend");
+//				PlayerService.writeUserStatus2XmlFile(user,"nosend");
 				UserInfo uinfo  = UserInfoMemoryCache.getUserInfo(uid);
-				ActionscriptObject response = PlayerManager.getUinfo(uinfo,true);
+				ActionscriptObject response = PlayerService.getUinfo(uinfo,true);
 				response.put("Ver", ConstList.gameVersion);
 				response.put("key", user.bbx_userkey);
 
 				if(resetPassword.equals("yes"))
 				{
-					response.put("password",PlayerManager.resetPasswd(uinfo));
+					response.put("password", PlayerService.resetPasswd(uinfo));
 				}
 
-				ActionscriptObject djObjList =PlayerManager.getUsedDj(uinfo, user);
-				int[][] diamondList = PlayerManager.getDiamondList(djObjList,uinfo);
-				response.put("diamond", PlayerManager.getDiamondListStr(diamondList));
-				response.put("vip", PlayerManager.getVipid(djObjList,uinfo)+"");
+				ActionscriptObject djObjList = PlayerService.getUsedDj(uinfo, user);
+				int[][] diamondList = PlayerService.getDiamondList(djObjList,uinfo);
+				response.put("diamond", PlayerService.getDiamondListStr(diamondList));
+				response.put("vip", PlayerService.getVipid(djObjList,uinfo)+"");
 
 				StringBuffer sb = new StringBuffer();
 				sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

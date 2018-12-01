@@ -1,7 +1,6 @@
-package com.archy.dezhou.Global;
+package com.archy.dezhou.global;
 
 import java.io.StringReader;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;

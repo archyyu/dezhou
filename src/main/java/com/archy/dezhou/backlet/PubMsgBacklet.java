@@ -5,7 +5,7 @@ import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;
 
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.room.base.IRoom;
 

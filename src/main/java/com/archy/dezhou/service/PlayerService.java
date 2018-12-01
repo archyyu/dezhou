@@ -1,4 +1,4 @@
-package com.archy.dezhou.ndb;
+package com.archy.dezhou.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -18,9 +18,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-import com.archy.dezhou.Global.ConstList;
-import com.archy.dezhou.Global.UserInfoMemoryCache;
-import com.archy.dezhou.Global.UserModule;
+import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.global.UserInfoMemoryCache;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.util.PayFinalValue;
 import com.archy.dezhou.util.Utils;
@@ -29,17 +29,17 @@ import com.archy.dezhou.entity.UserInfo;
 /**
  * 用户实体对象共分为3类： user_info 用户的属性信息，为用户注册的信息汇总。 user 用户之间互动的信息。 player 用户玩德州扑克的信息。
  */
-public class PlayerManager
+public class PlayerService
 {
 
+	protected static Logger log = Logger.getLogger(PlayerService.class);
 	/*******************************************************************************
 	 * 操作UserInfoMemoryCache.userinfo单个元素的方法相关。 从数据库中获得单个用户的属性信息userinfo。
 	 * 关键字：uid_info.xml
 	 */
-	
-	private static SqlSessionFactory	sqlMapper	= DBServer.getInstance().getSqlMapper();
-	protected static Logger log = Logger.getLogger(PlayerManager.class);
-	
+
+	private static SqlSessionFactory	sqlMapper	= null;
+
 	@SuppressWarnings("unchecked")
 	public static UserInfo NewUserInfoFromDb(String uid)
 	{
@@ -56,16 +56,16 @@ public class PlayerManager
 		}
 		finally
 		{
-			session.close();	
+			session.close();
 		}
-		
+
 
 		if(getUserInfo != null && getUserInfo.size() > 0)
 		{
 			UserInfo usInfo = getUserInfoData((UserInfo) getUserInfo.get(0));
 			return usInfo;
 		}
-		else 
+		else
 		{
 			log.warn(" 错误！userInfo=" );
 			return null;
@@ -75,7 +75,7 @@ public class PlayerManager
 	public static UserInfo getUserInfoData(UserInfo usInfo)
 	{
 		UserInfo userInfo = usInfo;
-		
+
 		String ifrewards = String.valueOf(usInfo.getIfRewards());
 		if (ifrewards != null && ifrewards.length() > 4)
 		{
@@ -89,26 +89,26 @@ public class PlayerManager
 		String todayStr = Utils.getDateToStr(0);
 		userInfo.setDateStr(todayStr);
 		UserInfoMemoryCache.addUserInfo(userInfo);
-		
+
 		return userInfo;
 	}
-	
-	
+
+
 
 	public static ActionscriptObject UpdateUserInfo(UserInfo userInfo, ActionscriptObject passwordInfo)
-	{	
+	{
 		ActionscriptObject UpdateStatus = new ActionscriptObject();
-		
+
 		String name = "";
-		try 
+		try
 		{
 			name = URLDecoder.decode(userInfo.getName(),"UTF-8");
 		}
-		catch (UnsupportedEncodingException e) 
+		catch (UnsupportedEncodingException e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		if (passwordInfo.size() != 2)
 		{
 			userInfo.setName(name);
@@ -122,25 +122,25 @@ public class PlayerManager
 			int rcount = 0;
 			userInfo.setSaveUpdate(false);
 			String psd = MD5.instance().getHash(passwordInfo.getString("op"));
-			log.warn(" userInfo MD5 getPassWord= " + userInfo.getPassWord() 
+			log.warn(" userInfo MD5 getPassWord= " + userInfo.getPassWord()
 				+ " MD5 oldPsd="  + psd);
-			
+
 			if(userInfo.getPassWord().equals(psd))
 			{
-				log.warn(" userInfo getPassWord= " + passwordInfo.getString("op"));				
+				log.warn(" userInfo getPassWord= " + passwordInfo.getString("op"));
 				rcount = 1;
 			}
-					
+
 			if(rcount > 0)
 			{
 				String newPassword = MD5.instance().getHash(passwordInfo.getString("np"));
-				userInfo.setPassWord(newPassword);	
-				userInfo.setSaveUpdate(true);			
+				userInfo.setPassWord(newPassword);
+				userInfo.setSaveUpdate(true);
 				log.warn(" updateInfo MD5 userPassword=" + userInfo.getPassWord()
-					+ "   userPassword=" + passwordInfo.getString("np"));			
+					+ "   userPassword=" + passwordInfo.getString("np"));
 				UpdateStatus.put("status", "updateUserInfoOkIncludePassword");
 				UpdateStatus.put("cnt", "用户密码修改成功！");
-				UpdateStatus.put("code", "1");			
+				UpdateStatus.put("code", "1");
 			}
 			else
 			{
@@ -152,7 +152,7 @@ public class PlayerManager
 		}
 
 		return UpdateStatus;
-		
+
 	}
 
 	public static boolean ifRegistered(String userName, String uid)
@@ -176,8 +176,8 @@ public class PlayerManager
         return size > 0;
     }
 
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	public static ActionscriptObject RankList()
 	{
@@ -198,22 +198,22 @@ public class PlayerManager
 		{
 			sessionRank.close();
 		}
-		
+
 		if(userInfoRankList != null && userInfoRankList.size() > 0)
-		{			
+		{
 			int j = userInfoRankList.size();
-			
+
 			for (int i = 0; i < j; i++)
 			{
 				ActionscriptObject oneUser = new ActionscriptObject();
-				
+
 				oneUser.put("pic", (((UserInfo)userInfoRankList.get(i)).getPic()));
 				oneUser.put("name", (((UserInfo)userInfoRankList.get(i)).getName()));
 				oneUser.put("uid", (((UserInfo)userInfoRankList.get(i)).getUid()));
 				oneUser.put("level", (((UserInfo)userInfoRankList.get(i)).getLevel()));
 				oneUser.put("allmoney", (((UserInfo)userInfoRankList.get(i)).getAMoney()));
-				
-				rankList.put(i, oneUser);			
+
+				rankList.put(i, oneUser);
 			}
 		}
 		rankList.put("ts", "" + System.currentTimeMillis());
@@ -240,18 +240,18 @@ public class PlayerManager
 		{
 			mobileUserId = "-1";
 		}
-	
+
 		List<Object> userInfoList = null;
-		
+
 		if (loginType == 0)
 		{
 
 			SqlSession sessionUserLogin = sqlMapper.openSession();
-			
+
 			Map<String,Object> map = new HashMap<String,Object>();
 			map.put("password", Password);
 			map.put("uid", Integer.parseInt(userName));
-			
+
 			try
 			{
 				userInfoList = sessionUserLogin.selectList("ndb.userLogin", map);
@@ -263,7 +263,7 @@ public class PlayerManager
 			}
 			finally
 			{
-				sessionUserLogin.close();			
+				sessionUserLogin.close();
 			}
 		}
 		else if (loginType == 1)
@@ -280,7 +280,7 @@ public class PlayerManager
 			}
 			finally
 			{
-				sessionUserLoginMobile.close();		
+				sessionUserLoginMobile.close();
 			}
 		}
 		else
@@ -316,12 +316,12 @@ public class PlayerManager
 				uinfo.setLogintime(s);
 				uinfo.setOline(true);
 				UserInfoMemoryCache.addUserInfo(uinfo);
-				
+
 				User user = new User(uinfo.getName());
 				user.setUid(String.valueOf(uid));
-				
+
 				UserModule.getInstance().addUser(user);
-				
+
 				if (key == null || key.length() < 10)
 					key = setDefaultUserKeyWithNullUserId(user.getUid());
 
@@ -346,10 +346,10 @@ public class PlayerManager
 					response.put("password", resetPasswd(uinfo));
 				}
 				uinfo.setPropmap(refreshUserShowDj(uinfo, user));
-				
+
 				StringBuffer sb = new StringBuffer();
 				sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-				
+
 				log.debug("  response==== " + uinfo.getAchList());
 				return SFSObjectSerializer.obj2xml(response, 0, "", sb);
 			}
@@ -387,7 +387,7 @@ public class PlayerManager
 			return BackletKit.errorXml("userPassWordIsRequired").getBytes();
 		}
 
-		
+
 		int userInfo = 0;
 		if (!ifRegistered(userName, ""))
 		{
@@ -395,21 +395,21 @@ public class PlayerManager
 			{
 
 				userId = CreateUserId();
-				
+
 				SqlSession sessionAddUser = sqlMapper.openSession();
 				UserInfo getUserInfo = new UserInfo();
-				
+
 				getUserInfo.setName(userName);
 				getUserInfo.setUid(userId);
 				getUserInfo.setPassWord(password);
 				getUserInfo.setEmail(email);
 				getUserInfo.setGendar(gendar);
 				getUserInfo.setBirthday(birthday);
-					
+
 				try
 				{
 					userInfo = sessionAddUser.insert("ndb.addUser", getUserInfo);
-					sessionAddUser.commit();		
+					sessionAddUser.commit();
 				}
 				catch (Exception t)
 				{
@@ -431,7 +431,7 @@ public class PlayerManager
 			catch (Exception Ex)
 			{
 				Ex.printStackTrace();
-	
+
 				log.debug(" DebugInsert="  + userInfo);
 				log.debug(Ex.getMessage());
 			}
@@ -459,21 +459,21 @@ public class PlayerManager
 		return EchoUserInfo.getBytes();
 	}
 
-	
+
 	@SuppressWarnings({ "unchecked" })
 	public static HashMap<String, String> AutoRegister(String userid, String key)
 	{
 		int rcount = 0;
 		int userId = 0;
-		
+
 		HashMap<String, String> userInfoMap = new HashMap<String, String>();
 		String Uid = getUidFromMobileUserid(userid);
 		if (!Uid.equals("-1"))
 		{
 			log.warn("这个用户已经注册过");
-	
+
 			SqlSession sessionResetUserTime = sqlMapper.openSession();
-			
+
 			try
 			{
 				sessionResetUserTime.update("ndb.ResetUserTime", userid);
@@ -504,7 +504,7 @@ public class PlayerManager
 		String userName = "C" + userId;
 
 		SqlSession sessionsIfRegistered = sqlMapper.openSession();
-		
+
 		int size = 0;
 		try
 		{
@@ -537,9 +537,9 @@ public class PlayerManager
 			{
 
 				SqlSession sessionAddUser = sqlMapper.openSession();
-				
+
 				UserInfo insertUserInfo = new UserInfo();
-				
+
 				insertUserInfo.setUid(userId);
 				insertUserInfo.setName(userName);
 				insertUserInfo.setPassWord(password);
@@ -548,7 +548,7 @@ public class PlayerManager
 				insertUserInfo.setBirthday(birthday);
 				insertUserInfo.setMobile(userid);
 				insertUserInfo.setSessionKey(key);
-				
+
 				try
 				{
 					sessionAddUser.insert("ndb.addUser", insertUserInfo);
@@ -575,7 +575,7 @@ public class PlayerManager
 
 		}
 		NewUserInfoFromDb(userId + "");
-		
+
 		return userInfoMap;
 	}
 
@@ -618,7 +618,7 @@ public class PlayerManager
 	{
 		SqlSession session = sqlMapper.openSession();
 		List<Object> userEmailList = null;
-		
+
 		try
 		{
 			userEmailList = session.selectList("ndb.userValidEmail", email);
@@ -632,7 +632,7 @@ public class PlayerManager
 		{
 			session.close();
 		}
-		
+
 		try
 		{
 			if(userEmailList != null && userEmailList.size() > 0)
@@ -662,9 +662,9 @@ public class PlayerManager
 			int suffix = Math.abs(random.nextInt() % (passwordList.length));
 			resetpasswd += passwordList[suffix];
 		}
-		
+
 		uinfo.setPassWord(resetpasswd);
-	
+
 		SqlSession session = sqlMapper.openSession();
 		try
 		{
@@ -763,13 +763,13 @@ public class PlayerManager
 		//TODO
 //		response = UserModule.getInstance().handleRequest(ConstList.CMD_MYDJ, reqObj, user,
 //				UserModule.getInstance().getAdminRoomId(), false);
-//		
-//		
+//
+//
 //		log.warn(" usedDJ=" + response);
 		uinfo.MyEquipedDaoju = response;
 		return response;
 	}
-	
+
 	public static ActionscriptObject getUserAch(UserInfo uinfo)
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -794,7 +794,7 @@ public class PlayerManager
 
 		response.put("user", user);
 		response.put("_cmd", "uinfo");
-		
+
 		return response;
 	}
 	public static boolean ifHavaEquipedSameDaoju(UserInfo uinfo, User user, int Djid)
@@ -1007,9 +1007,9 @@ public class PlayerManager
 		response.put("add", add + "");
 
 		User u = UserModule.getInstance().getUserByUserId(Integer.parseInt(uinfo.getUid()));
-		
+
 		uinfo.setPropmap(refreshUserShowDj(uinfo, u));
-		
+
 		if (u == null)
 		{
 			response = getExtraObject(response, uinfo, u);
@@ -1100,7 +1100,7 @@ public class PlayerManager
 
 		SqlSession session = sqlMapper.openSession();
 		List<Object> userInfoList = null;
-		
+
 		try
 		{
 			userInfoList = session.selectList("ndb.userLoginMobile", mobileUserId);
@@ -1114,7 +1114,7 @@ public class PlayerManager
 		{
 			session.close();
 		}
-		
+
 		if(userInfoList != null && userInfoList.size() > 0)
 		{
 			uid = ((UserInfo)userInfoList.get(0)).getUid();

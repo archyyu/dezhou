@@ -1,8 +1,6 @@
 package com.archy.dezhou.util;
 
-import java.io.IOException;
-
-import com.archy.dezhou.Global.ConstList;
+import com.archy.dezhou.global.ConstList;
 
 /**
  * 将字符串编码成16进制数字,适用于所有字符（包括中文）
