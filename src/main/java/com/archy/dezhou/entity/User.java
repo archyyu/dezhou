@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.util.Config;
 
 
 public class User
@@ -50,11 +49,7 @@ public class User
 	/**玩家的成就列表**/
 	private HashMap<String,  HashMap<String, Integer>> achList = new HashMap<String,  HashMap<String, Integer>>(); 
 	private ActionscriptObject achieveList = new ActionscriptObject();
-	/**
-	 * 用来存放玩家携带的道具列表
-	 */
-	private HashMap<String, HashMap<String, Integer>> propmap = new HashMap<String, HashMap<String, Integer>>();
-	private ActionscriptObject DaojuList = new ActionscriptObject();
+	protected Logger log = Logger.getLogger(getClass().getName());
 	private int winTzCount = 0;
 	private int lostTzCount = 0;
 	private int tributeBet = 0;
@@ -73,7 +68,6 @@ public class User
 	private int secondRoundBet = 0; // 第二轮押注筹码
 	private int thirdRoundBet = 0; // 第三轮押注筹码
 	private int fourthRoundBet = 0; // 第四轮押注筹码
-	private GoldMatchInfo gmInfo; // 关于金币场地信息
 
 	private String email = ""; // 邮箱地址
 	private int level = 0; // 等级
@@ -118,8 +112,11 @@ public class User
 	public ActionscriptObject MyEquipedDaoju = new ActionscriptObject();
 
 	public int vipid = -1;
+	/**
+	 * 用来存放玩家携带的道具列表
+	 */
 
-	protected Logger log = Logger.getLogger(Config.class.getName());
+	private ActionscriptObject DaojuList = new ActionscriptObject();
 	/*****************************************************************************************************/
 	public User()
 	{
@@ -638,33 +635,6 @@ public class User
 		this.dateStr = dateStr;
 	}
 
-	public HashMap<String, HashMap<String, Integer>> getPropmap()
-	{
-		if (propmap == null || propmap.size() == 0)
-		{
-			propmap = new HashMap<String, HashMap<String, Integer>>();
-			HashMap<String, Integer> demoHashMap = new HashMap<String, Integer>();
-			demoHashMap.put("133", 1);
-			propmap.put("A", demoHashMap);
-			propmap.put("B", demoHashMap);
-		}
-		return propmap;
-	}
-
-	public void setPropmap(HashMap<String, HashMap<String, Integer>> propmap)
-	{
-		this.propmap = propmap;
-	}
-
-	public GoldMatchInfo getGmInfo()
-	{
-		return gmInfo;
-	}
-
-	public void setGmInfo(GoldMatchInfo gmInfo)
-	{
-		this.gmInfo = gmInfo;
-	}
 
 	public int getUserLevel()
 	{

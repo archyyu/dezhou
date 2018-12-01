@@ -21,9 +21,9 @@ import com.archy.dezhou.entity.PukeType;
 
 /**
  * 2010年4月29日0:03:16
- * 
+ *
  * @author chch
- * 
+ *
  */
 public class Utils
 {
@@ -313,7 +313,7 @@ public class Utils
 
 	/**
 	 * 返回数组中相等的值
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -349,7 +349,7 @@ public class Utils
 
 	/**
 	 * 返回葫芦和一对的num 返回四条和单牌的num
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -389,7 +389,7 @@ public class Utils
 
 	/**
 	 * 返回三条和两个单牌的num
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -438,7 +438,7 @@ public class Utils
 
 	/**
 	 * 返回两对牌，以及一单张的num值
-	 * 
+	 *
 	 * @param a
 	 * @return
 	 */
@@ -476,7 +476,7 @@ public class Utils
 
 	/**
 	 * 将数组中相等的值以及“0”去掉，返回从小到大排序的数组
-	 * 
+	 *
 	 * @param args
 	 */
 	public static List delEqualNum(int[] a)
@@ -506,7 +506,7 @@ public class Utils
 
 	/**
 	 * 将数组中a[n]-a[n-1]的值保存在数组中
-	 * 
+	 *
 	 * @param list
 	 */
 	public static int[] sidePool(List list)
@@ -527,7 +527,7 @@ public class Utils
 
 	/**
 	 * 获取系统的当前时间
-	 * 
+	 *
 	 * @param args
 	 */
 	public static String getCurrentTime()
@@ -537,7 +537,7 @@ public class Utils
 
 	/**
 	 * 切割字符串
-	 * 
+	 *
 	 * @param args
 	 */
 	public static List splitStrToArray(String str, String c)
@@ -553,7 +553,7 @@ public class Utils
 
 	/**
 	 * 获取三个随机数
-	 * 
+	 *
 	 * @param amt
 	 * @return
 	 */
@@ -571,7 +571,7 @@ public class Utils
 
 	/**
 	 * 根据给定的净胜场次，获得经验值
-	 * 
+	 *
 	 * @param args
 	 */
 	public static int getExprienceNumByWintz(int wintz)
@@ -615,7 +615,7 @@ public class Utils
 
 	/**
 	 * 计算出2%的几率
-	 * 
+	 *
 	 * @param args
 	 */
 	public static int isOneOrZero()
@@ -632,7 +632,7 @@ public class Utils
 	 * 3360+15(n-20)*(n+19)=15*n*n-15n-2340 41~70 ：An =
 	 * 21060+20(n-40)*(n+39)=20*n*n-20n-10140 71~100 ：An =
 	 * 86460+25(n-70)*(n+69)=25*n*n-25n-34290
-	 * 
+	 *
 	 * @param args
 	 */
 	public static int[] retLevelAndExp(int exp)
@@ -665,7 +665,7 @@ public class Utils
 
 	/**
 	 * 判断挑战双方是否处于同一梯度中
-	 * 
+	 *
 	 * @param args
 	 */
 	public static boolean IsInSameEchelon(int zlevel, int blevel)
@@ -676,7 +676,7 @@ public class Utils
 
 	/**
 	 * 判断挑战玩家处于哪一梯度
-	 * 
+	 *
 	 * @param args
 	 */
 	public static int retEchelon(int level)
@@ -708,7 +708,7 @@ public class Utils
 
 	/**
 	 * 判断征服赛，两者的筹码是否符合规定
-	 * 
+	 *
 	 * @param args
 	 */
 	public static int retBetByEchelon(int level)
@@ -737,7 +737,7 @@ public class Utils
 
 	/**
 	 * 返回系统当前时间
-	 * 
+	 *
 	 * @param args
 	 */
 	public static String retCurrentTiem()
@@ -746,7 +746,7 @@ public class Utils
 	}
 
 	/**
-	 * 
+	 *
 	 * @param args
 	 */
 	public static long millsTosecond(long L)
@@ -758,7 +758,7 @@ public class Utils
 
 	/**
 	 * 获取日期
-	 * 
+	 *
 	 * @param difnum
 	 * @return
 	 */
@@ -879,7 +879,6 @@ public class Utils
 				* Long.parseLong(s2) * Long.parseLong(s3) - Long.parseLong(s0);
 		s = s0 + "" + uidToken;
 
-		getAuthorInfo(s);
 		return s;
 	}
 
@@ -901,196 +900,8 @@ public class Utils
 		return formatDate.format(time);
 	}
 
-	public static long[] getAuthorInfo(String AuthorToken)
-	{
-		long tokenInfo[] = new long[5];
-		ConstList.config.logger.info("AuthorToken=" + AuthorToken);
-		tokenInfo[0] = Long.parseLong(AuthorToken.substring(0, 2));
-		tokenInfo[1] = Long.parseLong(AuthorToken.substring(2, 4));
-		tokenInfo[2] = Long.parseLong(AuthorToken.substring(4, 8));
-		long tmpL1 = Long.parseLong(AuthorToken.substring(0, 8));
-		long tmpL2 = Long.parseLong(AuthorToken.substring(8));
-		long tmpL3 = (tmpL2 - tmpL2)
-				/ (tokenInfo[0] * tokenInfo[1] * tokenInfo[2]);
-
-		ConstList.config.logger.info("tmpL1=" + tmpL1 + ",tmpL2=" + tmpL2
-				+ ",tmpL3=" + tmpL3);
-		ConstList.config.logger.info("tokenInfo[0]=" + tokenInfo[0] + ","
-				+ tokenInfo[1] + "," + tokenInfo[2] + "," + tokenInfo[3]);
-		return tokenInfo;
-
-	}
 
 	public static int debugid = 16;
 
-	public static void main(String[] args)
-	{
-		if (debugid == 16)
-		{
 
-			// ConstList.config.logger.info(getAuthrozedString("10085"));
-			ConstList.config.logger.info(retLevelAndExp(10)[0] + ","
-					+ retLevelAndExp(10)[1] + "," + retLevelAndExp(10)[2] + ","
-					+ retLevel(9017));
-		}
-		if (debugid == 0)
-		{
-			ConstList.config.logger.info(retLevel(7980));
-			ConstList.config.logger.info(retLevelAndExp(7980));
-		}
-		else if (debugid == 1)
-		{
-			int[] a = selectNum(1, "12");
-			for (int i = 0; i < a.length; i++)
-			{
-				ConstList.config.logger.info(a[i]);
-			}
-		}
-		else if (debugid == 2)
-		{
-			String str = "2007-8-29";
-			System.out.print(volidateDate(str));
-		}
-		else if (debugid == 3)
-		{
-			System.out.print(getDateToStr(0));
-			String[] str =
-			{ "sid1", "sid2", "sid3", "sid4", "sid5", "sid6", "sid7", "sid8",
-					"sid9" };
-			retItem("a", "sid9", str);
-			retItem("c", "sid2", str);
-			ConstList.config.logger.info(encodeStr("King's"));
-			ConstList.config.logger.info(retLevelAndExp(80));
-			String b = retLevelAndExp(8)[0] + "";
-			Random ran = new Random();
-			int a = ran.nextInt(2);
-		}
-		else if (debugid == 4)
-		{
-			int a = getExprienceNumByWintz(51);
-		}
-		else if (debugid == 5)
-		{
-			String a = getThreeRadomNum();
-			ConstList.config.logger.info(IsInSameEchelon(0, 4));
-			retLevel(481647);
-			splitStrToArray("2@2@2@2@2@2@2@32@32@", "@");
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String s = sdf.format(new Date());
-		}
-		else if (debugid == 4)
-		{
-			String s = "25";
-			ConstList.config.logger.info(s.substring(1, 2));
-		}
-		else if (debugid == 6)
-		{
-			int[] a =
-			{ 5, 6, 6, 4, 4 };
-			a = retNumForTwo(a);
-			for (int i = 0; i < a.length; i++)
-			{
-				ConstList.config.logger.info(a[i]);
-			}
-			getMaxAndNum(a);
-			int t = retNum(a);
-			ConstList.config.logger.info(t);
-			int[] b = selectNum(5, sortArrayToStr(a));
-			for (int i = 0; i < b.length; i++)
-			{
-				ConstList.config.logger.info(b[i]);
-			}
-		}
-		else if (debugid == 7)
-		{
-			int[] a =
-			{ 5, 7 };
-			getMaxAndNum(a);
-		}
-		else if (debugid == 8)
-		{
-			int[] a =
-			{ 5, 356, 4, 8, 4, 43, 5, 4, 0 };
-			List aa = delEqualNum(a);
-			int[] b = sidePool(delEqualNum(a));
-			for (int i = 0; i < b.length; i++)
-			{
-				ConstList.config.logger.info(b[i]);
-			}
-		}
-		else if (debugid == 9)
-		{
-			int[] a = selectNum(1, "12");
-			for (int i = 0; i < a.length; i++)
-			{
-				ConstList.config.logger.info(a[i]);
-			}
-		}
-		else if (debugid == 10)
-		{
-			int[] a =
-			{ 5, 3, 4, 5, 4 };
-			retNumForTwo(a);
-			int num = retNum(a);
-			System.out.print(num);
-		}
-		else if (debugid == 11)
-		{
-			int[] a =
-			{ 1, 2, 3, 5, 6, 6, 7, 7 };
-
-			a = sortBigToSmall(a);
-			for (int i = 0; i < a.length; i++)
-			{
-				System.out.print(a[i]);
-			}
-		}
-		else if (debugid == 12)
-		{
-			String[] a =
-			{ "37721@133", "37728@333", "37729@233", "37724@533", "37726@633", };
-			System.out.print(compareStrRetBigB(a));
-		}
-		else if (debugid == 13)
-		{
-			int[] a =
-			{ 1, 2, 3, 5, 6, 6, 7, 7 };
-			a = sortArray(a);
-			for (int i = 0; i < a.length; i++)
-			{
-				ConstList.config.logger.info(a[i]);
-			}
-
-		}
-		else if (debugid == 14)
-		{
-			int[] a =
-			{ 1, 2, 3, 5, 6, 6, 7, 7 };
-			Map<String,Integer> map = getMaxAndNum(a);
-			Set<String> hm = map.keySet();
-			ConstList.config.logger.info(hm);
-			Iterator<String> it =  hm.iterator();
-			while (it.hasNext())
-			{
-				String str =  it.next();
-				ConstList.config.logger.info(str);
-			}
-		}
-		else if (debugid == 15)
-		{
-			HashMap map = new HashMap();
-			map.put(1, 3);
-			map.put(3, 5);
-			map.put("a", 343);
-			ConstList.config.logger.info(map);
-			int[] b = (int[]) map.get("barray");
-			for (int i = 0; i < b.length; i++)
-			{
-				System.out.print(b[i]);
-			}
-			String str = 2 + "l" + 3;
-			String s = str.substring(str.indexOf("l") + 1);
-			System.out.print(s);
-		}
-	}
 }

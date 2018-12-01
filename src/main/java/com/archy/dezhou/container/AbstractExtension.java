@@ -68,7 +68,6 @@ public abstract class AbstractExtension
 	{
 		StringBuffer sb = new StringBuffer("[ ");
 		sb.append(getClass().getName()).append(" ]: ").append(msg);
-		ConstList.config.logger.info(sb);
 	}
 
 	public IXMLElement loadConfig(String xmlFile)
@@ -124,9 +123,7 @@ public abstract class AbstractExtension
 		}
 		catch (JSONException jsoEx)
 		{
-			ConstList.config.logger
-					.error((new StringBuilder("Error creating JSON response: "))
-							.append(jsoEx).toString());
+
 		}
 	}
 

@@ -74,7 +74,6 @@ public class PlayerManageBacklet extends DataBacklet
 			String uid = userid;
 			if (userid.length() > 0 && !uid.equals("-1"))
 			{
-				ConstList.config.logger.info("uid=" + uid);
 				XmlError = BackletKit.errorXml("UserHasRegistered");
 				xmlByteA = XmlError.getBytes();
 			}

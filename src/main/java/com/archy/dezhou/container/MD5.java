@@ -16,8 +16,6 @@ public class MD5
 		}
 		catch (NoSuchAlgorithmException e)
 		{
-			ConstList.config.logger
-					.info("Could not instantiate the MD5 Message Digest!");
 		}
 	}
 

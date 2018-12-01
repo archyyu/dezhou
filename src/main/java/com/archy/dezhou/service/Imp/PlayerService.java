@@ -1009,8 +1009,19 @@ public class PlayerService
 		return response;
 	}
 
-	public static Player selectPlayerById(Integer uid){
+	public static Player selectPlayerById(Integer uid)
+    {
 	    return new Player();
+    }
+
+    public static Player selectPlayerByAccount(String account)
+    {
+	    return new Player();
+    }
+
+    public static boolean savePlayer(Player player)
+    {
+        return true;
     }
 
 

@@ -12,7 +12,6 @@ import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
 import com.archy.dezhou.entity.puker.FivePukeItem;
 import com.archy.dezhou.entity.puker.PukerKit;
-import com.archy.dezhou.util.Config;
 
 public class Player extends User
 {
@@ -32,7 +31,7 @@ public class Player extends User
 	
 	private int totalGambleBet = 0;
 	
-	protected Logger log = Logger.getLogger(Config.class.getName());
+	protected Logger log = Logger.getLogger(Player.class.getName());
 	
 	private Map<Integer,Integer> betMap = new HashMap<Integer,Integer>();
 	

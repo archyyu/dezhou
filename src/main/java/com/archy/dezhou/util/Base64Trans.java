@@ -147,25 +147,4 @@ public class Base64Trans
 		return sb.toString().getBytes("iso8859-1");
 	}
 
-	public static void main(String[] args) throws
-            IOException
-	{
-		String s = "我是一条狼";
-		ConstList.config.logger.error("**************0****************");
-		ConstList.config.logger.error("加密前：" + s);
-		String x = encode(s.getBytes());
-		ConstList.config.logger.error("加密后：" + x);
-		String x1 = new String(decode(x));
-		ConstList.config.logger.error("解密后：" + x1);
-		ConstList.config.logger.error("**************1****************");
-		ConstList.config.logger.error(getBASE64(s.getBytes()));
-		ConstList.config.logger.error(new String(getFromBASE64(x)));
-		ConstList.config.logger.error("**************2****************");
-		BASE64Encoder encode = new BASE64Encoder();
-		String base64 = encode.encode("test|0".getBytes());
-		ConstList.config.logger.error(base64);
-		BASE64Decoder decode = new BASE64Decoder();
-		byte[] b = decode.decodeBuffer(base64);
-		ConstList.config.logger.error(new String(b));
-	}
 }

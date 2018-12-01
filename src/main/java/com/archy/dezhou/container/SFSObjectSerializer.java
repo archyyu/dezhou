@@ -115,7 +115,6 @@ public class SFSObjectSerializer
 		}
 		catch (Exception e)
 		{
-			ConstList.config.logger.error(e.getMessage());
 
 		}
 
@@ -295,9 +294,5 @@ public class SFSObjectSerializer
 
 	}
 
-	public static void dumpAsObj(SFSObject ao)
-	{
-		ConstList.config.logger.info(" dumpAsObj: "  + ao.toString());
-	}
 
 }

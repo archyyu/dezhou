@@ -450,24 +450,6 @@ public class PukeModuleServiceImp implements PukeModuleService
 		return cPkmap;
 	}
 
-	public void printPkList(HashMap<String, HashMap<Integer, Puke>> comparePkmap)
-	{
-
-		for (String key : comparePkmap.keySet())
-		{
-
-			HashMap<Integer, Puke> pklist = comparePkmap.get(key);
-			ConstList.config.logger
-					.info("___________________begin___________________key="
-							+ key);
-			for (Integer skey : pklist.keySet())
-			{
-				ConstList.config.logger.info(skey + "---"
-						+ pklist.get(skey).getNum() + ","
-						+ pklist.get(skey).getTag() + "|");
-			}
-		}
-	}
 	
 	public class ComparatorPukeMap implements Comparator<Player>
 	{

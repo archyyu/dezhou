@@ -28,7 +28,6 @@ import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.service.PukeModuleService;
 import com.archy.dezhou.thread.roomUnit.OfflineDealUnit;
 import com.archy.dezhou.thread.roomUnit.RoomDealUnit;
-import com.archy.dezhou.entity.Prop;
 
 public class UserModule extends AbstractExtension
 {
@@ -195,10 +194,6 @@ public class UserModule extends AbstractExtension
 		sendResponse(aObj, -1, null, recipientList);
 	}
 
-	public HashMap<String, Prop> getPropMap()
-	{
-		return new HashMap<String, Prop>();
-	}
 
 
 	public int[] getplayerNum(String roomKey)
