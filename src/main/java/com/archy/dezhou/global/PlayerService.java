@@ -1,4 +1,4 @@
-package com.archy.dezhou.service.Imp;
+package com.archy.dezhou.global;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -19,8 +19,6 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
-import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.util.PayFinalValue;
 import com.archy.dezhou.util.Utils;

@@ -18,8 +18,6 @@ import java.util.Set;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
-import com.archy.dezhou.service.Imp.PukeModuleServiceImp;
-import com.archy.dezhou.service.PukeModuleService;
 
 public class PukerKit
 {
@@ -39,13 +37,7 @@ public class PukerKit
 		FivePukeItem item = getMaxFive(map);
 		item.calculateHandValue();
 	}
-	
-	private static PukeModuleService pms = new PukeModuleServiceImp();
-	
-	public static PukeModuleService getPms()
-	{
-		return pms;
-	}
+
 	
 	private static Map<Integer,Puke> randomPuke = new HashMap<Integer,Puke>();
 	
@@ -53,7 +45,7 @@ public class PukerKit
 	{
 		if(randomPuke.isEmpty())
 		{
-			randomPuke = pms.Puke();
+			randomPuke = PukerKit.Puke();
 		}
 		return randomPuke.get(index);
 	}
@@ -159,17 +151,34 @@ public class PukerKit
 		num = 0;
 		return group;
 	}
-	
-	public static int getPukeMapLevel(HashMap<Integer,Puke> map)
+
+
+
+
+	/**
+	 * 生成扑克集合
+	 *
+	 */
+	public static  Map<Integer,Puke> Puke()
 	{
-		return pms.getLevel(map);
+		Map<Integer,Puke> map = new HashMap<Integer,Puke>(52);
+		int i = 65;
+		int k = 2;
+		for (int j = 0; j < 52; j++)
+		{
+			if (j % 13 == 0 && j != 0)
+			{
+				i++;
+				k = 2;
+			}
+			Puke Puke = new Puke(String.valueOf((char) i), k);
+			map.put(j, Puke);
+			k++;
+		}
+		return map;
 	}
-	
-	public static int compareTwoPukeMap(HashMap<Integer,Puke> leftPukeMap,HashMap<Integer,Puke> rightPukeMap)
-	{
-		return pms.compareTwoPukeMap(leftPukeMap,rightPukeMap);
-	}
-	
+
+
 	public static List<Player> sortPlayerByPukeMap(List<Player> players)
 	{
 		Collections.sort(players,new Comparator<Player>() {

@@ -19,19 +19,17 @@ import com.archy.dezhou.container.AbstractExtension;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
-import com.archy.dezhou.service.Imp.PukeModuleServiceImp;
+import com.archy.dezhou.entity.puker.PukerKit;
 import com.archy.dezhou.util.XLoad;
 import org.apache.log4j.Logger;
 
 
-import com.archy.dezhou.entity.room.Room; 
-import com.archy.dezhou.service.PukeModuleService;
+import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.thread.roomUnit.OfflineDealUnit;
 import com.archy.dezhou.thread.roomUnit.RoomDealUnit;
 
 public class UserModule extends AbstractExtension
 {
-	public Map<Integer, Puke> randomPuke; // 生成牌的集合
 
  	private Logger log = Logger.getLogger(getClass());
 
@@ -125,7 +123,6 @@ public class UserModule extends AbstractExtension
 	{
 		log.info("user module **init**");
 
-		pukeInit();
 		roomListInit();
 
 		this.startRoomThread();
@@ -146,13 +143,6 @@ public class UserModule extends AbstractExtension
 		thread.setName("RoomDealUnit");
 		thread.start();
 		log.warn("Offline Deal Unit thread started");
-	}
-
-	private void pukeInit()
-	{
-		PukeModuleService pms = new PukeModuleServiceImp();
-		randomPuke = pms.Puke();
-
 	}
 
 	private void roomListInit()
@@ -185,16 +175,6 @@ public class UserModule extends AbstractExtension
 	{
 
 	}
-
-
-	// 发数据包给客户
-	public void sendMessageBag(ActionscriptObject aObj, Room r)
-	{
-		LinkedList<SocketChannel> recipientList = new LinkedList<SocketChannel>();
-		sendResponse(aObj, -1, null, recipientList);
-	}
-
-
 
 	public int[] getplayerNum(String roomKey)
 	{
