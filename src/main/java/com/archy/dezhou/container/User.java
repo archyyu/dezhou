@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-import com.archy.dezhou.entity.ConnectInstance;
 import com.archy.dezhou.entity.room.Room;
 
 public class User
@@ -65,11 +64,6 @@ public class User
 	public Map<Object, Object> properties;
 	public Map<Object, Object> buddyVariables;
 
-	// 赌桌交互数据
-	private Queue<ConnectInstance> betMessageList = new LinkedList<ConnectInstance>();
-
-	// 用户之间文本信息交互信息
-	private Queue<ConnectInstance> bstMessageList = new LinkedList<ConnectInstance>();
 
 	public User(String name)
 	{
@@ -94,45 +88,6 @@ public class User
 		bbSessionId = "This user was created manually";
 	}
 
-	public void clearBetMessageQuene()
-	{
-		betMessageList.clear();
-	}
-
-	public void clearBbsMessageQuene()
-	{
-		bstMessageList.clear();
-	}
-
-	public void sendBetMessage(ConnectInstance nextConnection)
-	{
-		betMessageList.offer(nextConnection);
-	}
-	
-	public ConnectInstance popBetMessage()
-	{
-		return betMessageList.poll();
-	}
-	
-	public int getBetMessageSize()
-	{
-		return this.betMessageList.size();
-	}
-
-	public void sendBbsMessage(ConnectInstance nextConnect)
-	{
-		bstMessageList.offer(nextConnect);
-	}
-	
-	public ConnectInstance popBbsMessage()
-	{
-		return bstMessageList.poll();
-	}
-	
-	public int getBbsMessageSize()
-	{
-		return this.bstMessageList.size();
-	}
 
 	public void initUser()
 	{

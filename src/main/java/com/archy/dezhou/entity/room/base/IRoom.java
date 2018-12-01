@@ -32,29 +32,29 @@ public interface IRoom
 	
 	ActionscriptObject toAsObj();
 	
-	int getSBet();
+	Integer getSbet();
 	
 	void notifyRoomPlayerButOne(ActionscriptObject aObj, ConstList.MessageType msgType, String uId);
 	
 	void notifyRoomPlayer(ActionscriptObject aObj, ConstList.MessageType msgType);
 	
-	int getBBet();
+	Integer getBbet();
 	
 	int getRoomId();
 	
 	String getName();
+
+	String getShowname();
 	
 	String getCreator();
 	
 	int getMaxUsers();
-	
-	Map<String, RoomVariable> getVariables();
-	
+
 	User[] getAllUsers();
 	
-	int getMinBuy();
+	Integer getMinbuy();
 	
-	int getMaxBuy();
+	Integer getMaxbuy();
 	
 	int getUserCount();
 	
@@ -67,9 +67,7 @@ public interface IRoom
 	void gameOverHandle();
 	
 	int getSecsPassByTurn();
-	
-	String getValueByKey(String key);
-	
+
 	int howManyUsers();
 	
 	int howManySpecators();

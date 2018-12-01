@@ -1,6 +1,5 @@
 package com.archy.dezhou.container;
 
-import com.archy.dezhou.db.DataRow;
 import java.util.*;
 
 public class ActionscriptObject extends SFSObject
@@ -25,11 +24,6 @@ public class ActionscriptObject extends SFSObject
 		putMap(this, "", map);
 	}
 
-	public ActionscriptObject(DataRow row)
-	{
-		this();
-		putDataRow(this, "", row);
-	}
 
 	public void put(String key, Object o)
 	{
@@ -178,8 +172,6 @@ public class ActionscriptObject extends SFSObject
 				aObj.putCollection(count, (Collection) collectionItem);
 			else if (collectionItem instanceof Map)
 				aObj.putMap(count, (Map) collectionItem);
-			else if (collectionItem instanceof DataRow)
-				aObj.putDataRow(count, (DataRow) collectionItem);
 			else
 				aObj.put(count, collectionItem);
 			count++;
@@ -210,29 +202,9 @@ public class ActionscriptObject extends SFSObject
 				aObj.putCollection(itemKey, (Collection) itemVal);
 			else if (itemVal instanceof Map)
 				aObj.putMap(itemKey, (Map) itemVal);
-			else if (itemVal instanceof DataRow)
-				aObj.putDataRow(itemKey, (DataRow) itemVal);
 			else
 				aObj.put(itemKey, itemVal);
 		}
 
-	}
-
-	public void putDataRow(String key, DataRow row)
-	{
-		putDataRow(new ActionscriptObject(), key, row);
-	}
-
-	public void putDataRow(int key, DataRow row)
-	{
-		putDataRow(String.valueOf(key), row);
-	}
-
-	private void putDataRow(ActionscriptObject aObj, String key, DataRow row)
-	{
-		if (row.getType() == 0)
-			putCollection(aObj, key, row.getDataAsList());
-		else
-			putMap(aObj, key, row.getDataAsMap());
 	}
 }

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import com.archy.dezhou.entity.Mol;
 
 public class PayUtils
 {
@@ -184,73 +183,7 @@ public class PayUtils
 		return res.toString();
 	}
 
-	public static String postMsgToMol(Mol mol)
-	{
-		// String API_URL =
-		// "http://molv3.molsolutions.com/api/login/u_module/purchase.aspx";
-		String URL = PayFinalValue.MOL_API_URL + PayFinalValue.MOL_URL_Purchase;
 
-		// _blank 在新窗口中打开。 _self 默认。在相同的框架中打开。 _parent 在父框架集中打开。 _top 在整个窗口中打开。
-		// framename 在指定的框架中打开
-		String post = "<html><body><form name='paypalform' target='_parent' method='post' action='"
-				+ URL + "'>";
-		post += "<input type='hidden' name='MerchantID' value='"
-				+ mol.getMerchantID() + "'/>";
-		post += "<input type='hidden' name='Amount' value='" + mol.getAmount()
-				+ "'/>";
-		post += "<input type='hidden' name='MRef_ID' value='"
-				+ mol.getMRef_ID() + "'/>";
-		post += "<input type='hidden' name='Description' value='"
-				+ mol.getDescription() + "'/>";
-		post += "<input type='hidden' name='Currency' value='"
-				+ mol.getCurrency() + "'/>";
-		post += "<input type='hidden' name='HeartBeat' value='"
-				+ mol.getHeartBeat() + "'/>";
-		post += "<input type='hidden' name='Signature' value='"
-				+ mol.getSignature() + "'/>";
-		post += "<input type='hidden' name='Name' value='" + mol.getName()
-				+ "'/>";
-		post += "<input type='hidden' name='Email' value='" + mol.getEmail()
-				+ "'/>";
-		post += "<input type='hidden' name='Country' value='"
-				+ mol.getCountry() + "'/>";
-		post += "</form>";
-		post += "<script language='javascript' type='text/javascript'>document.paypalform.submit();</script></body></html>";
-		post = post.replaceAll("/n", "");
-		return post;
-	}
-
-	public static String molQueryTrxStatus(Mol mol)
-	{
-		// String API_URL = "http://molv3.molsolutions.com/api/login";
-		String API_URL = PayFinalValue.MOL_API_URL;
-		String req = "MerchantID=" + mol.getMerchantID() + "&MRef_ID="
-				+ mol.getMRef_ID() + "&HeartBeat=" + mol.getHeartBeat()
-				+ "&Signature=" + mol.getSignature();
-		StringBuffer res = new StringBuffer();
-		try
-		{
-			URL u = new URL(API_URL + PayFinalValue.MOL_URL_Querytrxstatus
-					+ req);
-			URLConnection uc = u.openConnection();
-			uc.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					uc.getInputStream()));
-			String line = null;
-			while ((line = in.readLine()) != null)
-			{
-				res.append(line);
-			}
-			in.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			System.out.println("molQueryTrxStatus error");
-		}
-		return res.toString();
-	}
 
 	// Mycard 之billing
 	public static String getMcBillingAuthCode(String sid, String orderID,

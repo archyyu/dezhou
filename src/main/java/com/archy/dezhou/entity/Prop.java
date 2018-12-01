@@ -13,6 +13,11 @@ public class Prop
 	private int expireDay;
 	private String consumeCode;
 
+	public Prop()
+	{
+
+	}
+
 	public String getForType()
 	{
 		return forType;

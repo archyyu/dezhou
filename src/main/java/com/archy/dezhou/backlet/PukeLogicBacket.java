@@ -120,15 +120,9 @@ public class PukeLogicBacket extends DataBacklet
 				{
 					return BackletKit.infoXml("UserManagerParmsIsValid").getBytes();
 				}
-				
-				if (user.getBetMessageSize() > 0)
-				{
-					httpResponse.headers().set("num",""+ (user.getBetMessageSize() - 1));
-				}
-				else
-				{
-					httpResponse.headers().set("num", "0");
-				}
+
+				httpResponse.headers().set("num", "0");
+
 			}
 			catch (Exception e)
 			{

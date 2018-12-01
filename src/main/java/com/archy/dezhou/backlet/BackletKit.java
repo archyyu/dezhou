@@ -21,8 +21,6 @@ public class BackletKit
 		backlets.put("userManage", new PlayerManageBacklet());
 		backlets.put("roomlist", new RoomListBacklet());
 		backlets.put("bet",new PukeLogicBacket());
-		backlets.put("TimerBet", new TimerBetBacklet());
-		backlets.put("TimerBBS", new TimerBBSBacklet());
 		backlets.put("other", new OtherBacklet());
 		backlets.put("scriptName", new ScriptNameBacklet());
 		backlets.put("pubMsg", new PubMsgBacklet());

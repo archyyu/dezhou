@@ -132,7 +132,7 @@ public class PukerGame implements IPukerGame
 		this.roundNum ++;
 		this.round = 1;
 		this.fiveSharePk.clear();
-		this.maxBet = this.room.getBBet();
+		this.maxBet = this.room.getBbet();
 		this.resetAllPlayer();
 		this.autoSetNextBankerSeat();
 		this.autoSetPlayerState();
@@ -163,7 +163,7 @@ public class PukerGame implements IPukerGame
 			User user = UserModule.getInstance().getUserByUserId(Integer.parseInt(entry.getValue().getUserId()));
 			UserInfo userInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
 			
-			if(userInfo.getRmoney() < this.room.getBBet())
+			if(userInfo.getRmoney() < this.room.getBbet())
 			{
 				this.room.userStandUp(user,true);
 			}

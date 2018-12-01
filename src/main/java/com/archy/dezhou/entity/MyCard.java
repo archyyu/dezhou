@@ -15,6 +15,11 @@ public class MyCard
 	private String GAME_TNO;
 	private String tradeok_time;
 
+	public MyCard()
+	{
+
+	}
+
 	public String getMyCard_ID()
 	{
 		return MyCard_ID;

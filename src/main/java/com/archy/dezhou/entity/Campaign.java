@@ -7,6 +7,10 @@ public class Campaign
 	private int tributebet;
 	private String timemillis;
 
+	public Campaign(){
+
+	}
+
 	public String getLuid()
 	{
 		return luid;

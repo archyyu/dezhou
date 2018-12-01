@@ -32,8 +32,6 @@ public class ConstList
 	    	Element root = document.getRootElement();
 	    	
     		ConstList.LinkPoolSize = Integer.parseInt( root.element("dbpoolsize").getText() );
-    		ConstList.gameVersion = root.element("gameVersion").getText();
-    		ConstList.gameInstallurl = root.element("gameInstallurl").getText();
 	    	
 		}
 		catch (Exception e)
@@ -43,28 +41,13 @@ public class ConstList
 	}
 	
 	public static String gameVersion = null;
-	public static String gameInstallurl = null;
 
 	public static int LinkPoolSize = 20;
-	
-	
-	public static String debugUserKey = "094ca7ceff3ab0c6af27b98420493fb9";
-	
-	public static HashMap<Integer, String> blackWordList; // 黑话列表
 
-	public static String httpConfigFileName = "server.json";
-
-	public static String roomConfigFileName = "room.json";
 
 	public static String dbConfigFileName = "db-config.xml";
 
-	public static final String cpid = "710525";
-	public static final String gameId = "652510052578";
 
-	public static final String SenderId = "760";
-
-	public static final String ChannelId = "10002000";
-	public static final String DefaultChannelId = "15077000";
 
 	public static final String CMD_LOOK_CARD = "1"; // 看牌
 	public static final String CMD_ADD_BET = "2"; // 加注
@@ -202,13 +185,6 @@ public class ConstList
 	public static String ht = "C"; // 红桃
 	public static String mh = "B"; // 梅花
 	public static String fk = "A"; // 方块
-
-	/**
-	 * 房间类型
-	 */
-	public static final String RoomType_RG = "rg"; // 普通场
-	public static final String RoomType_KS = "ks"; // 快速场
-	public static final String RoomType_GD = "gd"; // 金币场
 
 	public static final int level_9_ExpireTime = 20000; // 第9级优先级消息队列的过期时间为20秒
 	public static final int level_8_ExpireTime = 40000; // 第8级优先级消息队列的过期时间为40秒

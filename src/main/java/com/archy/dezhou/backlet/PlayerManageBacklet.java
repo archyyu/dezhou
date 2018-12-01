@@ -11,7 +11,6 @@ import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.UserInfo;
 import com.archy.dezhou.ndb.PlayerManager;
-import com.archy.dezhou.thread.AsynchronousModule;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.HashMap;
@@ -230,9 +229,7 @@ public class PlayerManageBacklet extends DataBacklet
 			}
 			else
 			{
-				AsynchronousModule mm = new AsynchronousModule(
-						password, email, HANDLENAME);
-				mm.t.start();
+
 				xmlByteA = BackletKit.infoXml("Dealing").getBytes();
 			}
 		

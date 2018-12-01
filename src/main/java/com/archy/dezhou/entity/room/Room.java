@@ -3,6 +3,7 @@ package com.archy.dezhou.entity.room;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.Global.ConstList;
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.container.ActionscriptObject;
@@ -10,7 +11,6 @@ import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.entity.ConnectInstance;
 import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
@@ -18,7 +18,6 @@ import com.archy.dezhou.util.HeartTimer;
 import com.archy.dezhou.Global.PropValues;
 import com.archy.dezhou.Global.UserInfoMemoryCache;
 import com.archy.dezhou.container.RoomVariable;
-import com.archy.dezhou.container.TimerMessageQuene;
 import com.archy.dezhou.entity.room.base.IPukerGame;
 import com.archy.dezhou.entity.room.base.IRoomState;
 import com.archy.dezhou.util.Utils;
@@ -27,36 +26,9 @@ public class Room implements IRoom
 {
 
 	private Logger log = Logger.getLogger(getClass());
-	
-	
-	private Map<String,String> roomConfig = null;
- 	
-	/**
-	 *
-	 *
-	 **/
-	public Room(String name ,String zone,String Creater,String roomType)
-	{
-		setRoomID();
-		this.name = name;
-		this.zone = zone;
-		this.creator = Creater;
-		this.roomType = roomType;
-		
-		this.roomConfig = UserModule.getInstance().getRoomConfigByType(roomType);
-		if(this.roomConfig == null)
-		{
-			log.fatal("create room error ,room type not exist : " + roomType);
-			return ;
-		}
-		
-		this.pokerGame = new PukerGame(this);
-	}
 
-	public void destroyExtensions()
-	{
-
-	}
+    private int roomid;
+    private String name;
 	
 	@Override
 	public boolean isUserInRoom(User user)
@@ -277,7 +249,6 @@ public class Room implements IRoom
 	@Override
 	public int userLeave(User user)
 	{
-		user.clearBetMessageQuene();
 		this.forceRemoveUser(user);
 		return 0;
 	}
@@ -427,87 +398,12 @@ public class Room implements IRoom
 		return false;
 	}
 
-	public User getUserByName(String userName)
-	{
-		for(User user : this.userMap.values())
-		{
-			if(user.getName().equals(userName))
-			{
-				return user;
-			}
-		}
-		return null;
-	}
 
-	public User getUserByUid(String Uid)
-	{
-		for(Map.Entry<Integer, User>  entry : this.userMap.entrySet())
-		{
-			if(entry.getValue().getUid().equals(Uid))
-			{
-				return entry.getValue();
-			}
-		}
-		return null;
-	}
-
-	public User[] getSpectatorList()
-	{
-		return this.spectatorList.toArray(new User[this.spectatorList.size()]);
-	}
 
 	@Override
 	public User[] getAllUsers()
 	{
 		return this.userMap.values().toArray(new User[this.userMap.size()]);
-	}
-
-	public User[] getAllUsersButOne(User user)
-	{
-		List<User> tempUserList = new ArrayList<User>();
-		tempUserList.addAll(this.userMap.values());
-		tempUserList.remove(user);
-		return tempUserList.toArray(new User[tempUserList.size()]);
-	}
-
-	public User[] getAllUsersButOne(Integer uid)
-	{
-		User user = UserModule.getInstance().getUserByUserId(uid);
-		return this.getAllUsersButOne(user);
-	}
-
-	public String getXmlVariable(String varName)
-	{
-		StringBuffer xmlVar = new StringBuffer();
-		RoomVariable rv = roomVariables.get(varName);
-		if (rv != null)
-		{
-			xmlVar.append("<var n='").append(varName);
-			xmlVar.append("' t='").append(rv.getType());
-			xmlVar.append("'><![CDATA[").append(rv.getValue())
-					.append("]]></var>");
-		}
-		return xmlVar.toString();
-	}
-
-	public List<String> getVariableNames()
-	{
-		List<String> ll = new LinkedList<String>();
-		synchronized (roomVariables)
-		{
-			ll.addAll(roomVariables.keySet());
-		}
-		return ll;
-	}
-
-	public Map<String, RoomVariable> getVariables()
-	{
-		return roomVariables;
-	}
-
-	public RoomVariable getVariable(String varName)
-	{
-		return roomVariables.get(varName);
 	}
 
 	@Override
@@ -531,10 +427,6 @@ public class Room implements IRoom
 		this.name = name;
 	}
 
-	public boolean isPrivate()
-	{
-		return isPrivate;
-	}
 
 	public boolean isTemp()
 	{
@@ -608,73 +500,8 @@ public class Room implements IRoom
 	{
 		return creator;
 	}
-	
-	public void notifyRoomPlayerButOne(ActionscriptObject aObj, ConstList.MessageType msgType, String uId)
-	{
-		long timeStamp = System.currentTimeMillis();
-		Set<User> users = new HashSet<User>();
-		
-		synchronized (this.userMap)
-		{
-			users.addAll(this.userMap.values());
-		}
-		synchronized (this.spectatorList)
-		{
-			users.addAll(this.spectatorList);
-		}
-		
-		for(User user : users)
-		{
-			if(user.getUid().equals(uId))
-			{
-				continue;
-			}
-			
-			ConnectInstance connect = new ConnectInstance();
-			connect.status = 0;
-			connect.roomKey = this.getName();
-			connect.priority = (byte) msgType.getMessageLevel();
-			connect.CreateTmeStampe = timeStamp;
-			aObj.put("ts", connect.CreateTmeStampe + "");
-			connect.expireTime = msgType.getMessageExpireTime();
-			connect.aObj = aObj;
-			connect._cmd = aObj.getString("_cmd");
-			++TimerMessageQuene.totalLinkid;
-			connect.linkid = TimerMessageQuene.totalLinkid;
-			user.sendBetMessage(connect);
-		}
-	}
-	
-	public void notifyRoomPlayer(ActionscriptObject aObj, ConstList.MessageType msgType)
-	{
-		long timeStamp = System.currentTimeMillis();
-		Set<User> users = new HashSet<User>();
-		
-		synchronized (this.userMap)
-		{
-			users.addAll(this.userMap.values());
-		}
-		synchronized (this.spectatorList)
-		{
-			users.addAll(this.spectatorList);
-		}
-		
-		for(User user : users)
-		{
-			ConnectInstance connect = new ConnectInstance();
-			connect.status = 0;
-			connect.roomKey = this.getName();
-			connect.priority = (byte) msgType.getMessageLevel();
-			connect.CreateTmeStampe = timeStamp;
-			aObj.put("ts", connect.CreateTmeStampe + "");
-			connect.expireTime = msgType.getMessageExpireTime();
-			connect.aObj = aObj;
-			connect._cmd = aObj.getString("_cmd");
-			++TimerMessageQuene.totalLinkid;
-			connect.linkid = TimerMessageQuene.totalLinkid;
-			user.sendBetMessage(connect);
-		}
-	}
+	private Integer minbuy;
+	private Integer maxbuy;
 
 	private void setRoomID()
 	{
@@ -695,61 +522,8 @@ public class Room implements IRoom
 	{
 		this.isLimbo = isLimbo;
 	}
-	
-	public String getRoomType()
-	{
-		return this.roomType;
-	}
-	
-	public String getChineseName()
-	{
-		return this.roomConfig.get("showname");
-	}
-	
-	@Override
-	public int getMinBuy()
-	{
-		String str = this.roomConfig.get("mixbuy");
-		if(str != null)
-		{
-			return Integer.parseInt(str);
-		}
-		return 0;
-	}
-	
-	@Override
-	public int getSBet()
-	{
-		String str = this.roomConfig.get("sbet");
-		if(str != null)
-		{
-			return Integer.parseInt(str);
-		}
-		return 0;
-	}
-	
-	@Override
-	public int getBBet()
-	{
-		String str = this.roomConfig.get("bbet");
-		if(str != null)
-		{
-			return Integer.parseInt(str);
-		}
-		return 0;
-	}
-	
-	@Override
-	public int getMaxBuy()
-	{
-		String str = this.roomConfig.get("maxbuy");
-		if(str != null)
-		{
-			return Integer.parseInt(str);
-		}
-		return 0;
-	}
-	
+
+
 	@Override
 	public boolean isGame()
 	{
@@ -777,119 +551,102 @@ public class Room implements IRoom
 		}
 		return this.pokerGame.getSecsPassByTurn();
 	}
-	
-	@Override
-	public String getValueByKey(String key)
+	private Integer bbet;
+	private Integer sbet;
+	private String showname;
+
+	/**
+	 *
+	 *
+	 **/
+	public Room(String name ,String zone,String creator)
 	{
-		return this.roomConfig.get(key);
+		setRoomID();
+
+		this.name = name;
+		this.zone = zone;
+		this.creator = creator;
+
+
+		this.pokerGame = new PukerGame(this);
 	}
-	
-	@Override
-	public ActionscriptObject toAsObj()
+
+	public Room(JSONObject obj)
+    {
+        setRoomID();
+
+        this.name = obj.getString("name");
+        this.creator = "admin";
+        this.bbet = obj.getIntValue("bbet");
+        this.sbet = obj.getIntValue("sbet");
+        this.minbuy = obj.getIntValue("mixbuy");
+        this.maxbuy = obj.getIntValue("maxbuy");
+        this.showname = obj.getString("showname");
+
+        this.pokerGame = new PukerGame(this);
+    }
+
+	public void notifyRoomPlayerButOne(ActionscriptObject aObj, ConstList.MessageType msgType, String uId)
 	{
-		ActionscriptObject response = new ActionscriptObject();
-		
-		response.put("_cmd",ConstList.CMD_ROOMINFO);
-		response.put("ig", this.isGame()?"yes":"no");
-		response.putNumber("turn",this.pokerGame.getTurn());
-		response.putNumber("round",this.pokerGame.getRound());
-		
-		response.putNumber("mbet",this.getBBet());
-		response.putNumber("sbet",this.getSBet());
-		response.putNumber("msid",this.pokerGame.maxSeatId());
-		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
-		response.putNumber("wt",this.pokerGame.getNextSeatId());
-		
-		response.putNumber("minbuy",this.getMinBuy());
-		response.putNumber("maxbuy",this.getMaxBuy());
-		
-		response.put("chname",this.getValueByKey("showname"));
-		response.put("roomName",this.getName());
-		response.putNumber("fpb",this.pokerGame.getPoolBet(1));
-		response.putNumber("spb",this.pokerGame.getPoolBet(2));
-		response.putNumber("tpb",this.pokerGame.getPoolBet(3));
-		response.putNumber("fopb",this.pokerGame.getPoolBet(4));
-		
-		if(this.isGame())
+		long timeStamp = System.currentTimeMillis();
+		Set<User> users = new HashSet<User>();
+
+		synchronized (this.userMap)
 		{
-			response.put("fpk",this.pokerGame.fiveSharePkToAsob());
+			users.addAll(this.userMap.values());
 		}
-		
-		ActionscriptObject as_plist = new ActionscriptObject();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		synchronized (this.spectatorList)
 		{
-			ActionscriptObject as_player = new ActionscriptObject();
-			Player player = entry.getValue();
-			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-			
-			if(uinfo == null)
+			users.addAll(this.spectatorList);
+		}
+
+		for(User user : users)
+		{
+			if(user.getUid().equals(uId))
 			{
 				continue;
 			}
-			
-			HashMap<String, HashMap<String, Integer>> propmap = uinfo.getPropmap();
-			HashMap<String, Integer> showmap = propmap.get(PropValues.Prop_MainType_A);
-			HashMap<String, Integer> funcwmap = propmap.get(PropValues.Prop_MainType_B);
+			// TODO 通知其他用户，我做了什么
 
-			String dj_show = "0";
-			for (String key : showmap.keySet())
-			{
-				dj_show = key;
-			}
-			as_player.put("dj_show", dj_show);
-			
-			ActionscriptObject dj_func = new ActionscriptObject();
-			for (String key : funcwmap.keySet())
-			{
-				dj_func.put("type", key);
-				dj_func.put("ucount", String.valueOf(funcwmap.get(key)));
-			}
-			as_player.put("dj_func", dj_func);
-			
-			as_player.put("un",uinfo.getName());
-			as_player.putNumber("lev",Utils.retLevelAndExp(uinfo.getExprience())[0]);
-			as_player.putNumber("sid",entry.getKey());
-			as_player.put("uid",player.getUserId());
-			
-			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.put("pic",uinfo.getPic());
-			as_player.putBool("isp",uinfo.isPlaying());
-			as_player.putNumber("tb",player.getTempBet());
-			as_player.putNumber("yt",player.getYourTurn());
-			
-			as_player.putNumber("cm",uinfo.getRmoney());
-			as_player.putNumber("tm",uinfo.getAMoney());
-			as_player.putNumber("gs",player.getGameState().value());
-			as_player.putNumber("ps",player.getPlayerState().value());
-			
-			as_player.putNumber("frb", uinfo.getFirstRoundBet());
-			as_player.putNumber("srb", uinfo.getSecondRoundBet());
-			as_player.putNumber("trb", uinfo.getThirdRoundBet());
-			as_player.putNumber("ftrb", uinfo.getFourthRoundBet());
-			
-			if(this.isGame())
-			{
-				Puke p = player.getPuke(5);
-				if(p != null)
-				{
-					as_player.put("pk1",p.toAobj());
-				}
-				
-				Puke p2 = player.getPuke(6);
-				if(p2 != null)
-				{
-					as_player.put("pk2",p2.toAobj());
-				}
-				
-			}
-			as_plist.put("sid" + entry.getKey(),as_player);
 		}
-		
-		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
-		response.put("plist",as_plist);
-		
-		return response;
 	}
+
+	public void notifyRoomPlayer(ActionscriptObject aObj, ConstList.MessageType msgType)
+	{
+		long timeStamp = System.currentTimeMillis();
+		Set<User> users = new HashSet<User>();
+
+		synchronized (this.userMap)
+		{
+			users.addAll(this.userMap.values());
+		}
+		synchronized (this.spectatorList)
+		{
+			users.addAll(this.spectatorList);
+		}
+
+		//通知房间其他用户
+	}
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Integer getMinbuy() {
+        return minbuy;
+    }
+
+    public void setMinbuy(Integer minbuy) {
+        this.minbuy = minbuy;
+    }
+
+    public Integer getMaxbuy() {
+        return maxbuy;
+    }
+
+    public void setMaxbuy(Integer maxbuy) {
+        this.maxbuy = maxbuy;
+    }
 	
 	public Map<Integer,Player> userListToPlayerMap()
 	{
@@ -900,13 +657,7 @@ public class Room implements IRoom
 	
 	private static AtomicInteger autoId = new AtomicInteger(0);
 	
-	private int roomid;
-	
-	private String name;
-	
-	private String roomType = "";
-	
-	private Map<String, RoomVariable> roomVariables = new HashMap<String, RoomVariable>();
+
 	
 	//进入并且坐下的玩家
 	private Map<Integer,User> userMap = new Hashtable<Integer,User>();
@@ -915,13 +666,144 @@ public class Room implements IRoom
 	
 	//进入房间，但是尚未坐下的玩家
 	private Set<User> spectatorList = Collections.synchronizedSet( new HashSet<User>() );
-	
-	private boolean isPrivate;
-	
+
+    public Integer getBbet() {
+        return bbet;
+    }
+
+    public void setBbet(Integer bbet) {
+        this.bbet = bbet;
+    }
+
 	private boolean isLimbo;
 	
 	private String zone;
 	
 	public String creator;
+
+    public Integer getSbet() {
+        return sbet;
+    }
+
+    public void setSbet(Integer sbet) {
+        this.sbet = sbet;
+    }
+
+    public String getShowname() {
+        return showname;
+    }
+
+    public void setShowname(String showname) {
+        this.showname = showname;
+    }
+
+    @Override
+	public ActionscriptObject toAsObj()
+	{
+		ActionscriptObject response = new ActionscriptObject();
+
+		response.put("_cmd",ConstList.CMD_ROOMINFO);
+		response.put("ig", this.isGame()?"yes":"no");
+		response.putNumber("turn",this.pokerGame.getTurn());
+		response.putNumber("round",this.pokerGame.getRound());
+
+		response.putNumber("mbet",this.getBbet());
+		response.putNumber("sbet",this.getSbet());
+		response.putNumber("msid",this.pokerGame.maxSeatId());
+		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
+		response.putNumber("wt",this.pokerGame.getNextSeatId());
+
+		response.putNumber("minbuy",this.getMinbuy());
+		response.putNumber("maxbuy",this.getMaxbuy());
+
+		response.put("chname",this.getShowname());
+		response.put("roomName",this.getName());
+		response.putNumber("fpb",this.pokerGame.getPoolBet(1));
+		response.putNumber("spb",this.pokerGame.getPoolBet(2));
+		response.putNumber("tpb",this.pokerGame.getPoolBet(3));
+		response.putNumber("fopb",this.pokerGame.getPoolBet(4));
+
+		if(this.isGame())
+		{
+			response.put("fpk",this.pokerGame.fiveSharePkToAsob());
+		}
+
+		ActionscriptObject as_plist = new ActionscriptObject();
+		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		{
+			ActionscriptObject as_player = new ActionscriptObject();
+			Player player = entry.getValue();
+			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
+
+			if(uinfo == null)
+			{
+				continue;
+			}
+
+			HashMap<String, HashMap<String, Integer>> propmap = uinfo.getPropmap();
+			HashMap<String, Integer> showmap = propmap.get(PropValues.Prop_MainType_A);
+			HashMap<String, Integer> funcwmap = propmap.get(PropValues.Prop_MainType_B);
+
+			String dj_show = "0";
+			for (String key : showmap.keySet())
+			{
+				dj_show = key;
+			}
+			as_player.put("dj_show", dj_show);
+
+			ActionscriptObject dj_func = new ActionscriptObject();
+			for (String key : funcwmap.keySet())
+			{
+				dj_func.put("type", key);
+				dj_func.put("ucount", String.valueOf(funcwmap.get(key)));
+			}
+			as_player.put("dj_func", dj_func);
+
+			as_player.put("un",uinfo.getName());
+			as_player.putNumber("lev",Utils.retLevelAndExp(uinfo.getExprience())[0]);
+			as_player.putNumber("sid",entry.getKey());
+			as_player.put("uid",player.getUserId());
+
+			as_player.putNumber("pkl",player.getPkLevel());
+			as_player.put("pic",uinfo.getPic());
+			as_player.putBool("isp",uinfo.isPlaying());
+			as_player.putNumber("tb",player.getTempBet());
+			as_player.putNumber("yt",player.getYourTurn());
+
+			as_player.putNumber("cm",uinfo.getRmoney());
+			as_player.putNumber("tm",uinfo.getAMoney());
+			as_player.putNumber("gs",player.getGameState().value());
+			as_player.putNumber("ps",player.getPlayerState().value());
+
+			as_player.putNumber("frb", uinfo.getFirstRoundBet());
+			as_player.putNumber("srb", uinfo.getSecondRoundBet());
+			as_player.putNumber("trb", uinfo.getThirdRoundBet());
+			as_player.putNumber("ftrb", uinfo.getFourthRoundBet());
+
+			if(this.isGame())
+			{
+				Puke p = player.getPuke(5);
+				if(p != null)
+				{
+					as_player.put("pk1",p.toAobj());
+				}
+
+				Puke p2 = player.getPuke(6);
+				if(p2 != null)
+				{
+					as_player.put("pk2",p2.toAobj());
+				}
+
+			}
+			as_plist.put("sid" + entry.getKey(),as_player);
+		}
+
+		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
+		response.put("plist",as_plist);
+
+		return response;
+	}
+
+
 	
 }

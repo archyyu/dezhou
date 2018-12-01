@@ -69,7 +69,6 @@ public class RoomListBacklet extends DataBacklet
 //				{
 //					return BackletKit.infoXml("haveBeenEntered").getBytes();
 //				}
-				user.clearBetMessageQuene();
 				oldRoom.userLeave(user);
 				
 //				ConstList.config.logger.info(" leave oldroom: "  + oldRoom.getRoomId() +  " user:" +user);
@@ -103,7 +102,7 @@ public class RoomListBacklet extends DataBacklet
 			{
 				return BackletKit.errorXml("UserNotLogined").getBytes();
 			}
-			user.clearBetMessageQuene();
+
 			IRoom room = UserModule.getInstance().getRoomByName(rName);
 			
 			if(room == null)
@@ -150,17 +149,15 @@ public class RoomListBacklet extends DataBacklet
 			subchild.setAttribute("uc", "" + usercount[1]);
 			subchild.setAttribute("sc", "" + usercount[2]);
 
-			subchild.setAttribute("mix_buy",room.getValueByKey("mixbuy"));
-			subchild.setAttribute("big_bet",room.getValueByKey("bbet"));
-			subchild.setAttribute("ts",room.getValueByKey("ts"));
-			subchild.setAttribute("small_bet",room.getValueByKey("sbet"));
-			subchild.setAttribute("max_buy",room.getValueByKey("maxbuy"));
-			subchild.setAttribute("roomtype",room.getValueByKey("roomtype"));
-			subchild.setAttribute("creater",room.getValueByKey("creater"));
-			subchild.setAttribute("show_name",room.getValueByKey("showname"));
+			subchild.setAttribute("mix_buy","" + room.getMinbuy());
+			subchild.setAttribute("big_bet","" + room.getBbet());
+			subchild.setAttribute("small_bet","" + room.getSbet());
+			subchild.setAttribute("max_buy","" + room.getMaxbuy());
+			subchild.setAttribute("creater",room.getCreator());
+			subchild.setAttribute("show_name",room.getShowname());
 
-			if(  roomlist.get(i).getBBet() >= Integer.parseInt(sb)
-					&& roomlist.get(i).getBBet() <= Integer.parseInt(bb))
+			if(  roomlist.get(i).getBbet() >= Integer.parseInt(sb)
+					&& roomlist.get(i).getBbet() <= Integer.parseInt(bb))
 			{
 				child.addContent(subchild);
 			}

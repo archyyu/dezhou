@@ -13,18 +13,20 @@ import java.util.Map;
 import java.util.List;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.container.AbstractExtension;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.service.Imp.PukeModuleServiceImp;
+import com.archy.dezhou.util.XLoad;
 import org.apache.log4j.Logger;
 
 
 import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.entity.room.base.IRoom;
 import com.archy.dezhou.service.PukeModuleService;
-import com.archy.dezhou.thread.MemberRemoveBind;
 import com.archy.dezhou.thread.roomUnit.OfflineDealUnit;
 import com.archy.dezhou.thread.roomUnit.RoomDealUnit;
 import com.archy.dezhou.entity.Prop;
@@ -32,9 +34,6 @@ import com.archy.dezhou.entity.Prop;
 public class UserModule extends AbstractExtension
 {
 	public Map<Integer, Puke> randomPuke; // 生成牌的集合
-	public String handleName = "httphander";
-	private HashMap<String, HashMap<String, String>> roomset;// 房间设置信息
-	private HashMap<String, Prop> propMap;
 
  	private Logger log = Logger.getLogger(getClass());
 
@@ -129,9 +128,8 @@ public class UserModule extends AbstractExtension
 		log.info("user module **init**");
 
 		userInfoInit();
-		roomMsgInit();
+		roomListInit();
 
-		threadStartInit();
 		this.startRoomThread();
 		
 	}
@@ -156,43 +154,34 @@ public class UserModule extends AbstractExtension
 	{
 		PukeModuleService pms = new PukeModuleServiceImp();
 		randomPuke = pms.Puke();
-		//propMap = XmlReaderUtils.retXmlReaderByProp(ConstList.PropertyFileName);
-		log.info("**propMap init Ok");
-		
-		ConstList.blackWordList = new HashMap<Integer, String>();
-		log.info("**blackWordList init Ok");
+
 	}
-	
-	public Map<String,String> getRoomConfigByType(String roomType)
+
+	private void roomListInit()
 	{
-		return roomset.get(roomType);
-	}
-	
-	private void roomMsgInit()
-	{
-		//roomset = XmlReaderUtils.retXmlReaderByRoom(ConstList.roomConfigFileName);
-		for (String rkey : roomset.keySet())
-		{
-			HashMap<String, String> roomConfig = roomset.get(rkey);
-			try
-			{
-				IRoom room = new Room(roomConfig.get("name"),"","admin",roomConfig.get("name"));
-				this.addRoom(room);
-			}
-			catch (Exception e)
-			{
-				log.error("**buildroom error**",e);
-			}
-		}
+		String content = new String(XLoad.getResource("room.json"));
+
+        JSONArray array = JSONArray.parseArray(content);
+
+        for(int i = 0 ; i < array.size() ; i++){
+
+            JSONObject obj = array.getJSONObject(i);
+
+            try
+            {
+                IRoom room = new Room(obj);
+                this.addRoom(room);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+
 		log.warn("room created ok");
 	}
 
-	private void threadStartInit()
-	{
-		// 定时永久写入数据库文件。
-		MemberRemoveBind write2Db = new MemberRemoveBind("write2Db", handleName);
-		write2Db.mrbThread.start();
-	}
 
 	public void destroy()
 	{
@@ -209,7 +198,7 @@ public class UserModule extends AbstractExtension
 
 	public HashMap<String, Prop> getPropMap()
 	{
-		return propMap;
+		return new HashMap<String, Prop>();
 	}
 
 

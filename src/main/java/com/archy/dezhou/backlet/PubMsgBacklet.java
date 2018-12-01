@@ -8,7 +8,6 @@ import java.util.Map;
 import com.archy.dezhou.Global.UserModule;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.room.base.IRoom;
-import com.archy.dezhou.thread.AsynchronousModule;
 
 public class PubMsgBacklet extends DataBacklet
 {
@@ -63,35 +62,7 @@ public class PubMsgBacklet extends DataBacklet
 		}
 		else 
 		{
-			roomkey = room.getName();
-			AsynchronousModule mm  = null;
-			if(user.getUid().equals("10000") && Command.equals("pubMsg"))
-			{
-				mm = new AsynchronousModule(msg,user,Command,messageType,HANDLENAME);
-			}
-			else if(!user.getUid().equals("10000") && Command.equals("pubMsg"))
-			{
-				mm = new AsynchronousModule(msg,room,user,Command,messageType,HANDLENAME);
-			}
-			else if(Command.equals("priMsg"))
-			{
-				mm = new AsynchronousModule(msg,user,fuid,Command,messageType);
-			}
-			
-			if(mm!= null)
-			{
-				mm.t.start();
-				xmlByteA = BackletKit.infoXml("Dealing").getBytes();	
-			}
-			else if(Command.equals("world"))
-			{
-				httpResponse.headers().set("cmd", "worldMsg");
-				xmlByteA = BackletKit.WorldListXml(user);
-			}
-			else
-			{
-				xmlByteA = BackletKit.infoXml("null").getBytes();	
-			}
+
 		}
 		return xmlByteA;
 	}
