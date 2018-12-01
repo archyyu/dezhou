@@ -1,13 +1,11 @@
 package com.archy.dezhou.backlet;
 
+import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
-import com.archy.dezhou.container.User;
-import com.archy.dezhou.entity.UserInfo;
 import com.archy.dezhou.service.Imp.PlayerService;
 import io.netty.handler.codec.http.FullHttpResponse;
 
@@ -34,8 +32,7 @@ public class ScriptNameBacklet extends DataBacklet
 			String mobile = parms.get("mobile") == null ? "": parms.get("mobile");
 			String key = parms.get("key") == null ? "": parms.get("key");
 			//1 ：真实手机  2：模拟器
-			String uid = "-1";
-			uid = PlayerService.getUidFromMobileUserid(userid);
+			String uid = userid;
 			User user = null;
 			//该用户已经注册了，判断他是否在线
 			if(!uid.equals("-1"))
@@ -79,14 +76,11 @@ public class ScriptNameBacklet extends DataBacklet
 			else if( user != null && key.length() >25 && userid.length()>0)
 			{
 				log.info("该用户已经处于在线状态！");
-				user.bbx_mobile = mobile;
-				user.bbx_userId = userid;
-				user.bbx_userkey = key;
+
 //				PlayerService.writeUserStatus2XmlFile(user,"nosend");
-				UserInfo uinfo  = UserInfoMemoryCache.getUserInfo(uid);
+				User uinfo  = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
 				ActionscriptObject response = PlayerService.getUinfo(uinfo,true);
 				response.put("Ver", ConstList.gameVersion);
-				response.put("key", user.bbx_userkey);
 
 				if(resetPassword.equals("yes"))
 				{
@@ -106,7 +100,6 @@ public class ScriptNameBacklet extends DataBacklet
 			}
 			else 
 			{
-				ConstList.config.logger.info("模拟器用户：uid="+uid+",(user == null)="+(user == null)+",userid="+userid+",key="+key);
 				xmlByteA = BackletKit.errorXml("EmulatorCantAutoLogin").getBytes();
 			}
 

@@ -7,45 +7,14 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
-import com.archy.dezhou.util.Config;
 import com.archy.dezhou.util.XLoad;
 
 public class ConstList
 {
 
-	public static Config config = new Config();
 
-	private static Logger log = Logger.getLogger(ConstList.class);
-	
-	/**
-	 *初始化db配置 
-	 **/
-	public static void initDbConfig()
-	{
-		try
-		{
-			byte[] bytes = XLoad.getResource(ConstList.dbConfigFileName);
-			SAXReader reader = new SAXReader(); 
-	    	StringReader read = new StringReader(new String(bytes));
-	    	Document document = reader.read(read);
-	    	Element root = document.getRootElement();
-	    	
-    		ConstList.LinkPoolSize = Integer.parseInt( root.element("dbpoolsize").getText() );
-	    	
-		}
-		catch (Exception e)
-		{
-			log.error("decode db config error", e);
-		}
-	}
 	
 	public static String gameVersion = null;
-
-	public static int LinkPoolSize = 20;
-
-
-	public static String dbConfigFileName = "db-config.xml";
-
 
 
 	public static final String CMD_LOOK_CARD = "1"; // 看牌

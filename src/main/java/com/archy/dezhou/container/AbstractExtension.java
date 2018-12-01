@@ -2,9 +2,11 @@ package com.archy.dezhou.container;
 
 import java.util.LinkedList;
 
+import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.util.json.JSONException;
 import com.archy.dezhou.util.json.JSONObject;
+import com.archy.dezhou.entity.User;
 import net.n3.nanoxml.IXMLElement;
 
 public abstract class AbstractExtension

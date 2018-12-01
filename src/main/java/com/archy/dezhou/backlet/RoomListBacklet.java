@@ -4,10 +4,11 @@ package com.archy.dezhou.backlet;
  *@author archy_yu 
  **/
 
+import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.User;
+import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
-import com.archy.dezhou.container.User;
-import com.archy.dezhou.entity.room.base.IRoom;
 import io.netty.handler.codec.http.FullHttpResponse;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -53,15 +54,15 @@ public class RoomListBacklet extends DataBacklet
 			httpResponse.headers().set("cmd", "roomjoin");
 			httpResponse.headers().set("ts", "-1");
 			
-			IRoom room = UserModule.getInstance().getRoomByName(roomname);
-			User user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+			Room room = UserModule.getInstance().getRoomByName(roomname);
+			Player user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
 			
 			if(room == null || user == null)
 			{
 				return BackletKit.errorXml("UserNotLogined").getBytes();
 			}
 			
-			IRoom oldRoom = UserModule.getInstance().getRoom(user.getRoomId());
+			Room oldRoom = UserModule.getInstance().getRoom(user.getRoomId());
 			if(oldRoom != null)
 			{
 				
@@ -95,7 +96,7 @@ public class RoomListBacklet extends DataBacklet
 		{
 			String uid = parms.get("uid");
 			String rName = parms.get("name");
-			User user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+			Player user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
 			
 			
 			if(user == null)
@@ -103,7 +104,7 @@ public class RoomListBacklet extends DataBacklet
 				return BackletKit.errorXml("UserNotLogined").getBytes();
 			}
 
-			IRoom room = UserModule.getInstance().getRoomByName(rName);
+			Room room = UserModule.getInstance().getRoomByName(rName);
 			
 			if(room == null)
 			{
@@ -134,13 +135,13 @@ public class RoomListBacklet extends DataBacklet
 	public String getRoomListFromMemory(String roomtype, String bb,
 											   String sb)
 	{
-		List<IRoom> roomlist = UserModule.getInstance().getRoomList();
+		List<Room> roomlist = UserModule.getInstance().getRoomList();
 		String xmlString = "";
 		Element root = new Element("roomCollection");
 		Element child = new Element("rooms");
 		for (int i = 0; i < roomlist.size(); i++)
 		{
-			IRoom room = roomlist.get(i);
+			Room room = roomlist.get(i);
 			Element subchild = new Element("room");
 			subchild.setAttribute("id", "" + room.getRoomId());
 			subchild.setAttribute("name", room.getName());

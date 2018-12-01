@@ -1,5 +1,7 @@
 package com.archy.dezhou.container;
 
+import com.archy.dezhou.entity.User;
+
 public class RoomVariable extends UserVariable
 {
 

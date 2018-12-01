@@ -10,17 +10,15 @@ import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.entity.puker.FivePukeItem;
 import com.archy.dezhou.entity.puker.PukerKit;
 import com.archy.dezhou.util.Config;
 
-public class Player
+public class Player extends User
 {
 
 	private int seatId = -1; // 座位号
-	
-	private String userId; // 用户Id
+
 	
 	private int yourTurn = 0; // 下注标识 1 代表 yes 0 no
 
@@ -115,16 +113,6 @@ public class Player
 	public void setSeatId(int seatId)
 	{
 		this.seatId = seatId;
-	}
-
-	public String getUserId()
-	{
-		return userId;
-	}
-
-	public void setUserId(String userId)
-	{
-		this.userId = userId;
 	}
 
 	public PlayerCareerState getPlayerState()
@@ -247,15 +235,14 @@ public class Player
 	public ActionscriptObject toAsObj()
 	{
 		ActionscriptObject asObj = new ActionscriptObject();
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(this.userId);
 		
 		asObj.putNumber("sid",this.getSeatId());
-		asObj.put("un",uInfo.getName());
-		asObj.put("uid",this.getUserId());
+		asObj.put("un",this.getName());
+		asObj.put("uid",this.getUid());
 		asObj.putNumber("tb",this.getTempBet());
 		asObj.putNumber("yt",this.getYourTurn());
 		asObj.putNumber("gs",this.getGameState().value());
-		asObj.putNumber("cm",uInfo.getRmoney());
+		asObj.putNumber("cm",this.getRmoney());
 		
 		return asObj;
 	}

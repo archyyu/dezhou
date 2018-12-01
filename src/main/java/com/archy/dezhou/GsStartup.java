@@ -5,6 +5,7 @@ import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.netty.HttpServerKit;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 /**
  *@author archy_yu 
@@ -26,8 +27,8 @@ public class GsStartup
 		
 		try
 		{
-			ConstList.initDbConfig();
-			log.warn("db config init ok");
+
+			PropertyConfigurator.configure("log4j.properties");
 			
 			UserModule.getInstance().init();
 			log.warn("UserModule init ok");

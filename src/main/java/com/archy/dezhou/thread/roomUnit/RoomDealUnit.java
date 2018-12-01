@@ -3,8 +3,8 @@ package com.archy.dezhou.thread.roomUnit;
 import java.util.List;
 import java.util.ArrayList;
 
+import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.global.UserModule;
-import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.thread.roomUnit.base.IRoomDealUnit;
@@ -26,9 +26,9 @@ public class RoomDealUnit implements IRoomDealUnit
 		{
 			long start = System.currentTimeMillis();
 			
-			List<IRoom> roomListCpy = new ArrayList<IRoom>();
+			List<Room> roomListCpy = new ArrayList<Room>();
 			roomListCpy.addAll(UserModule.getInstance().getRoomList());
-			for(IRoom room : roomListCpy)
+			for(Room room : roomListCpy)
 			{
 				room.beatHeart(start);
 			}

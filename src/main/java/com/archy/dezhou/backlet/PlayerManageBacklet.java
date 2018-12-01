@@ -4,12 +4,13 @@ package com.archy.dezhou.backlet;
  *@author archy_yu 
  **/
 
+import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
-import com.archy.dezhou.entity.UserInfo;
+import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.service.Imp.PlayerService;
 import io.netty.handler.codec.http.FullHttpResponse;
 
@@ -70,8 +71,7 @@ public class PlayerManageBacklet extends DataBacklet
 			String userid = parms.get("userid");
 			String key = parms.get("key");
 
-			String uid = PlayerService
-					.getUidFromMobileUserid(userid);
+			String uid = userid;
 			if (userid.length() > 0 && !uid.equals("-1"))
 			{
 				ConstList.config.logger.info("uid=" + uid);
@@ -144,12 +144,12 @@ public class PlayerManageBacklet extends DataBacklet
 					: parms.get("np");
 			String oldPassword = parms.get("op") == null ? ""
 					: parms.get("op");
-			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid);
+			User uinfo = PlayerService.selectPlayerById(Integer.parseInt(uid));
 
 			response.headers().set("cmd", "registerupdate");
 			response.headers().set("ts", "-1");
 			response.headers().set("num", "0");
-			if (! UserInfoMemoryCache.isUserInfoOnline(uid) )
+			if ( UserModule.getInstance().getUserByUserId(Integer.parseInt(uid)) == null )
 			{
 				XmlError = BackletKit.errorXml("UserNotLogined");
 				xmlByteA = XmlError.getBytes();
@@ -246,8 +246,8 @@ public class PlayerManageBacklet extends DataBacklet
 			}
 			else
 			{
-				UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid);
-				UserInfo cuinfo = UserInfoMemoryCache.getUserInfo(cuid);
+				Player uinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+				Player cuinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(cuid));
 				if (uinfo == null)
 				{
 					xmlByteA = BackletKit.errorXml("YouAreNotLogined!")
@@ -277,66 +277,13 @@ public class PlayerManageBacklet extends DataBacklet
 			}
 		
 		}
-		else if(subCmd.equals(PICUPDATE))
-		{
-
-			String uid = parms.get("uid");
-			String pic = parms.get("pic");
-
-			if (uid == null || pic == null)
-			{
-				xmlByteA = BackletKit.errorXml("ParmsIsInvalid")
-						.getBytes();
-			}
-			else
-			{
-				UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid);
-				if (uinfo == null)
-					xmlByteA =BackletKit.errorXml("YouAreNotLogined").getBytes();
-				else
-				{
-					uinfo.setPic(pic);
-					String subFolderName = String
-							.valueOf(Integer.parseInt(uid) % 20);
-					String destFilename = "session/player/"
-							+ subFolderName + "/" + uid
-							+ "_info.xml";
-//					PlayerService.writeUserInfo2XmlFile(uinfo, HANDLENAME);
-					SAXBuilder builder = new SAXBuilder(false);
-					ActionscriptObject PassWordInfo = new ActionscriptObject();
-
-					ActionscriptObject upodatetatus = PlayerService.UpdateUserInfo(uinfo, PassWordInfo);
-					ActionscriptObject asResponse = null;
-
-					asResponse = PlayerService.getUinfo(uinfo, true);
-
-					if (upodatetatus == null)
-					{
-						asResponse.put("status", "registerUpdatefail");
-						asResponse.put("code", "0");
-						asResponse.put("cnt", "用户资料修改失败！");
-					}
-					else
-					{
-						asResponse.put("status",upodatetatus.get("status"));
-						asResponse.put("code",upodatetatus.get("code"));
-						asResponse.put("cnt",upodatetatus.get("cnt"));
-					}
-					StringBuffer sb = new StringBuffer();
-					sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-					xmlByteA = SFSObjectSerializer.obj2xml(asResponse, 0, "", sb);
-					xmlByteA = BackletKit.SimpleObjectXml(xmlByteA);
-				}
-			}
-		}
 		else if(subCmd.equals(LOGOUT))
 		{
 			String uid = parms.get("uid");
-			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid);
+			Player uinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
 			if (uinfo != null)
 			{
 				xmlByteA = BackletKit.infoXml("loginoutOk").getBytes();
-				UserInfoMemoryCache.removeUserInfo(uid);
 			}
 			else
 			{
@@ -348,8 +295,7 @@ public class PlayerManageBacklet extends DataBacklet
 		{
 			String uid = parms.get("uid");
 			String rName = parms.get("rn");
-			
-			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid);
+
 		}
 		else
 		{

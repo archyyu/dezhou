@@ -6,13 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.archy.dezhou.global.UserModule;
+
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.User;
 import com.archy.dezhou.util.Config;
 
 
-public class UserInfo
+public class User
 {
 	private int uid = 0;
 	private String roomType = "pt";
@@ -69,7 +68,7 @@ public class UserInfo
 	private String dateStr = "";
 
 	private int pklevel = 0; // 扑克的等级
-	private HashMap<Integer, Puke> pkType = new HashMap<Integer, Puke>();// 玩家牌的集合
+
 	private int firstRoundBet = 0; // 第一轮押注筹码
 	private int secondRoundBet = 0; // 第二轮押注筹码
 	private int thirdRoundBet = 0; // 第三轮押注筹码
@@ -107,7 +106,9 @@ public class UserInfo
 	private String maxhandstr= "";
 	private long maxhandvalue = 0;
 	public String isTeachFinished = new String("-1");
-	public boolean ifkicked = false;
+
+	private Integer roomId;
+
 	public int[][] diamondList = new int[][]
 	{
 	{ 113, 0 },
@@ -120,12 +121,20 @@ public class UserInfo
 
 	protected Logger log = Logger.getLogger(Config.class.getName());
 	/*****************************************************************************************************/
-	public UserInfo()
+	public User()
 	{
 
 	}
 
-	public long getIfRewards()
+    public Integer getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
+    }
+
+    public long getIfRewards()
 	{
 		return ifrewards;
 	}
@@ -208,16 +217,6 @@ public class UserInfo
 	public void SetDaojuLis(ActionscriptObject DaojuList)
 	{
 		this.DaojuList = DaojuList;
-	}
-
-	public HashMap<Integer, Puke> getPkType()
-	{
-		return pkType;
-	}
-
-	public void setPkType(HashMap<Integer, Puke> pkType)
-	{
-		this.pkType = pkType;
 	}
 
 	public int getFirstRoundBet()
@@ -304,6 +303,16 @@ public class UserInfo
 		else
 			this.maxTMoney = maxTMoney;
 	}
+
+    public boolean isStandUpExpired(long time)
+    {
+        return false;
+    }
+
+    public boolean isLeaveExpired(long time)
+    {
+        return false;
+    }
 
 	public Map<Integer, Puke> getMaxHand()
 	{
@@ -394,11 +403,6 @@ public class UserInfo
 	public void setName(String name)
 	{
 		this.name = name;
-		User user = UserModule.getInstance().getUserByUserId(this.uid);
-		if(user != null)
-		{
-			user.setName(name);
-		}
 	}
 
 	public int getWinTzCount()
@@ -411,9 +415,9 @@ public class UserInfo
 		this.winTzCount = winTzCount;
 	}
 
-	public String getUid()
+	public Integer getUid()
 	{
-		return uid + "";
+		return uid;
 	}
 
 	public String getPassWord()
@@ -523,6 +527,11 @@ public class UserInfo
 			this.roommoney -= rmoney;
 		}
 	}
+
+	public boolean isOffLine()
+    {
+        return false;
+    }
 	
 
 	public void setBackupRmoney(int rmoney)

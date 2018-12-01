@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 import com.archy.dezhou.backlet.base.IDataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.User;
+import com.archy.dezhou.entity.User;
 
 public class BackletKit
 {
@@ -21,7 +21,6 @@ public class BackletKit
 		backlets.put("userManage", new PlayerManageBacklet());
 		backlets.put("roomlist", new RoomListBacklet());
 		backlets.put("bet",new PukeLogicBacket());
-		backlets.put("other", new OtherBacklet());
 		backlets.put("scriptName", new ScriptNameBacklet());
 		backlets.put("pubMsg", new PubMsgBacklet());
 	}

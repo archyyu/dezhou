@@ -9,29 +9,25 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
-import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.entity.room.base.IRoom;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.global.PropValues;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.entity.puker.PukerKit;
-import com.archy.dezhou.entity.room.base.IPukerGame;
 import com.archy.dezhou.util.Utils;
 
 
-public class PukerGame implements IPukerGame
+public class PukerGame
 {
 	
 	private Logger log = Logger.getLogger(getClass());
 	
-	private IRoom room = null;
+	private Room room = null;
 	
 	//当前的庄家座位号
 	private int bankSeatId = 0;
@@ -70,19 +66,14 @@ public class PukerGame implements IPukerGame
 	
 	Map<Integer,Integer> roundPoolBet = new HashMap<Integer,Integer>();
 	
-	public PukerGame(IRoom room)
+	public PukerGame(Room room)
 	{
 		this.room = room;
 	}
 	
-	
-	@Override
+
 	public void beatHeart( long now )
 	{
-//		if(this.isGameOver() && this.room.isGame())
-//		{
-//			this.gameOverHandle();
-//		}
 		
 		if(this.currentPlayer == null)
 		{
@@ -92,7 +83,7 @@ public class PukerGame implements IPukerGame
 		if(this.currentPlayer.isDropCardExpired(now))
 		{
 			Player tempPlayer = this.currentPlayer;
-			log.info("roomName: " + this.room.getName() + " seat: " + this.currentPlayer.getSeatId() + " Id: " + this.currentPlayer.getUserId() + " drop card time expired");
+			log.info("roomName: " + this.room.getName() + " seat: " + this.currentPlayer.getSeatId() + " Id: " + this.currentPlayer.getUid() + " drop card time expired");
 			this.currentPlayer.addDropCardNum();
 			this.playerDropCard(this.currentPlayer);
 			
@@ -100,17 +91,14 @@ public class PukerGame implements IPukerGame
 			{
 				if(tempPlayer.getDropCardNum() >= 2)
 				{
-					User user = UserModule.getInstance().getUserByUserId(Integer.parseInt( tempPlayer.getUserId() ));
-					if(user != null)
-					{
-						IRoom room = UserModule.getInstance().getRoom(user.getRoomId());
-						if(room != null)
-						{
-							log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId() 
-									+ " userId: " + user.getUserId() + " 两次弃牌，导致被站起 ");
-							room.userStandUp(user,true);
-						}
-					}
+
+                    Room room = UserModule.getInstance().getRoom(tempPlayer.getRoomId());
+                    if(room != null)
+                    {
+                        log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId()
+                                + " userId: " + tempPlayer.getUid() + " 两次弃牌，导致被站起 ");
+                        room.userStandUp(tempPlayer.getUid(),true);
+                    }
 				}
 			}
 			
@@ -118,7 +106,7 @@ public class PukerGame implements IPukerGame
 		
 	}
 
-	@Override
+	
 	public void gameStartHandle()
 	{
 		log.info("roomName: " + this.room.getName() + " 新一轮扑克比赛开始");
@@ -151,7 +139,7 @@ public class PukerGame implements IPukerGame
 		this.clearPublicPoolBet();
 	}
 	
-	@Override
+	
 	public void clearLessMoneyPlayer()
 	{
 		
@@ -160,40 +148,32 @@ public class PukerGame implements IPukerGame
 		
 		for(Map.Entry<Integer, Player> entry : tempPlayerMap.entrySet())
 		{
-			User user = UserModule.getInstance().getUserByUserId(Integer.parseInt(entry.getValue().getUserId()));
-			UserInfo userInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
-			
-			if(userInfo.getRmoney() < this.room.getBbet())
+			if(entry.getValue().getRmoney() < this.room.getBbet())
 			{
-				this.room.userStandUp(user,true);
+				this.room.userStandUp(entry.getValue().getUid(),true);
 			}
 		}
 	}
 	
-	@Override
+	
 	public void resetAllPlayer()
 	{
 		this.playerMap.clear();
 		this.playerMap.putAll( this.room.userListToPlayerMap() );
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			UserInfo userInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
-			if(userInfo != null)
-			{
-				userInfo.setPlaying(true);
-			}
-			
+		    entry.getValue().setPlaying(true);
 			entry.getValue().clearTempBet();
 			entry.getValue().clearTotalGambleBet();
 			entry.getValue().setYourTurn(0);
 			entry.getValue().clearPukeInfo();
 			entry.getValue().setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
 			entry.getValue().setGameState(ConstList.PlayerGameState.PLAYER_STATE_PLAYER);
-			log.info("roomName: " + this.room.getName() + " 参与玩家: seat: " + entry.getValue().getSeatId() + " Id: " + entry.getValue().getUserId());
+			log.info("roomName: " + this.room.getName() + " 参与玩家: seat: " + entry.getValue().getSeatId() + " Id: " + entry.getValue().getUid());
 		}
 	}
 	
-	@Override
+	
 	public void autoSetPlayerState()
 	{
 		List<Player> playerList = new ArrayList<Player>();
@@ -237,13 +217,11 @@ public class PukerGame implements IPukerGame
 		smallBlind.addTempBet(this.maxBet/2);
 		smallBlind.addTotalGambleBet(this.maxBet/2);
 		
-		log.info("roomName: " + this.room.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUserId() + " deduct Bet " + this.maxBet);
-		log.info("roomName: " + this.room.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUserId() + " deduct Bet " + this.maxBet/2);
-		
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(bigBlind.getUserId());
-		uInfo.deductRmoney(this.maxBet);
-		uInfo = UserInfoMemoryCache.getUserInfo(smallBlind.getUserId());
-		uInfo.deductRmoney(this.maxBet/2);
+		log.info("roomName: " + this.room.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
+		log.info("roomName: " + this.room.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUid() + " deduct Bet " + this.maxBet/2);
+
+        bigBlind.deductRmoney(this.maxBet);
+        smallBlind.deductRmoney(this.maxBet/2);
 		
 	}
 	
@@ -260,7 +238,7 @@ public class PukerGame implements IPukerGame
 		}
 		
 		log.info("roomName: " + this.room.getName() + " banker : seat: " + this.bankSeatId 
-				+ " Id: " + this.playerMap.get(this.bankSeatId).getUserId());
+				+ " Id: " + this.playerMap.get(this.bankSeatId).getUid());
 	}
 	
 	public Player popNextPlayer()
@@ -275,7 +253,7 @@ public class PukerGame implements IPukerGame
 		return this.currentPlayer;
 	}
 	
-	@Override
+	
 	public void dispatchPukers()
 	{
 		int totalPuke = 2 * playerMap.size() + 5;
@@ -302,7 +280,7 @@ public class PukerGame implements IPukerGame
 			
 			log.info("roomName: " + this.room.getName() +
 					" seat: " + entry.getValue().getSeatId() +
-					" Id: " + entry.getValue().getUserId() + 
+					" Id: " + entry.getValue().getUid() +
 					" puke1: " + PukerKit.getPuke(pukeArray[n-1]).toString() +
 					" puke2: " + PukerKit.getPuke(pukeArray[n-1 + playerMap.size()]).toString());
 			
@@ -310,7 +288,7 @@ public class PukerGame implements IPukerGame
 		}
 	}
 	
-	@Override
+	
 	public int getSecsPassByTurn()
 	{
 		if(this.currentPlayer == null)
@@ -330,7 +308,7 @@ public class PukerGame implements IPukerGame
 		
 		for(Player player : players)
 		{
-			log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUserId()
+			log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid()
 					+ " handleValue: " + player.getPkValue()
 					+ " gambleValue: " + player.getTotalGambleBet());
 		}
@@ -390,12 +368,11 @@ public class PukerGame implements IPukerGame
 			
 			for(Player player : sameCardPlayers)
 			{
-				UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-				uInfo.addRmoney(totalBet/sameCardPlayers.size());
+                player.addRmoney(totalBet/sameCardPlayers.size());
 			
 				log.info("roomName: " + this.room.getName() 
 						+ " 奖励   seat : " + player.getSeatId() 
-						+ " Id: " + player.getUserId() 
+						+ " Id: " + player.getUid()
 						+ " add : " + totalBet/sameCardPlayers.size() );
 				
 				if(this.winMap.containsKey(player.getSeatId()))
@@ -405,7 +382,7 @@ public class PukerGame implements IPukerGame
 				else
 				{
 					this.winMap.put(player.getSeatId(), totalBet/sameCardPlayers.size());
-					uInfo.addWinNum();
+                    player.addWinNum();
 				}
 			}
 			
@@ -415,13 +392,13 @@ public class PukerGame implements IPukerGame
 		
 	}
 	
-	@Override
+	
 	public void clearPublicPoolBet()
 	{
 		this.publicPoolBet = 0;
 	}
 	
-	@Override
+	
 	public ActionscriptObject fiveSharePkToAsob()
 	{
 		ActionscriptObject aso = new ActionscriptObject();
@@ -432,7 +409,7 @@ public class PukerGame implements IPukerGame
 		return aso;
 	}
 	
-	@Override
+	
 	public void settleRoundPlayersOnStart()
 	{
 		this.playerList.clear();
@@ -460,7 +437,7 @@ public class PukerGame implements IPukerGame
 		}
 		
 		Player tempPlayer = this.playerList.peek();
-		while(!tempPlayer.getUserId().equals(player.getUserId()))
+		while(!tempPlayer.getUid().equals(player.getUid()))
 		{
 			this.playerList.offer(this.playerList.poll());
 			tempPlayer = this.playerList.peek();
@@ -468,7 +445,7 @@ public class PukerGame implements IPukerGame
 		this.playerList.poll();
 	}
 	
-	@Override
+	
 	public void settleRoundPlayerOnRoundOver()
 	{
 		this.playerList.clear();
@@ -508,17 +485,13 @@ public class PukerGame implements IPukerGame
 		}
 	}
 
-	@Override
+	
 	public void gameOverHandle()
 	{
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			UserInfo userInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
-			if(userInfo != null)
-			{
-				userInfo.setPlaying(false);
-				userInfo.addCompletePkNum();
-			}
+			entry.getValue().setPlaying(false);
+			entry.getValue().addCompletePkNum();
 		}
 		
 		this.currentPlayer = null;
@@ -529,16 +502,7 @@ public class PukerGame implements IPukerGame
 		this.room.gameOverHandle();
 		this.notifyRoomPlayerRoundOver();
 		this.notifyRoomPlayerPokeGameOver();
-		
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			UserInfo userInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
-			if(userInfo != null)
-			{
-				userInfo.setSaveUpdate(true);
-			}
-		}
-		
+
 		this.clearLessMoneyPlayer();
 	}
 	
@@ -548,12 +512,15 @@ public class PukerGame implements IPukerGame
 		int j = players.size();
 		for(int i = 0; i < j; i++)
 		{
+
+		    Player player =  players.get(i);
 			
 			Map<Integer, Puke> maxHand = new HashMap<Integer, Puke>();
 
-			List<Puke> fivePk = players.get(i).getFivePk();
-			long fivepkvalue = players.get(i).getPkValue();
-			UserInfo usInfo = UserInfoMemoryCache.getUserInfo(players.get(i).getUserId());
+			List<Puke> fivePk = player.getFivePk();
+			long fivepkvalue = player.getPkValue();
+
+
 			int l = fivePk.size();
 			for(int k = 0; k < l; k++)
 			{
@@ -561,22 +528,22 @@ public class PukerGame implements IPukerGame
 			}
 
 			
-			if(usInfo.getMaxHandStr().equals(""))
+			if(player.getMaxHandStr().equals(""))
 			{
-				usInfo.setMaxHand(maxHand);
-				usInfo.setMaxHandValue(fivepkvalue);
-				usInfo.setMaxHandStr(usInfo.GetMaxhandStringFromObj(usInfo.getMaxHand()));
+                player.setMaxHand(maxHand);
+                player.setMaxHandValue(fivepkvalue);
+                player.setMaxHandStr(player.GetMaxhandStringFromObj(player.getMaxHand()));
 			}
 			else 
 			{
 				if(players.get(i).getGameState() != ConstList.PlayerGameState.GAME_STATE_STANDUP
 					 && players.get(i).getGameState() != ConstList.PlayerGameState.GAME_STATE_DROP_CARD )
 				{
-					if(fivepkvalue > usInfo.getMaxHandValue())
+					if(fivepkvalue > player.getMaxHandValue())
 					{
-						usInfo.setMaxHand(maxHand);
-						usInfo.setMaxHandValue(fivepkvalue);
-						usInfo.setMaxHandStr(usInfo.GetMaxhandStringFromObj(usInfo.getMaxHand()));
+                        player.setMaxHand(maxHand);
+                        player.setMaxHandValue(fivepkvalue);
+                        player.setMaxHandStr(player.GetMaxhandStringFromObj(player.getMaxHand()));
 					}
 				}	
 			}
@@ -584,7 +551,7 @@ public class PukerGame implements IPukerGame
 
 	}
 	
-	@Override
+	
 	public ActionscriptObject toAsObj()
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -602,54 +569,36 @@ public class PukerGame implements IPukerGame
 		
 		response.putNumber("mbet",this.maxBet());
 		response.putNumber("wt_sid",this.currentPlayer.getSeatId());
-		response.put("wt_uid",this.currentPlayer.getUserId());
+		response.put("wt_uid",this.currentPlayer.getUid());
 		
 		ActionscriptObject as_plist = new ActionscriptObject();
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
 			ActionscriptObject as_player = new ActionscriptObject();
 			Player player = entry.getValue();
-			UserInfo uinfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
+
+
+
 			
-			HashMap<String, HashMap<String, Integer>> propmap = uinfo.getPropmap();
-			HashMap<String, Integer> showmap = propmap.get(PropValues.Prop_MainType_A);
-			HashMap<String, Integer> funcwmap = propmap.get(PropValues.Prop_MainType_B);
-			
-			String dj_show = "0";
-			for (String key : showmap.keySet())
-			{
-				dj_show = key;
-			}
-			as_player.put("dj_show", dj_show);
-			
-			ActionscriptObject dj_func = new ActionscriptObject();
-			for (String key : funcwmap.keySet())
-			{
-				dj_func.put("type", key);
-				dj_func.put("ucount", String.valueOf(funcwmap.get(key)));
-			}
-			as_player.put("dj_func", dj_func);
-			
-			as_player.put("un",uinfo.getName());
-			as_player.putNumber("lev",Utils.retLevelAndExp(uinfo.getExprience())[0]);
+			as_player.put("un",player.getName());
 			as_player.putNumber("sid",entry.getKey());
-			as_player.put("uid",player.getUserId());
+			as_player.put("uid",player.getUid());
 			
 			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.put("pic",uinfo.getPic());
+			as_player.put("pic",player.getPic());
 			as_player.putBool("isp",true);
 			as_player.putNumber("tb",player.getTempBet());
 			as_player.putNumber("yt",player.getYourTurn());
 			
-			as_player.putNumber("cm",uinfo.getRmoney());
-			as_player.putNumber("tm",uinfo.getAMoney());
+			as_player.putNumber("cm",player.getRmoney());
+			as_player.putNumber("tm",player.getAMoney());
 			as_player.putNumber("gs",player.getGameState().value());
 			as_player.putNumber("ps",player.getPlayerState().value());
 			
-			as_player.putNumber("frb", uinfo.getFirstRoundBet());
-			as_player.putNumber("srb", uinfo.getSecondRoundBet());
-			as_player.putNumber("trb", uinfo.getThirdRoundBet());
-			as_player.putNumber("ftrb", uinfo.getFourthRoundBet());
+			as_player.putNumber("frb", player.getFirstRoundBet());
+			as_player.putNumber("srb", player.getSecondRoundBet());
+			as_player.putNumber("trb", player.getThirdRoundBet());
+			as_player.putNumber("ftrb", player.getFourthRoundBet());
 			
 			Puke p = player.getPuke(5);
 			if(p != null)
@@ -671,7 +620,7 @@ public class PukerGame implements IPukerGame
 		return response;
 	}
 	
-	@Override
+	
 	public void notifyRoomPlayerPokeGameOver()
 	{
 		ActionscriptObject asObj = new ActionscriptObject();
@@ -705,8 +654,7 @@ public class PukerGame implements IPukerGame
 			{
 				continue;
 			}
-			UserInfo uInfo = UserInfoMemoryCache.getUserInfo(entry.getValue().getUserId());
-			cmList.put(entry.getValue().getSeatId(),uInfo.getRmoney() + "");
+			cmList.put(entry.getValue().getSeatId(),entry.getValue().getRmoney() + "");
 		}
 		asObj.put("cmList",cmList);
 		asObj.put("_cmd",ConstList.CMD_DBT); 
@@ -714,7 +662,7 @@ public class PukerGame implements IPukerGame
 		this.room.notifyRoomPlayer(asObj, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
-	@Override
+	
 	public void notifyRoomPlayerPokeGameStart()
 	{
 		ActionscriptObject response = this.toAsObj();
@@ -729,12 +677,12 @@ public class PukerGame implements IPukerGame
 		response.put("_cmd",ConstList.CMD_WHO_TURN);
 		response.putNumber("mbet",this.maxBet);
 		response.putNumber("wt_sid",currentPlayer.getSeatId());
-		response.put("wt_uid",currentPlayer.getUserId());
+		response.put("wt_uid",currentPlayer.getUid());
 		
 		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
-	@Override
+	
 	public void turnOverHandle()
 	{
 		if(this.room.isGame() == false )
@@ -763,7 +711,7 @@ public class PukerGame implements IPukerGame
 		return this.playerList.isEmpty();
 	}
 	
-	@Override
+	
 	public boolean isGameOverWhenDropCard()
 	{
 		int size = 0;
@@ -803,7 +751,7 @@ public class PukerGame implements IPukerGame
         return size >= 2;
     }
 	
-	@Override
+	
 	public boolean isGameOver()
 	{
 		if(this.round >= 4)
@@ -854,7 +802,7 @@ public class PukerGame implements IPukerGame
         return this.playerMap.containsKey(player.getSeatId()) != false;
     }
 	
-	@Override
+	
 	public void roundOverHandle()
 	{
 		if(this.isGameOver())
@@ -886,7 +834,7 @@ public class PukerGame implements IPukerGame
 		return ;
 	}
 	
-	@Override
+	
 	public void notifyRoomPlayerRoundOver()
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -909,7 +857,7 @@ public class PukerGame implements IPukerGame
 		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerLookCard(Player player)
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -918,7 +866,7 @@ public class PukerGame implements IPukerGame
 			response.put("error","notYourTurn");
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " not your turn ");
+					+ player.getUid() + " not your turn ");
 			
 			return response;
 		}
@@ -931,19 +879,19 @@ public class PukerGame implements IPukerGame
 		response.put("_cmd", ConstList.CMD_LOOK_CARD);
 		response.put("user", as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUserId() + " look card " );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUserId());
+		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " look card " );
+		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
 	
-	@Override
+	
 	public void addPoolBet(int bet)
 	{
 		this.currentRoundBet += bet;
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerAddBet(Player player,int bet)
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -953,17 +901,16 @@ public class PukerGame implements IPukerGame
 			
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " not your turn ");
+					+ player.getUid() + " not your turn ");
 			
 			return response;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_ADD_BET);
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-		
-		if(bet > uInfo.getRmoney())
+
+		if(bet > player.getRmoney())
 		{
-			bet = uInfo.getRmoney();
+			bet = player.getRmoney();
 		}
 		
 		if(bet < 2 * (this.maxBet - player.getTempBet()))
@@ -972,7 +919,7 @@ public class PukerGame implements IPukerGame
 			
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " add bet error bet: " + bet);
+					+ player.getUid() + " add bet error bet: " + bet);
 			
 			return response;
 		}
@@ -980,7 +927,7 @@ public class PukerGame implements IPukerGame
 		this.addPoolBet(bet);
 		player.addTempBet(bet);
 		player.addTotalGambleBet(bet);
-		uInfo.deductRmoney(bet);
+		player.deductRmoney(bet);
 		player.setYourTurn(0);
 		
 		if(player.getTempBet() > this.maxBet)
@@ -993,14 +940,14 @@ public class PukerGame implements IPukerGame
 		response.put("_cmd",ConstList.CMD_ADD_BET);
 		response.put("user",as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUserId() + " add " + bet  );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUserId());
+		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " add " + bet  );
+		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.settleRoundPlayersOnAddBet(player);
 		this.turnOverHandle();
 		return response;
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerFollowBet(Player player,int bet)
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -1010,17 +957,16 @@ public class PukerGame implements IPukerGame
 			
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " not your turn ");
+					+ player.getUid() + " not your turn ");
 			
 			return response;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_FOLLOW_BET);
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-		
-		if(bet > uInfo.getRmoney())
+
+		if(bet > player.getRmoney())
 		{
-			bet = uInfo.getRmoney();
+			bet = player.getRmoney();
 		}
 		
 		if(player.getTempBet() + bet < this.maxBet)
@@ -1028,7 +974,7 @@ public class PukerGame implements IPukerGame
 			response.put("error","YouParmsisNotValid");
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " call error,bet: " + bet);
+					+ player.getUid() + " call error,bet: " + bet);
 			
 			return response;
 		}
@@ -1036,7 +982,7 @@ public class PukerGame implements IPukerGame
 		this.addPoolBet(bet);
 		player.addTempBet(bet);
 		player.addTotalGambleBet(bet);
-		uInfo.deductRmoney(bet);
+		player.deductRmoney(bet);
 		player.setYourTurn(0);
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_FOLLOW_BET);
 		
@@ -1050,13 +996,13 @@ public class PukerGame implements IPukerGame
 		ActionscriptObject as_player = player.toAsObj();
 		response.put("user",as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUserId() + " call " + bet );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUserId());
+		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet );
+		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerDropCard(Player player)
 	{
 		
@@ -1067,7 +1013,7 @@ public class PukerGame implements IPukerGame
 			
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " not your turn ");
+					+ player.getUid() + " not your turn ");
 			
 			return response;
 		}
@@ -1080,7 +1026,7 @@ public class PukerGame implements IPukerGame
 		
 		this.publicPoolBet += player.getTotalGambleBet();
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUserId() + " drop card " );
+		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " drop card " );
 		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 		this.turnOverHandle();
 		if(this.room.isGame() && this.isGameOverWhenDropCard())
@@ -1091,7 +1037,7 @@ public class PukerGame implements IPukerGame
 		return response;
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerAllIn(Player player,int bet)
 	{
 		ActionscriptObject response = new ActionscriptObject();
@@ -1101,21 +1047,20 @@ public class PukerGame implements IPukerGame
 			
 			log.error("roomName: " + this.room.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
-					+ player.getUserId() + " not your turn ");
+					+ player.getUid() + " not your turn ");
 			
 			return response;
 		}
-		
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-		if(bet > uInfo.getRmoney())
+
+		if(bet > player.getRmoney())
 		{
-			bet = uInfo.getRmoney();
+			bet = player.getRmoney();
 		}
 		
 		this.addPoolBet(bet);
 		player.addTempBet(bet);
 		player.addTotalGambleBet(bet);
-		uInfo.deductRmoney(bet);
+		player.deductRmoney(bet);
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_ALL_END);
 		player.setYourTurn(0);
@@ -1130,13 +1075,13 @@ public class PukerGame implements IPukerGame
 		response.put("_cmd",ConstList.CMD_ALL_IN);
 		response.put("user",player.toAsObj());
 		
-		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUserId() + " all in " + bet );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUserId());
+		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " all in " + bet );
+		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
 	
-	@Override
+	
 	public ActionscriptObject playerStandUp(Player player)
 	{
 		if(player == null)
@@ -1150,13 +1095,12 @@ public class PukerGame implements IPukerGame
 		}
 		
 		ActionscriptObject response = new ActionscriptObject();
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-		
+
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
-		
-		uInfo.addAmoney(uInfo.getRmoney());
-		uInfo.clearRoomMoney();
+
+		player.addAmoney(player.getRmoney());
+		player.clearRoomMoney();
 		
 		ActionscriptObject as_player = player.toAsObj();
 		as_player.putBool("isp",false);
@@ -1175,7 +1119,7 @@ public class PukerGame implements IPukerGame
 		return response;
 	}
 	
-	@Override
+	
 	public boolean isYouTurn(Player player)
 	{
 		if(this.currentPlayer == null || player == null)
@@ -1183,35 +1127,33 @@ public class PukerGame implements IPukerGame
 			return false;
 		}
 
-        return player.getUserId().equals(this.currentPlayer.getUserId());
+        return player.getUid().equals(this.currentPlayer.getUid());
 
     }
 	
-	@Override
+	
 	public ActionscriptObject playerLeave(Player player)
 	{
 		this.playerMap.remove(player.getSeatId());
 		ActionscriptObject response = new ActionscriptObject();
-		UserInfo uInfo = UserInfoMemoryCache.getUserInfo(player.getUserId());
-		User user = UserModule.getInstance().getUserByUserId(Integer.parseInt( player.getUserId() ));
-		
+
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
-		
-		uInfo.addAmoney(uInfo.getRmoney());
-		uInfo.clearRoomMoney();
-		
-		user.setRoomId(-1);
+
+		player.addAmoney(player.getRmoney());
+
+		player.setRoomId(-1);
+
 		ActionscriptObject as_player = player.toAsObj();
 		
 		response.put("_cmd",ConstList.CMD_LEAVE);
 		response.put("_user",as_player);
 
-		if(this.room.isPlayerSitDown(player.getUserId()))
+		if(this.room.isPlayerSitDown(player.getUid()))
 		{
 			response.put("flag","sit");
 			response.put("user",as_player);
-			this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUserId());
+			this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		}
 		else
 		{
@@ -1226,7 +1168,7 @@ public class PukerGame implements IPukerGame
 		return response;
 	}
 	
-	public boolean isUserPlaying(String uid)
+	public boolean isUserPlaying(Integer uid)
 	{	
 		if(this.room.isGame() == false)
 		{
@@ -1235,7 +1177,7 @@ public class PukerGame implements IPukerGame
 		
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			if(entry.getValue().getUserId().equals(uid))
+			if(entry.getValue().getUid().equals(uid))
 			{
 				return true;
 			}
@@ -1244,14 +1186,14 @@ public class PukerGame implements IPukerGame
 		return false;
 	}
 	
-	@Override
+	
 	public void playerStandup(int seatId)
 	{
 		Player player = playerMap.get(seatId);
 		if(player != null)
 		{
 			this.publicPoolBet += player.getTotalGambleBet();
-			if(this.currentPlayer != null && player.getUserId().equals(this.currentPlayer.getUserId()))
+			if(this.currentPlayer != null && player.getUid().equals(this.currentPlayer.getUid()))
 			{
 				this.turnOverHandle();
 			}
@@ -1261,12 +1203,12 @@ public class PukerGame implements IPukerGame
 		return ;
 	}
 	
-	@Override
+	
 	public Player findPlayerByUser(User u)
 	{
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			if(entry.getValue().getUserId().equals(u.getUid()))
+			if(entry.getValue().getUid().equals(u.getUid()))
 			{
 				return entry.getValue();
 			}
@@ -1274,31 +1216,31 @@ public class PukerGame implements IPukerGame
 		return null;
 	}
 	
-	@Override
+	
 	public int getTurn()
 	{
 		return this.roundNum;
 	}
 	
-	@Override
+	
 	public int getRound()
 	{
 		return this.round;
 	}
 	
-	@Override
+	
 	public int maxBet()
 	{
 		return this.maxBet;
 	}
 	
-	@Override
+	
 	public int maxSeatId()
 	{
 		return this.maxBetSeatId;
 	}
 	
-	@Override
+	
 	public int getPoolBet(int round)
 	{
 		if(this.roundPoolBet.containsKey(round))
@@ -1311,13 +1253,13 @@ public class PukerGame implements IPukerGame
 		}
 	}
 	
-	@Override
+	
 	public int getBankerSeatId()
 	{
 		return this.bankSeatId;
 	}
 	
-	@Override
+	
 	public int getNextSeatId()
 	{
 		if(currentPlayer == null)
@@ -1327,7 +1269,7 @@ public class PukerGame implements IPukerGame
 		return this.currentPlayer.getSeatId();
 	}
 	
-	@Override
+	
 	public void settleNextTurnPlayer()
 	{
 		this.popNextPlayer();

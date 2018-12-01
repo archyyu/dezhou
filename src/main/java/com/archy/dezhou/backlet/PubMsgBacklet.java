@@ -1,13 +1,13 @@
 package com.archy.dezhou.backlet;
 
 import com.archy.dezhou.backlet.base.DataBacklet;
+import com.archy.dezhou.entity.room.Room;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;
 
 import com.archy.dezhou.global.UserModule;
-import com.archy.dezhou.container.User;
-import com.archy.dezhou.entity.room.base.IRoom;
+import com.archy.dezhou.entity.User;
 
 public class PubMsgBacklet extends DataBacklet
 {
@@ -18,7 +18,7 @@ public class PubMsgBacklet extends DataBacklet
 	{
 		byte[] xmlByteA = null;
 
-		IRoom room = null;
+		Room room = null;
 		String roomkey = null;
 		String uid = parms.get("uid") == null ? "" : parms.get("uid");
 		String rn = parms.get("rn") == null ? "" : parms.get("rn");

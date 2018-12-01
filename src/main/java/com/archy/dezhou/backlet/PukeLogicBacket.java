@@ -1,20 +1,18 @@
 package com.archy.dezhou.backlet;
 
+import com.archy.dezhou.entity.room.PukerGame;
+import com.archy.dezhou.entity.room.Room;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;
 
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.backlet.base.DataBacklet;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
-import com.archy.dezhou.container.User;
-import com.archy.dezhou.entity.room.base.IPukerGame;
-import com.archy.dezhou.entity.room.base.IRoom;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.UserInfo;
+import com.archy.dezhou.entity.User;
 
 public class PukeLogicBacket extends DataBacklet
 {
@@ -28,23 +26,20 @@ public class PukeLogicBacket extends DataBacklet
 		byte[] xmlByteA = null;
 		ActionscriptObject asObj = null;
 
-		User user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+		Player user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
 		if(user == null)
 		{
 			return BackletKit.errorXml("UserNotLogined").getBytes();
 		}
+
 		
-		user.updateOperateTime();
-		
-		UserInfo userInfo = UserInfoMemoryCache.getUserInfo(uid);
-		
-		IRoom room = UserModule.getInstance().getRoom( user.getRoomId() );
+		Room room = UserModule.getInstance().getRoom( user.getRoomId() );
 		if(room == null)
 		{
 			return BackletKit.errorXml("parmsInInvalid").getBytes();
 		}
 		
-		IPukerGame game = room.getPokerGame();
+		PukerGame game = room.getPokerGame();
 		Player player = game.findPlayerByUser(user);
 		
 		if(player != null)
@@ -69,13 +64,13 @@ public class PukeLogicBacket extends DataBacklet
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerAddBet(player,bet);
-					userInfo.setSaveUpdate(true);
+					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_FOLLOW_BET))
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerFollowBet(player,bet);
-					userInfo.setSaveUpdate(true);
+					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_DROP_CARD))
 				{
@@ -85,7 +80,7 @@ public class PukeLogicBacket extends DataBacklet
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerAllIn(player,bet);
-					userInfo.setSaveUpdate(true);
+					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_SITDOWN))
 				{
@@ -99,7 +94,7 @@ public class PukeLogicBacket extends DataBacklet
 				}
 				else if(cmd.equals(ConstList.CMD_STANDUP))
 				{
-					asObj = room.userStandUp(user,false);
+					asObj = room.userStandUp(user.getUid(),false);
 					if(game != null)
 					{
 						if(room.isGame() && game.isGameOverWhenDropCard())
@@ -135,7 +130,7 @@ public class PukeLogicBacket extends DataBacklet
 			{
 				log.error("CMD_FLUSHACH=="+ cmd);
 						
-				asObj = userInfo.getAcheiveList();
+				asObj = user.getAcheiveList();
 			}
 			if(asObj == null)
 			{

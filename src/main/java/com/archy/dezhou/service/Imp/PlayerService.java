@@ -13,35 +13,28 @@ import java.util.Random;
 import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.MD5;
-import com.archy.dezhou.container.User;
+import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.User;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserInfoMemoryCache;
 import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.util.PayFinalValue;
 import com.archy.dezhou.util.Utils;
-import com.archy.dezhou.entity.UserInfo;
 
-/**
- * 用户实体对象共分为3类： user_info 用户的属性信息，为用户注册的信息汇总。 user 用户之间互动的信息。 player 用户玩德州扑克的信息。
- */
+
 public class PlayerService
 {
 
 	protected static Logger log = Logger.getLogger(PlayerService.class);
-	/*******************************************************************************
-	 * 操作UserInfoMemoryCache.userinfo单个元素的方法相关。 从数据库中获得单个用户的属性信息userinfo。
-	 * 关键字：uid_info.xml
-	 */
 
 	private static SqlSessionFactory	sqlMapper	= null;
 
 	@SuppressWarnings("unchecked")
-	public static UserInfo NewUserInfoFromDb(String uid)
+	public static User NewUserInfoFromDb(String uid)
 	{
 		SqlSession session = sqlMapper.openSession();
 		List<Object> getUserInfo = null;
@@ -62,7 +55,7 @@ public class PlayerService
 
 		if(getUserInfo != null && getUserInfo.size() > 0)
 		{
-			UserInfo usInfo = getUserInfoData((UserInfo) getUserInfo.get(0));
+			User usInfo = getUserInfoData((User) getUserInfo.get(0));
 			return usInfo;
 		}
 		else
@@ -72,37 +65,36 @@ public class PlayerService
 		}
 	}
 
-	public static UserInfo getUserInfoData(UserInfo usInfo)
+	public static User getUserInfoData(User usInfo)
 	{
-		UserInfo userInfo = usInfo;
+		User user = usInfo;
 
 		String ifrewards = String.valueOf(usInfo.getIfRewards());
 		if (ifrewards != null && ifrewards.length() > 4)
 		{
-			userInfo.lastAdwardsTime = ifrewards;
+			user.lastAdwardsTime = ifrewards;
 		}
 		else
 		{
-			userInfo.lastAdwardsTime = String.valueOf(System.currentTimeMillis());
+			user.lastAdwardsTime = String.valueOf(System.currentTimeMillis());
 		}
 
 		String todayStr = Utils.getDateToStr(0);
-		userInfo.setDateStr(todayStr);
-		UserInfoMemoryCache.addUserInfo(userInfo);
+		user.setDateStr(todayStr);
 
-		return userInfo;
+		return user;
 	}
 
 
 
-	public static ActionscriptObject UpdateUserInfo(UserInfo userInfo, ActionscriptObject passwordInfo)
+	public static ActionscriptObject UpdateUserInfo(User user, ActionscriptObject passwordInfo)
 	{
 		ActionscriptObject UpdateStatus = new ActionscriptObject();
 
 		String name = "";
 		try
 		{
-			name = URLDecoder.decode(userInfo.getName(),"UTF-8");
+			name = URLDecoder.decode(user.getName(),"UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -111,8 +103,8 @@ public class PlayerService
 
 		if (passwordInfo.size() != 2)
 		{
-			userInfo.setName(name);
-			userInfo.setSaveUpdate(true);
+			user.setName(name);
+			user.setSaveUpdate(true);
 			UpdateStatus.put("status", "updateUserInfoOk");
 			UpdateStatus.put("cnt", "用户资料修改成功！");
 			UpdateStatus.put("code", "1");
@@ -120,23 +112,23 @@ public class PlayerService
 		else
 		{
 			int rcount = 0;
-			userInfo.setSaveUpdate(false);
+			user.setSaveUpdate(false);
 			String psd = MD5.instance().getHash(passwordInfo.getString("op"));
-			log.warn(" userInfo MD5 getPassWord= " + userInfo.getPassWord()
+			log.warn(" user MD5 getPassWord= " + user.getPassWord()
 				+ " MD5 oldPsd="  + psd);
 
-			if(userInfo.getPassWord().equals(psd))
+			if(user.getPassWord().equals(psd))
 			{
-				log.warn(" userInfo getPassWord= " + passwordInfo.getString("op"));
+				log.warn(" user getPassWord= " + passwordInfo.getString("op"));
 				rcount = 1;
 			}
 
 			if(rcount > 0)
 			{
 				String newPassword = MD5.instance().getHash(passwordInfo.getString("np"));
-				userInfo.setPassWord(newPassword);
-				userInfo.setSaveUpdate(true);
-				log.warn(" updateInfo MD5 userPassword=" + userInfo.getPassWord()
+				user.setPassWord(newPassword);
+				user.setSaveUpdate(true);
+				log.warn(" updateInfo MD5 userPassword=" + user.getPassWord()
 					+ "   userPassword=" + passwordInfo.getString("np"));
 				UpdateStatus.put("status", "updateUserInfoOkIncludePassword");
 				UpdateStatus.put("cnt", "用户密码修改成功！");
@@ -147,7 +139,7 @@ public class PlayerService
 				UpdateStatus.put("status", "PasswordIsNoMatch");
 				UpdateStatus.put("code", "0");
 				UpdateStatus.put("cnt", "用户密码不匹配，密码修改失败！");
-				userInfo.setSaveUpdate(false);
+				user.setSaveUpdate(false);
 			}
 		}
 
@@ -207,11 +199,11 @@ public class PlayerService
 			{
 				ActionscriptObject oneUser = new ActionscriptObject();
 
-				oneUser.put("pic", (((UserInfo)userInfoRankList.get(i)).getPic()));
-				oneUser.put("name", (((UserInfo)userInfoRankList.get(i)).getName()));
-				oneUser.put("uid", (((UserInfo)userInfoRankList.get(i)).getUid()));
-				oneUser.put("level", (((UserInfo)userInfoRankList.get(i)).getLevel()));
-				oneUser.put("allmoney", (((UserInfo)userInfoRankList.get(i)).getAMoney()));
+				oneUser.put("pic", (((User)userInfoRankList.get(i)).getPic()));
+				oneUser.put("name", (((User)userInfoRankList.get(i)).getName()));
+				oneUser.put("uid", (((User)userInfoRankList.get(i)).getUid()));
+				oneUser.put("level", (((User)userInfoRankList.get(i)).getLevel()));
+				oneUser.put("allmoney", (((User)userInfoRankList.get(i)).getAMoney()));
 
 				rankList.put(i, oneUser);
 			}
@@ -290,7 +282,7 @@ public class PlayerService
 
 		if(userInfoList != null && userInfoList.size() > 0)
 		{
-			uid = Integer.parseInt(((UserInfo)userInfoList.get(0)).getUid());
+			uid = ((User)userInfoList.get(0)).getUid();
 			log.warn("正常登陆查询数据库uid=" + uid);
 		}
 
@@ -298,37 +290,28 @@ public class PlayerService
 		{
 			try
 			{
-				UserInfo uinfo = UserInfoMemoryCache.getUserInfo(uid + "");
-				if (uinfo == null)
-				{
-					uinfo = NewUserInfoFromDb(String.valueOf(uid));
-				}
+				Player user = PlayerService.selectPlayerById(uid);
 
-				if (uinfo.getRmoney() > 0)
+				if (user.getRmoney() > 0)
 				{
-					uinfo.addAmoney(uinfo.getRmoney());
-					uinfo.clearRoomMoney();
+					user.addAmoney(user.getRmoney());
+					user.clearRoomMoney();
 				}
-				uinfo.setLastUpdateTime(System.currentTimeMillis());
-				uinfo.setLoginNum(uinfo.getLoginNum() + 1);
+				user.setLastUpdateTime(System.currentTimeMillis());
+				user.setLoginNum(user.getLoginNum() + 1);
 
 				String s = setNowStandardTimeString();
-				uinfo.setLogintime(s);
-				uinfo.setOline(true);
-				UserInfoMemoryCache.addUserInfo(uinfo);
+				user.setLogintime(s);
+				user.setOline(true);
 
-				User user = new User(uinfo.getName());
-				user.setUid(String.valueOf(uid));
+
 
 				UserModule.getInstance().addUser(user);
 
-				if (key == null || key.length() < 10)
-					key = setDefaultUserKeyWithNullUserId(user.getUid());
 
-				user.setUid(String.valueOf(uid));
-				user.bbx_userkey = key;
+				user.setUid(uid);
 
-				ActionscriptObject response = getUinfo(uinfo, true);
+				ActionscriptObject response = getUinfo(user, true);
 				if (isauto)
 				{
 					response.put("isauto", "yes");
@@ -340,17 +323,16 @@ public class PlayerService
 					response.put("mu", mobileUserId);
 				}
 				response.put("key", key);
-				response = getExtraObject(response, uinfo, user);
+				response = getExtraObject(response,user);
 				if (needResetPwd)
 				{
-					response.put("password", resetPasswd(uinfo));
+					response.put("password", resetPasswd(user));
 				}
-				uinfo.setPropmap(refreshUserShowDj(uinfo, user));
 
 				StringBuffer sb = new StringBuffer();
 				sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
-				log.debug("  response==== " + uinfo.getAchList());
+				log.debug("  response==== " + user.getAchList());
 				return SFSObjectSerializer.obj2xml(response, 0, "", sb);
 			}
 			catch (Exception ex)
@@ -397,18 +379,18 @@ public class PlayerService
 				userId = CreateUserId();
 
 				SqlSession sessionAddUser = sqlMapper.openSession();
-				UserInfo getUserInfo = new UserInfo();
+				User getUser = new User();
 
-				getUserInfo.setName(userName);
-				getUserInfo.setUid(userId);
-				getUserInfo.setPassWord(password);
-				getUserInfo.setEmail(email);
-				getUserInfo.setGendar(gendar);
-				getUserInfo.setBirthday(birthday);
+				getUser.setName(userName);
+				getUser.setUid(userId);
+				getUser.setPassWord(password);
+				getUser.setEmail(email);
+				getUser.setGendar(gendar);
+				getUser.setBirthday(birthday);
 
 				try
 				{
-					userInfo = sessionAddUser.insert("ndb.addUser", getUserInfo);
+					userInfo = sessionAddUser.insert("ndb.addUser", getUser);
 					sessionAddUser.commit();
 				}
 				catch (Exception t)
@@ -467,7 +449,7 @@ public class PlayerService
 		int userId = 0;
 
 		HashMap<String, String> userInfoMap = new HashMap<String, String>();
-		String Uid = getUidFromMobileUserid(userid);
+		String Uid = userid;
 		if (!Uid.equals("-1"))
 		{
 			log.warn("这个用户已经注册过");
@@ -538,20 +520,20 @@ public class PlayerService
 
 				SqlSession sessionAddUser = sqlMapper.openSession();
 
-				UserInfo insertUserInfo = new UserInfo();
+				User insertUser = new User();
 
-				insertUserInfo.setUid(userId);
-				insertUserInfo.setName(userName);
-				insertUserInfo.setPassWord(password);
-				insertUserInfo.setEmail(email);
-				insertUserInfo.setGendar(gendar);
-				insertUserInfo.setBirthday(birthday);
-				insertUserInfo.setMobile(userid);
-				insertUserInfo.setSessionKey(key);
+				insertUser.setUid(userId);
+				insertUser.setName(userName);
+				insertUser.setPassWord(password);
+				insertUser.setEmail(email);
+				insertUser.setGendar(gendar);
+				insertUser.setBirthday(birthday);
+				insertUser.setMobile(userid);
+				insertUser.setSessionKey(key);
 
 				try
 				{
-					sessionAddUser.insert("ndb.addUser", insertUserInfo);
+					sessionAddUser.insert("ndb.addUser", insertUser);
 					sessionAddUser.commit();
 				}
 				finally
@@ -637,8 +619,8 @@ public class PlayerService
 		{
 			if(userEmailList != null && userEmailList.size() > 0)
 			{
-				userinfo[0] = ((UserInfo)userEmailList.get(0)).getUid();
-				userinfo[1] = ((UserInfo)userEmailList.get(0)).getName();
+				userinfo[0] = ((User)userEmailList.get(0)).getUid() + "";
+				userinfo[1] = ((User)userEmailList.get(0)).getName();
 				return true;
 			}
 			return false;
@@ -650,7 +632,7 @@ public class PlayerService
 
 	}
 
-	public static String resetPasswd(UserInfo uinfo)
+	public static String resetPasswd(User uinfo)
 	{
 		String resetpasswd = "a";
 		String[] passwordList =
@@ -682,7 +664,7 @@ public class PlayerService
 		return resetpasswd;
 	}
 
-	public static ActionscriptObject getExtraObject(ActionscriptObject response, UserInfo uinfo, User user)
+	public static ActionscriptObject getExtraObject(ActionscriptObject response, User uinfo )
 	{
 		String MaxHandPuker = (uinfo.getMaxHandStr() == null || uinfo.getMaxHandStr()
 				.equals("")) ? "-1" : uinfo.getMaxHandStr();
@@ -693,15 +675,10 @@ public class PlayerService
 		response.put("maxTMoney", uinfo.getmaxTMoney() + "");
 		response.put("Ver", ConstList.gameVersion);
 
-		ActionscriptObject djObjList = getUsedDj(uinfo, user);
-
-		int[][] diamondList = getDiamondList(djObjList, uinfo);
-		response.put("diamond", getDiamondListStr(diamondList));
-		response.put("vip", getVipid(djObjList, uinfo) + "");
 		int experience = uinfo.getExprience();
 		int[] l = Utils.retLevelAndExp(experience);
 		uinfo.setLevel(l[0]);
-		uinfo.diamondList = diamondList;
+
 		response.put("lv", uinfo.getLevel() + "");
 		response.put("curjy", l[1] + "");
 		response.put("upjy", l[2] + "");
@@ -710,7 +687,7 @@ public class PlayerService
 
 	}
 
-	public static HashMap<String, HashMap<String, Integer>> refreshUserShowDj(UserInfo uinfo, User user)
+	public static HashMap<String, HashMap<String, Integer>> refreshUserShowDj(User uinfo, User user)
 	{
 		HashMap<String, HashMap<String, Integer>> props = new HashMap<String, HashMap<String, Integer>>();
 		ActionscriptObject djObjList = getUsedDj(uinfo, user);
@@ -752,9 +729,9 @@ public class PlayerService
 		return props;
 	}
 
-	public static ActionscriptObject getUsedDj(UserInfo uinfo, User user)
+	public static ActionscriptObject getUsedDj(User uinfo, User user)
 	{
-		String uid = uinfo.getUid();
+		String uid = uinfo.getUid() + "";
 		ActionscriptObject response = new ActionscriptObject();
 		ActionscriptObject reqObj = new ActionscriptObject();
 		reqObj.put("uid", uid);
@@ -770,7 +747,7 @@ public class PlayerService
 		return response;
 	}
 
-	public static ActionscriptObject getUserAch(UserInfo uinfo)
+	public static ActionscriptObject getUserAch(User uinfo)
 	{
 		ActionscriptObject response = new ActionscriptObject();
 		ActionscriptObject user = new ActionscriptObject();
@@ -797,28 +774,6 @@ public class PlayerService
 
 		return response;
 	}
-	public static boolean ifHavaEquipedSameDaoju(UserInfo uinfo, User user, int Djid)
-	{
-		boolean flag = false;
-		ActionscriptObject djObjList = getUsedDj(uinfo, user);
-
-		ActionscriptObject mydjList = (ActionscriptObject) djObjList
-				.get("djlist");
-		if (mydjList != null && mydjList.size() > 0)
-		{
-			for (int i = 0; i < mydjList.size(); i++)
-			{
-				ActionscriptObject daoju = (ActionscriptObject) mydjList.get(i);
-				int gtype = Integer.parseInt((String) daoju.get("gtype"));
-				if (Djid == gtype)
-				{
-					flag = true;
-				}
-
-			}
-		}
-		return flag;
-	}
 
 	public static String getDiamondListStr(int[][] diamondList)
 	{
@@ -841,7 +796,7 @@ public class PlayerService
 
 	}
 
-	public static int SendMoneyWithDiamondList(UserInfo uinfo)
+	public static int SendMoneyWithDiamondList(User uinfo)
 	{
 		int[][] diamondList = uinfo.diamondList;
 
@@ -851,7 +806,7 @@ public class PlayerService
 	}
 
 	public static int[][] getDiamondList(ActionscriptObject djList,
-			UserInfo uinfo)
+			User uinfo)
 	{
 		int[][] diamondList = new int[][]
 		{
@@ -889,7 +844,7 @@ public class PlayerService
 		return diamondList;
 	}
 
-	public static int getVipid(ActionscriptObject djList, UserInfo uinfo)
+	public static int getVipid(ActionscriptObject djList, User uinfo)
 	{
 
 		int vipid = -1;
@@ -947,7 +902,7 @@ public class PlayerService
 		return s;
 	}
 
-	public static ActionscriptObject getUinfo(UserInfo uinfo, boolean isSelf)
+	public static ActionscriptObject getUinfo(User uinfo, boolean isSelf)
 	{
 		ActionscriptObject response = new ActionscriptObject();
 		response.put("uid", "" + uinfo.getUid());
@@ -1006,35 +961,27 @@ public class PlayerService
 		}
 		response.put("add", add + "");
 
-		User u = UserModule.getInstance().getUserByUserId(Integer.parseInt(uinfo.getUid()));
 
-		uinfo.setPropmap(refreshUserShowDj(uinfo, u));
 
-		if (u == null)
-		{
-			response = getExtraObject(response, uinfo, u);
-		}
-		else
-		{
-			int experience = uinfo.getExprience();
-			int[] l = Utils.retLevelAndExp(experience);
-			uinfo.setLevel(l[0]);
-			response.put("lv", uinfo.getLevel() + "");
-			response.put("curjy", l[1] + "");
-			response.put("upjy", l[2] + "");
+        int experience = uinfo.getExprience();
+        int[] l = Utils.retLevelAndExp(experience);
+        uinfo.setLevel(l[0]);
+        response.put("lv", uinfo.getLevel() + "");
+        response.put("curjy", l[1] + "");
+        response.put("upjy", l[2] + "");
 
-			String MaxHandPuker = (uinfo.getMaxHandStr() == null || uinfo.getMaxHandStr()
-					.equals("")) ? "-1" : uinfo.getMaxHandStr();
-			String isTeachFinished = (uinfo.isTeachFinished == null || uinfo.isTeachFinished
-					.equals("")) ? "-1" : uinfo.isTeachFinished;
-			response.put("maxhand", MaxHandPuker);
-			response.put("isTeachFinished", isTeachFinished);
-			response.put("maxTMoney", uinfo.getmaxTMoney() + "");
-			response.put("Ver", ConstList.gameVersion);
-			response.put("vip", uinfo.vipid + "");
-			int[][] diamondList = uinfo.diamondList;
-			response.put("diamond", getDiamondListStr(diamondList));
-		}
+        String MaxHandPuker = (uinfo.getMaxHandStr() == null || uinfo.getMaxHandStr()
+                .equals("")) ? "-1" : uinfo.getMaxHandStr();
+        String isTeachFinished = (uinfo.isTeachFinished == null || uinfo.isTeachFinished
+                .equals("")) ? "-1" : uinfo.isTeachFinished;
+        response.put("maxhand", MaxHandPuker);
+        response.put("isTeachFinished", isTeachFinished);
+        response.put("maxTMoney", uinfo.getmaxTMoney() + "");
+        response.put("Ver", ConstList.gameVersion);
+        response.put("vip", uinfo.vipid + "");
+        int[][] diamondList = uinfo.diamondList;
+        response.put("diamond", getDiamondListStr(diamondList));
+
 
 		String mobi = "-1";
 		if (uinfo.getMobile() != null && uinfo.getMobile().length() > 0)
@@ -1062,12 +1009,15 @@ public class PlayerService
 		return response;
 	}
 
+	public static Player selectPlayerById(Integer uid){
+	    return new Player();
+    }
 
-	public static boolean ifRewards(UserInfo uinfo)
+
+	public static boolean ifRewards(User uinfo)
 	{
 		long rewardTime = Long.parseLong(uinfo.lastAdwardsTime);
-		System.out.println("rewardTime=" + rewardTime);
-		System.out.println("当前时间=" + System.currentTimeMillis());
+
 		boolean ifReward = false;
 		if (rewardTime > 0)
 		{
@@ -1090,37 +1040,6 @@ public class PlayerService
 
 		return ifReward;
 
-	}
-
-	@SuppressWarnings("unchecked")
-	public static String getUidFromMobileUserid(String mobileUserId)
-	{
-
-		String uid = "-1";
-
-		SqlSession session = sqlMapper.openSession();
-		List<Object> userInfoList = null;
-
-		try
-		{
-			userInfoList = session.selectList("ndb.userLoginMobile", mobileUserId);
-			session.commit();
-		}
-		catch(Exception t)
-		{
-			log.error("mysql error", t);
-		}
-		finally
-		{
-			session.close();
-		}
-
-		if(userInfoList != null && userInfoList.size() > 0)
-		{
-			uid = ((UserInfo)userInfoList.get(0)).getUid();
-			log.warn("正常登陆查询数据库,找到了该用户伪码的用户ID不为空，uid="+ uid);
-		}
-		return uid;
 	}
 
 }

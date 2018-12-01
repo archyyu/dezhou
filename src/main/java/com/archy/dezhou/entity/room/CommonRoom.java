@@ -1,7 +1,7 @@
 package com.archy.dezhou.entity.room;
 
 import com.archy.dezhou.global.UserModule;
-import com.archy.dezhou.container.User;
+import com.archy.dezhou.entity.User;
 
 public class CommonRoom
 {
@@ -12,7 +12,7 @@ public class CommonRoom
 		{
 			if(user.isOffLine())
 			{
-				UserModule.getInstance().UserLogout(user.getUserId());
+				UserModule.getInstance().UserLogout(user.getUid());
 			}
 		}
 	}

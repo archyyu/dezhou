@@ -17,15 +17,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.container.AbstractExtension;
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.User;
+import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.service.Imp.PukeModuleServiceImp;
 import com.archy.dezhou.util.XLoad;
 import org.apache.log4j.Logger;
 
 
-import com.archy.dezhou.entity.room.Room;
-import com.archy.dezhou.entity.room.base.IRoom;
+import com.archy.dezhou.entity.room.Room; 
 import com.archy.dezhou.service.PukeModuleService;
 import com.archy.dezhou.thread.roomUnit.OfflineDealUnit;
 import com.archy.dezhou.thread.roomUnit.RoomDealUnit;
@@ -39,18 +38,18 @@ public class UserModule extends AbstractExtension
 
 	private static UserModule instance = null;
 	
-	private Map<Integer,IRoom> roomsMap = new HashMap<Integer,IRoom>();
+	private Map<Integer,Room> roomsMap = new HashMap<Integer,Room>();
 	
-	private HashMap<Integer, User> usersMap = new HashMap<Integer, User>();
+	private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
 	
-	public IRoom getRoom(int id)
+	public Room getRoom(int id)
 	{
 		return roomsMap.get(id);
 	}
 	
-	public IRoom getRoomByName(String name)
+	public Room getRoomByName(String name)
 	{
-		for(Map.Entry<Integer, IRoom> entry : this.roomsMap.entrySet())
+		for(Map.Entry<Integer, Room> entry : this.roomsMap.entrySet())
 		{
 			if(entry.getValue().getName().equals(name))
 			{
@@ -60,17 +59,17 @@ public class UserModule extends AbstractExtension
 		return null;
 	}
 	
-	public void addRoom(IRoom room)
+	public void addRoom(Room room)
 	{
 		roomsMap.put(room.getRoomId(),room);
 	}
 	
-	public List<IRoom> getRoomList()
+	public List<Room> getRoomList()
 	{
-		return new ArrayList<IRoom>(this.roomsMap.values());
+		return new ArrayList<Room>(this.roomsMap.values());
 	}
 	
-	public int destroyRoom(IRoom room)
+	public int destroyRoom(Room room)
 	{
 		roomsMap.remove(room.getRoomId());
 		return 0;
@@ -81,31 +80,31 @@ public class UserModule extends AbstractExtension
 		roomsMap.remove(roomId);
 	}
 	
-	public User getUserByUserId(int userId)
+	public Player getUserByUserId(int userId)
 	{
 		return this.usersMap.get(userId);
 	}
 	
-	public void addUser(User user)
+	public void addUser(Player user)
 	{
-		this.usersMap.put(user.getUserId(),user);
+		this.usersMap.put(user.getUid(),user);
 	}
 	
 	public void removeUser(int userId)
 	{
 		this.usersMap.remove(userId);
 	}
+
 	
 	public void UserLogout(int userId)
 	{
 		this.usersMap.remove(userId);
-		UserInfoMemoryCache.removeUserInfo(userId + "");
 		log.warn("userId: " + userId + " logout");
 	}
 	
-	public User[] userToArray()
+	public Player[] userToArray()
 	{
-		return this.usersMap.values().toArray(new User[this.usersMap.size()]);
+		return this.usersMap.values().toArray(new Player[this.usersMap.size()]);
 	}
 	
 	public static UserModule getInstance()
@@ -127,7 +126,7 @@ public class UserModule extends AbstractExtension
 	{
 		log.info("user module **init**");
 
-		userInfoInit();
+		pukeInit();
 		roomListInit();
 
 		this.startRoomThread();
@@ -150,7 +149,7 @@ public class UserModule extends AbstractExtension
 		log.warn("Offline Deal Unit thread started");
 	}
 
-	private void userInfoInit()
+	private void pukeInit()
 	{
 		PukeModuleService pms = new PukeModuleServiceImp();
 		randomPuke = pms.Puke();
@@ -169,7 +168,7 @@ public class UserModule extends AbstractExtension
 
             try
             {
-                IRoom room = new Room(obj);
+                Room room = new Room(obj);
                 this.addRoom(room);
             }
             catch (Exception ex)
@@ -206,7 +205,7 @@ public class UserModule extends AbstractExtension
 	{
 		int[] playerNum = new int[] { 0, 0, 0 };
 		
-		IRoom room = this.getRoomByName(roomKey);
+		Room room = this.getRoomByName(roomKey);
 		if(room != null)
 		{
 			playerNum[1] = room.getUserCount();
