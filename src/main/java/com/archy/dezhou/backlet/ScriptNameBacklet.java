@@ -8,7 +8,7 @@ import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.container.User;
 import com.archy.dezhou.entity.UserInfo;
-import com.archy.dezhou.service.PlayerService;
+import com.archy.dezhou.service.Imp.PlayerService;
 import io.netty.handler.codec.http.FullHttpResponse;
 
 import java.util.Map;
