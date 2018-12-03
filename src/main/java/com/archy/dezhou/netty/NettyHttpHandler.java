@@ -6,10 +6,10 @@ package com.archy.dezhou.netty;
 
 import java.util.Map;
 
+import com.alibaba.fastjson.JSON;
 import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.controller.GameController;
-import com.archy.dezhou.controller.PlayerController;
-import com.archy.dezhou.controller.RoomController;
+import com.archy.dezhou.entity.RequestDto;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.backlet.base.IDataBacklet;
@@ -32,37 +32,23 @@ public class NettyHttpHandler extends SimpleChannelInboundHandler<Object>
 	
 	private static Logger log = Logger.getLogger(NettyHttpHandler.class);
 
-	public HttpResponse handle2(Object obj) {
-        HttpRequest httpRequest = (HttpRequest) obj;
+	public HttpResponse handle(Object obj) {
+
+		HttpRequest httpRequest = (HttpRequest) obj;
         HttpContent httpContent = (HttpContent) obj;
+
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
 
-        String req = httpRequest.getUri().split("\\?")[1];
         String content = httpContent.content().toString(CharsetUtil.UTF_8);
-        String cmds[] = req.split("\\|");
 
-        if (cmds[0] == "player")
-        {
-            new PlayerController().process(cmds[1],content,response);
-        }
-        else if (cmds[0] == "roomlist")
-        {
-            new RoomController().process(cmds[1],content,response);
-        }
-        else if (cmds[0] == "game")
-        {
-            new GameController().process(cmds[1],content,response);
-        }
-        else
-        {
+		RequestDto requestDto = JSON.parseObject(content,RequestDto.class);
 
-        }
-
+        new GameController().process(requestDto,response);
 
 		return response;
 	}
 	
-	public HttpResponse handle(Object obj)
+	public HttpResponse handle2(Object obj)
 	{
 		HttpRequest httpRequest = (HttpRequest)obj;
 		HttpContent httpContent = (HttpContent)obj;

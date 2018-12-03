@@ -119,11 +119,10 @@ public class UserModule extends AbstractExtension
 
 	}
 
-	public void init()
+	public void init(String path)
 	{
-		log.info("user module **init**");
 
-		roomListInit();
+		roomListInit(path);
 
 		this.startRoomThread();
 		
@@ -145,9 +144,9 @@ public class UserModule extends AbstractExtension
 		log.warn("Offline Deal Unit thread started");
 	}
 
-	private void roomListInit()
+	private void roomListInit(String path)
 	{
-		String content = new String(XLoad.getResource("room.json"));
+		String content = new String(XLoad.getResource(path));
 
         JSONArray array = JSONArray.parseArray(content);
 

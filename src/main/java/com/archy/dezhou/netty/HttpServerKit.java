@@ -25,12 +25,12 @@ public class HttpServerKit
 	
 	private static List<IHttpServer> httpServerList = new ArrayList<IHttpServer>();
 	
-	public static void initConfig()
+	public static void initConfig(String path)
 	{
 		try
 		{
 
-            String content = new String(XLoad.getResource("server.json"));
+            String content = new String(XLoad.getResource(path));
 
             JSONArray list = JSONArray.parseArray(content);
 
@@ -41,10 +41,15 @@ public class HttpServerKit
                 String host = subItem.getString("host");
                 int port = Integer.parseInt( subItem.getString("port") );
                 int cnt = Integer.parseInt( subItem.getString("threadCnt") );
-                HttpServer server = new HttpServer("", port, cnt);
+                HttpServer server = new HttpServer(host, port, cnt);
                 httpServerList.add(server);
 
             }
+
+			for(IHttpServer server : httpServerList)
+			{
+				server.start();
+			}
 
 			
 		}
@@ -53,22 +58,7 @@ public class HttpServerKit
 			log.error("init http server error", e);
 		}
 	}
-	
-	public static void lanuchAllHttpServer()
-	{
-		for(IHttpServer server : httpServerList)
-		{
-			server.start();
-		}
-	}
-	
-	public static void shutdownAllHttpServer()
-	{
-		for(IHttpServer server : httpServerList)
-		{
-			server.stop();
-		}
-	}
+
 	
 	public static String base64Decoder(String source)
 	{
