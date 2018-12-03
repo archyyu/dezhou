@@ -380,7 +380,7 @@ public class PukerGame
 				else
 				{
 					this.winMap.put(player.getSeatId(), totalBet/sameCardPlayers.size());
-                    player.addWinNum();
+
 				}
 			}
 			
@@ -489,7 +489,7 @@ public class PukerGame
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
 			entry.getValue().setPlaying(false);
-			entry.getValue().addCompletePkNum();
+			//entry.getValue().addCompletePkNum();
 		}
 		
 		this.currentPlayer = null;
@@ -512,7 +512,7 @@ public class PukerGame
 		{
 
 		    Player player =  players.get(i);
-			
+
 			Map<Integer, Puke> maxHand = new HashMap<Integer, Puke>();
 
 			List<Puke> fivePk = player.getFivePk();
@@ -525,26 +525,8 @@ public class PukerGame
 				maxHand.put(k, fivePk.get(k));
 			}
 
-			
-			if(player.getMaxHandStr().equals(""))
-			{
-                player.setMaxHand(maxHand);
-                player.setMaxHandValue(fivepkvalue);
-                player.setMaxHandStr(player.GetMaxhandStringFromObj(player.getMaxHand()));
-			}
-			else 
-			{
-				if(players.get(i).getGameState() != ConstList.PlayerGameState.GAME_STATE_STANDUP
-					 && players.get(i).getGameState() != ConstList.PlayerGameState.GAME_STATE_DROP_CARD )
-				{
-					if(fivepkvalue > player.getMaxHandValue())
-					{
-                        player.setMaxHand(maxHand);
-                        player.setMaxHandValue(fivepkvalue);
-                        player.setMaxHandStr(player.GetMaxhandStringFromObj(player.getMaxHand()));
-					}
-				}	
-			}
+
+			//设置玩家最大手牌
 		}
 
 	}
@@ -578,12 +560,11 @@ public class PukerGame
 
 
 			
-			as_player.put("un",player.getName());
+			as_player.put("un",player.getAccount());
 			as_player.putNumber("sid",entry.getKey());
 			as_player.put("uid",player.getUid());
 			
 			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.put("pic",player.getPic());
 			as_player.putBool("isp",true);
 			as_player.putNumber("tb",player.getTempBet());
 			as_player.putNumber("yt",player.getYourTurn());
@@ -592,11 +573,7 @@ public class PukerGame
 			as_player.putNumber("tm",player.getAMoney());
 			as_player.putNumber("gs",player.getGameState().value());
 			as_player.putNumber("ps",player.getPlayerState().value());
-			
-			as_player.putNumber("frb", player.getFirstRoundBet());
-			as_player.putNumber("srb", player.getSecondRoundBet());
-			as_player.putNumber("trb", player.getThirdRoundBet());
-			as_player.putNumber("ftrb", player.getFourthRoundBet());
+
 			
 			Puke p = player.getPuke(5);
 			if(p != null)

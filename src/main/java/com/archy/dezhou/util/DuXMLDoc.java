@@ -48,7 +48,7 @@ public class DuXMLDoc
 			// List zjiedian = et.getChildren();
 			// for (int j = 0; j < zjiedian.size(); j++) {
 			// Element xet = (Element) zjiedian.get(j);
-			// //System.out.println(xet.getName());
+			// //System.out.println(xet.getAccount());
 			//
 			// }
 		}

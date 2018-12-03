@@ -38,7 +38,7 @@
 //
 //			this.m_RootElement = doc.getRootElement();
 //			ConstList.config.logger.info("获得Xml文件的最上面的根[1]"
-//					+ m_RootElement.getName() + "," + m_RootElement.getText()
+//					+ m_RootElement.getAccount() + "," + m_RootElement.getText()
 //					+ "," + m_RootElement.getValue());
 //		}
 //		catch (IOException ex)
@@ -85,7 +85,7 @@
 //					while (it1.hasNext())
 //					{
 //						Element e1 = (Element) it1.next();
-//						ConstList.config.logger.info("[2]" + e1.getName() + ","
+//						ConstList.config.logger.info("[2]" + e1.getAccount() + ","
 //								+ e1.getText() + "," + e1.getValue());
 //						result.add(e1.getTextTrim());// 取出所包含的值，放到要返回的结果集中
 //					}
@@ -123,7 +123,7 @@
 //			while (it.hasNext())
 //			{
 //				Element e = (Element) it.next();
-//				ConstList.config.logger.info("[3]" + e.getName() + ","
+//				ConstList.config.logger.info("[3]" + e.getAccount() + ","
 //						+ e.getText() + "," + e.getValue());
 //				if (e.getAttributeValue("name").equals(codeName))
 //				{
@@ -174,7 +174,7 @@
 //					while (it1.hasNext())
 //					{
 //						Element e1 = (Element) it1.next();
-//						ConstList.config.logger.info("[4]" + e1.getName() + ","
+//						ConstList.config.logger.info("[4]" + e1.getAccount() + ","
 //								+ e1.getText() + "," + e1.getValue());
 //						if (e1.getTextTrim().equals(codeNamec))
 //						{// 比较第三级子元素

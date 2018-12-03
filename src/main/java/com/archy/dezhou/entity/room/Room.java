@@ -107,8 +107,7 @@ public class Room
 		userAobj.putNumber("sid", seatId);
 		userAobj.putNumber("cm", player.getRmoney());
 		userAobj.put("tm", String.valueOf(player.getAMoney()));
-		userAobj.put("un", player.getName());
-		userAobj.put("pic", player.getPic());
+		userAobj.put("un", player.getAccount());
 		userAobj.putNumber("ps", player.getPlayerState().value());
 		userAobj.putNumber("gs", player.getGameState().value());
 		userAobj.putNumber("lev", Integer.parseInt(Utils.retLevel(player.getExprience())));
@@ -164,7 +163,7 @@ public class Room
 
 		ActionscriptObject playerAs = new ActionscriptObject();
 		playerAs.putNumber("sid",seatId);
-		playerAs.put("un",player.getName());
+		playerAs.put("un",player.getAccount());
 		playerAs.putNumber("yt",player.getYourTurn());
 		playerAs.put("uid",player.getUid());
 		playerAs.put("uid",player.getUid());
@@ -566,13 +565,12 @@ public class Room
 
 			as_player.put("dj_func", dj_func);
 
-			as_player.put("un",player.getName());
+			as_player.put("un",player.getAccount());
 			as_player.putNumber("lev",Utils.retLevelAndExp(player.getExprience())[0]);
 			as_player.putNumber("sid",entry.getKey());
 			as_player.put("uid",player.getUid());
 
 			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.put("pic",player.getPic());
 			as_player.putBool("isp",player.isPlaying());
 			as_player.putNumber("tb",player.getTempBet());
 			as_player.putNumber("yt",player.getYourTurn());
@@ -582,10 +580,6 @@ public class Room
 			as_player.putNumber("gs",player.getGameState().value());
 			as_player.putNumber("ps",player.getPlayerState().value());
 
-			as_player.putNumber("frb", player.getFirstRoundBet());
-			as_player.putNumber("srb", player.getSecondRoundBet());
-			as_player.putNumber("trb", player.getThirdRoundBet());
-			as_player.putNumber("ftrb", player.getFourthRoundBet());
 
 			if(this.isGame())
 			{

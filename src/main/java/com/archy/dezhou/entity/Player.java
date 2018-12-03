@@ -2,8 +2,6 @@ package com.archy.dezhou.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import com.archy.dezhou.container.ActionscriptObject;
@@ -18,22 +16,20 @@ public class Player extends User
 
 	private int seatId = -1; // 座位号
 
-	
 	private int yourTurn = 0; // 下注标识 1 代表 yes 0 no
-
-	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
-
-	private PlayerGameState gameState = PlayerGameState.PLAYER_STATE_PLAYER;
 
 	private int tempBet = 0; // 存放用户面前的临时筹码
 	
 	private int tempGold = 0;
 	
 	private int totalGambleBet = 0;
-	
+
+	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
+
+	private PlayerGameState gameState = PlayerGameState.PLAYER_STATE_PLAYER;
+
 	protected Logger log = Logger.getLogger(Player.class.getName());
-	
-	private Map<Integer,Integer> betMap = new HashMap<Integer,Integer>();
+
 	
 	private volatile int dropCardNum = 0;
 	
@@ -236,7 +232,7 @@ public class Player extends User
 		ActionscriptObject asObj = new ActionscriptObject();
 		
 		asObj.putNumber("sid",this.getSeatId());
-		asObj.put("un",this.getName());
+		asObj.put("un",this.getAccount());
 		asObj.put("uid",this.getUid());
 		asObj.putNumber("tb",this.getTempBet());
 		asObj.putNumber("yt",this.getYourTurn());

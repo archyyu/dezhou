@@ -3,7 +3,6 @@ package com.archy.dezhou.global;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,6 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import com.archy.dezhou.container.SFSObjectSerializer;
-import com.archy.dezhou.util.PayFinalValue;
 import com.archy.dezhou.util.Utils;
 
 
@@ -50,39 +48,8 @@ public class PlayerService
 			session.close();
 		}
 
-
-		if(getUserInfo != null && getUserInfo.size() > 0)
-		{
-			User usInfo = getUserInfoData((User) getUserInfo.get(0));
-			return usInfo;
-		}
-		else
-		{
-			log.warn(" 错误！userInfo=" );
-			return null;
-		}
+        return null;
 	}
-
-	public static User getUserInfoData(User usInfo)
-	{
-		User user = usInfo;
-
-		String ifrewards = String.valueOf(usInfo.getIfRewards());
-		if (ifrewards != null && ifrewards.length() > 4)
-		{
-			user.lastAdwardsTime = ifrewards;
-		}
-		else
-		{
-			user.lastAdwardsTime = String.valueOf(System.currentTimeMillis());
-		}
-
-		String todayStr = Utils.getDateToStr(0);
-		user.setDateStr(todayStr);
-
-		return user;
-	}
-
 
 
 	public static ActionscriptObject UpdateUserInfo(User user, ActionscriptObject passwordInfo)
@@ -92,7 +59,7 @@ public class PlayerService
 		String name = "";
 		try
 		{
-			name = URLDecoder.decode(user.getName(),"UTF-8");
+			name = URLDecoder.decode(user.getAccount(),"UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
@@ -101,8 +68,7 @@ public class PlayerService
 
 		if (passwordInfo.size() != 2)
 		{
-			user.setName(name);
-			user.setSaveUpdate(true);
+			user.setAccount(name);
 			UpdateStatus.put("status", "updateUserInfoOk");
 			UpdateStatus.put("cnt", "用户资料修改成功！");
 			UpdateStatus.put("code", "1");
@@ -110,7 +76,6 @@ public class PlayerService
 		else
 		{
 			int rcount = 0;
-			user.setSaveUpdate(false);
 			String psd = MD5.instance().getHash(passwordInfo.getString("op"));
 			log.warn(" user MD5 getPassWord= " + user.getPassWord()
 				+ " MD5 oldPsd="  + psd);
@@ -125,7 +90,6 @@ public class PlayerService
 			{
 				String newPassword = MD5.instance().getHash(passwordInfo.getString("np"));
 				user.setPassWord(newPassword);
-				user.setSaveUpdate(true);
 				log.warn(" updateInfo MD5 userPassword=" + user.getPassWord()
 					+ "   userPassword=" + passwordInfo.getString("np"));
 				UpdateStatus.put("status", "updateUserInfoOkIncludePassword");
@@ -137,7 +101,7 @@ public class PlayerService
 				UpdateStatus.put("status", "PasswordIsNoMatch");
 				UpdateStatus.put("code", "0");
 				UpdateStatus.put("cnt", "用户密码不匹配，密码修改失败！");
-				user.setSaveUpdate(false);
+
 			}
 		}
 
@@ -197,8 +161,7 @@ public class PlayerService
 			{
 				ActionscriptObject oneUser = new ActionscriptObject();
 
-				oneUser.put("pic", (((User)userInfoRankList.get(i)).getPic()));
-				oneUser.put("name", (((User)userInfoRankList.get(i)).getName()));
+				oneUser.put("name", (((User)userInfoRankList.get(i)).getAccount()));
 				oneUser.put("uid", (((User)userInfoRankList.get(i)).getUid()));
 				oneUser.put("level", (((User)userInfoRankList.get(i)).getLevel()));
 				oneUser.put("allmoney", (((User)userInfoRankList.get(i)).getAMoney()));
@@ -296,12 +259,9 @@ public class PlayerService
 					user.clearRoomMoney();
 				}
 				user.setLastUpdateTime(System.currentTimeMillis());
-				user.setLoginNum(user.getLoginNum() + 1);
 
 				String s = setNowStandardTimeString();
 				user.setLogintime(s);
-				user.setOline(true);
-
 
 
 				UserModule.getInstance().addUser(user);
@@ -330,7 +290,6 @@ public class PlayerService
 				StringBuffer sb = new StringBuffer();
 				sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
-				log.debug("  response==== " + user.getAchList());
 				return SFSObjectSerializer.obj2xml(response, 0, "", sb);
 			}
 			catch (Exception ex)
@@ -379,7 +338,7 @@ public class PlayerService
 				SqlSession sessionAddUser = sqlMapper.openSession();
 				User getUser = new User();
 
-				getUser.setName(userName);
+				getUser.setAccount(userName);
 				getUser.setUid(userId);
 				getUser.setPassWord(password);
 				getUser.setEmail(email);
@@ -521,13 +480,12 @@ public class PlayerService
 				User insertUser = new User();
 
 				insertUser.setUid(userId);
-				insertUser.setName(userName);
+				insertUser.setAccount(userName);
 				insertUser.setPassWord(password);
 				insertUser.setEmail(email);
 				insertUser.setGendar(gendar);
 				insertUser.setBirthday(birthday);
 				insertUser.setMobile(userid);
-				insertUser.setSessionKey(key);
 
 				try
 				{
@@ -618,7 +576,7 @@ public class PlayerService
 			if(userEmailList != null && userEmailList.size() > 0)
 			{
 				userinfo[0] = ((User)userEmailList.get(0)).getUid() + "";
-				userinfo[1] = ((User)userEmailList.get(0)).getName();
+				userinfo[1] = ((User)userEmailList.get(0)).getAccount();
 				return true;
 			}
 			return false;
@@ -664,13 +622,6 @@ public class PlayerService
 
 	public static ActionscriptObject getExtraObject(ActionscriptObject response, User uinfo )
 	{
-		String MaxHandPuker = (uinfo.getMaxHandStr() == null || uinfo.getMaxHandStr()
-				.equals("")) ? "-1" : uinfo.getMaxHandStr();
-		String isTeachFinished = (uinfo.isTeachFinished == null || uinfo.isTeachFinished
-				.equals("")) ? "-1" : uinfo.isTeachFinished;
-		response.put("maxhand", MaxHandPuker);
-		response.put("isTeachFinished", isTeachFinished);
-		response.put("maxTMoney", uinfo.getmaxTMoney() + "");
 		response.put("Ver", ConstList.gameVersion);
 
 		int experience = uinfo.getExprience();
@@ -741,7 +692,6 @@ public class PlayerService
 //
 //
 //		log.warn(" usedDJ=" + response);
-		uinfo.MyEquipedDaoju = response;
 		return response;
 	}
 
@@ -752,20 +702,11 @@ public class PlayerService
 		user.put("uid", String.valueOf(uinfo.getUid()));
 		user.put("tm", String.valueOf(uinfo.getAMoney()));
 		user.put("gl", String.valueOf(uinfo.getGold()));
-		user.put("pic", uinfo.getPic());
-		user.put("ach", String.valueOf(uinfo.getAchievement()));
 		user.put("lae",Utils.retLevelAndExp(uinfo.getExprience()));
 
 		user.put("lvl", Utils.retLevelAndExp(uinfo.getExprience())[0]+"");
 		user.put("lev", Utils.retLevelAndExp(uinfo.getExprience()));
 
-		user.put("tzmp", String.valueOf(uinfo.getTzMatchPoint()));
-		user.put("zfmp", String.valueOf(uinfo.getZfMatchPoint()));
-		user.put("cdtype", uinfo.getCdtype());
-
-		user.put("cdt", Utils.millsTosecond(uinfo.getCoolDownTime()));
-		user.put("bmp", Utils.millsTosecond(uinfo.getBaceMPoint()));
-		user.put("cmp", String.valueOf(uinfo.getCMatchPoint()));
 
 		response.put("user", user);
 		response.put("_cmd", "uinfo");
@@ -794,14 +735,6 @@ public class PlayerService
 
 	}
 
-	public static int SendMoneyWithDiamondList(User uinfo)
-	{
-		int[][] diamondList = uinfo.diamondList;
-
-		return PayFinalValue.GIVEN_BET_EveryDay + diamondList[0][1] * 2000
-				+ diamondList[1][1] * 15000 + diamondList[2][1] * 8000
-				+ diamondList[3][1] * 35000;
-	}
 
 	public static int[][] getDiamondList(ActionscriptObject djList,
 			User uinfo)
@@ -837,7 +770,6 @@ public class PlayerService
 				}
 			}
 		}
-		uinfo.diamondList = diamondList;
 
 		return diamondList;
 	}
@@ -883,7 +815,6 @@ public class PlayerService
 				}
 			}
 		}
-		uinfo.vipid = vipid;
 		return vipid;
 	}
 
@@ -904,11 +835,10 @@ public class PlayerService
 	{
 		ActionscriptObject response = new ActionscriptObject();
 		response.put("uid", "" + uinfo.getUid());
-		response.put("nm", uinfo.getName() + "");
+		response.put("nm", uinfo.getAccount() + "");
 		// response.put("tm", uinfo.getTmoney()+"");
 		response.put("rm", uinfo.getRmoney() + "");
 		//response.put("password", uinfo.getPassWord());
-		response.put("maxTMoney", uinfo.getmaxTMoney() + "");
 
 		String email = "-1";
 		if (uinfo.getEmail() != null && uinfo.getEmail().length() > 0)
@@ -943,14 +873,7 @@ public class PlayerService
 		response.put("gold", uinfo.getGold() + "");
 
 		String pic = "-1";
-		if (uinfo.getPic() != null && uinfo.getPic().length() > 0)
-		{
-			pic = uinfo.getPic();
-		}
 		response.put("pic", pic + "");
-
-		response.put("wn", uinfo.getWinNum() + "");
-		response.put("ln", (uinfo.getCompletePkNum() - uinfo.getWinNum() ) + "");
 
 		String add = "-1";
 		if (uinfo.getAddress() != null && uinfo.getAddress().length() > 0)
@@ -968,17 +891,6 @@ public class PlayerService
         response.put("curjy", l[1] + "");
         response.put("upjy", l[2] + "");
 
-        String MaxHandPuker = (uinfo.getMaxHandStr() == null || uinfo.getMaxHandStr()
-                .equals("")) ? "-1" : uinfo.getMaxHandStr();
-        String isTeachFinished = (uinfo.isTeachFinished == null || uinfo.isTeachFinished
-                .equals("")) ? "-1" : uinfo.isTeachFinished;
-        response.put("maxhand", MaxHandPuker);
-        response.put("isTeachFinished", isTeachFinished);
-        response.put("maxTMoney", uinfo.getmaxTMoney() + "");
-        response.put("Ver", ConstList.gameVersion);
-        response.put("vip", uinfo.vipid + "");
-        int[][] diamondList = uinfo.diamondList;
-        response.put("diamond", getDiamondListStr(diamondList));
 
 
 		String mobi = "-1";
@@ -991,18 +903,6 @@ public class PlayerService
 		}
 		response.put("mobi", mobi + "");
 
-		if (ifRewards(uinfo))
-		{
-			response.put("ifReward", "10000");
-			uinfo.setAmoney(uinfo.getAMoney() + 10000);
-			response.put("tm", uinfo.getAMoney() + "");
-			uinfo.lastAdwardsTime = System.currentTimeMillis() + "";
-		}
-		else
-		{
-			response.put("ifReward", "0");
-			response.put("tm", uinfo.getAMoney() + "");
-		}
 
 		return response;
 	}
@@ -1023,32 +923,6 @@ public class PlayerService
     }
 
 
-	public static boolean ifRewards(User uinfo)
-	{
-		long rewardTime = Long.parseLong(uinfo.lastAdwardsTime);
 
-		boolean ifReward = false;
-		if (rewardTime > 0)
-		{
-			long curTime = System.currentTimeMillis();
-			Date preDate = new Date(rewardTime);
-			Date curDate = new Date(curTime);
-
-			Calendar pCalendar = Calendar.getInstance();
-			Calendar cCalendar = Calendar.getInstance();
-			pCalendar.setTime(preDate);
-			cCalendar.setTime(curDate);
-			if (pCalendar.get(Calendar.DAY_OF_MONTH) != cCalendar
-					.get(Calendar.DAY_OF_MONTH))
-			{
-				ifReward = true;
-			}
-		}
-		else
-			ifReward = true;
-
-		return ifReward;
-
-	}
 
 }

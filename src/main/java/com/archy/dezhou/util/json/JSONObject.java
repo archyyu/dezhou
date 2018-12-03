@@ -295,8 +295,8 @@ public class JSONObject
 	 * prefix. If the second remaining character is not upper case, then the
 	 * first character is converted to lower case.
 	 * 
-	 * For example, if an object has a method named <code>"getName"</code>, and
-	 * if the result of calling <code>object.getName()</code> is
+	 * For example, if an object has a method named <code>"getAccount"</code>, and
+	 * if the result of calling <code>object.getAccount()</code> is
 	 * <code>"Larry Fine"</code>, then the JSONObject will contain
 	 * <code>"name": "Larry Fine"</code>.
 	 * 

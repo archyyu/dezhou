@@ -63,13 +63,11 @@ public class PukeLogicBacket extends DataBacklet
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerAddBet(player,bet);
-					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_FOLLOW_BET))
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerFollowBet(player,bet);
-					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_DROP_CARD))
 				{
@@ -79,7 +77,6 @@ public class PukeLogicBacket extends DataBacklet
 				{
 					int bet = Integer.parseInt(parms.get("cb"));
 					asObj = game.playerAllIn(player,bet);
-					user.setSaveUpdate(true);
 				}
 				else if(cmd.equals(ConstList.CMD_SITDOWN))
 				{
@@ -129,7 +126,7 @@ public class PukeLogicBacket extends DataBacklet
 			{
 				log.error("CMD_FLUSHACH=="+ cmd);
 						
-				asObj = user.getAcheiveList();
+				asObj = null;
 			}
 			if(asObj == null)
 			{

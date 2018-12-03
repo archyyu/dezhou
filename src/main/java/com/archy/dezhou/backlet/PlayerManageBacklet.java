@@ -165,7 +165,7 @@ public class PlayerManageBacklet extends DataBacklet
 				if (!gendar.equals("") && gendar != null)
 					uinfo.setGendar(gendar);
 				if (!name.equals("") && name != null)
-					uinfo.setName(name);
+					uinfo.setAccount(name);
 				if (!address.equals("") && address != null)
 					uinfo.setAddress(address);
 				if (!mobile.equals("") && mobile != null)

@@ -65,7 +65,7 @@ public class RoomListBacklet extends DataBacklet
 			if(oldRoom != null)
 			{
 				
-//				if(oldRoom.getName().equals(roomname))
+//				if(oldRoom.getAccount().equals(roomname))
 //				{
 //					return BackletKit.infoXml("haveBeenEntered").getBytes();
 //				}
