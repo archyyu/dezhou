@@ -1,6 +1,8 @@
 # -
-一个德州扑克服务器代码
-语言:java
-数据库:mysql
-通信协议:http
-很久之前写的，现在开放出来，并且会继续完善
+A poke game, server part
+Language:java
+Database:mysql
+protocal:http
+
+This project was written long long ago. I have lost contacts with other members in the team. I will try to contribute this projects, and make it usedful.
+But not guarantee.
