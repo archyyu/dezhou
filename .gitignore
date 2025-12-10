@@ -1,0 +1,85 @@
+# Spring Boot .gitignore
+
+# Build tool files
+/target/
+!/target/.mvn-wrapper/
+
+# Maven wrapper
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.bin/
+.gen/
+.settings/
+.classpath
+.project
+.springBeans
+.sts4-cache/
+
+# VS Code
+.vscode/
+
+# IntelliJ
+/out/
+/*.iws
+/*.ipr
+/*.iml
+
+# Logs
+*.log
+*.log.*
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Dependency directories
+node_modules/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Maven build files
+pom.xml.versionsBackup
+pom.xml.releaseBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Spring Boot specific
+/application.properties
+/application.yml
+/application-*.properties
+/application-*.yml
+
+# Database files
+dezhou.sql
+*.sql
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Coverage reports
+coverage/

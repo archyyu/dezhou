@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: dezhou-poker-server
+  
+  datasource:
+    url: jdbc:mysql://localhost:33306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: aida87014999
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+mybatis:
+  config-location: classpath:mybatis.xml
+  mapper-locations: classpath:com/archy/dezhou/dao/*.xml
+  type-aliases-package: com.archy.dezhou.entity
+
+# Server configuration (from server.json)
+app:
+  servers:
+    - host: 0.0.0.0
+      port: 8001
+      threadCnt: 2
+    - host: 0.0.0.0
+      port: 8002
+      threadCnt: 2
+
+logging:
+  level:
+    root: INFO
+    com.archy.dezhou: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
