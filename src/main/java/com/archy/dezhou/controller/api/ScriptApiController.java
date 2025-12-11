@@ -79,20 +79,19 @@ public class ScriptApiController extends BaseApiController {
             // New user registration
             if (user == null && userid != null && userid.length() > 4 && 
                 key != null && key.length() > 25 && uid.equals("-1")) {
-                
-                HashMap<String, String> userinfoList = PlayerService.AutoRegister(userid, key);
-                
-                if (userinfoList != null && userinfoList.get("name") != null && 
+
+                HashMap<String, String> userinfoList = this.playerService.AutoRegister(userid, key);
+
+                if (userinfoList != null && userinfoList.get("name") != null &&
                     userinfoList.get("password") != null) {
                     
                     // Auto-register and login
-                    byte[] loginResponse = PlayerService.UserLogin(
-                            userinfoList.get("name"), 
+                    String loginResponse = this.playerService.UserLogin(
+                            userinfoList.get("name"),
                             userinfoList.get("password"), 
                             true, userid, key, 1, false);
                     
-                    String responseString = new String(loginResponse);
-                    return successResponse(responseString);
+                    return successResponse(loginResponse);
                 } else {
                     return errorResponse("AutoRigesterFailed");
                 }
@@ -102,10 +101,9 @@ public class ScriptApiController extends BaseApiController {
                      key != null && key.length() > 25 && !uid.equals("-1")) {
                 
                 boolean resetPwd = "yes".equals(resetPassword);
-                byte[] loginResponse = PlayerService.UserLogin("", "", false, userid, key, 1, resetPwd);
-                
-                String responseString = new String(loginResponse);
-                return successResponse(responseString);
+                String loginResponse = this.playerService.UserLogin("", "", false, userid, key, 1, resetPwd);
+
+                return successResponse(loginResponse);
             }
             // Existing user already logged in
             else if (user != null && key != null && key.length() > 25 && 
@@ -128,8 +126,7 @@ public class ScriptApiController extends BaseApiController {
                 response.put("vip", PlayerService.getVipid(djObjList, uinfo) + "");
                 
                 // Convert to XML for backward compatibility
-                String xmlResponse = JsonObjectWrapperToXml(response);
-                return successResponse(xmlResponse);
+                return successResponse(response.toJSONString());
             } else {
                 return errorResponse("EmulatorCantAutoLogin");
             }
@@ -214,10 +211,9 @@ public class ScriptApiController extends BaseApiController {
             String newPassword = PlayerService.resetPasswd(user);
             
             // Also perform login to get full user info
-            byte[] loginResponse = PlayerService.UserLogin("", "", false, userid, key, 1, true);
-            String responseString = new String(loginResponse);
-            
-            return successResponse(responseString);
+            String loginResponse = this.playerService.UserLogin("", "", false, userid, key, 1, true);
+
+            return successResponse(loginResponse);
         } catch (Exception e) {
             return errorResponse("PasswordResetFailed: " + e.getMessage());
         }

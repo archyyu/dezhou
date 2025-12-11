@@ -133,7 +133,7 @@ public class UserApiController extends BaseApiController {
             @RequestParam(required = false) String np,  // new password
             @RequestParam(required = false) String op) { // old password
 
-        Player currentUser = this.userService.getUserById(Integer.parseInt(uid));
+        Player currentUser = this.userService.getUserByUserId(Integer.parseInt(uid));
         if (currentUser == null) {
             return errorResponse("UserNotLogined");
         }

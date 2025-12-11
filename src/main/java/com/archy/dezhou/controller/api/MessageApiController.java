@@ -45,7 +45,7 @@ public class MessageApiController extends BaseApiController {
             }
             
             // Validate the user exists
-            User user = getUserById(Integer.parseInt(uid));
+            User user = this.userService.getUserByUserId(Integer.parseInt(uid));
             if (user == null) {
                 return errorResponse("UserNotFound");
             }
@@ -145,9 +145,9 @@ public class MessageApiController extends BaseApiController {
             @RequestParam String message) {
         
         try {
-            User fromUser = getUserById(Integer.parseInt(fromUid));
-            User toUser = getUserById(Integer.parseInt(toUid));
-            
+            User fromUser = this.userService.getUserByUserId(Integer.parseInt(fromUid));
+            User toUser = this.userService.getUserByUserId(Integer.parseInt(toUid));
+
             if (fromUser == null || toUser == null) {
                 return errorResponse("UserNotFound");
             }
