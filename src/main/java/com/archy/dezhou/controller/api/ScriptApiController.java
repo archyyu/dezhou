@@ -108,8 +108,6 @@ public class ScriptApiController extends BaseApiController {
             // Existing user already logged in
             else if (user != null && key != null && key.length() > 25 && 
                      userid != null && userid.length() > 0) {
-                
-                log.info("User already online: " + userid);
 
                 User uinfo = this.userService.getUserByUserId(Integer.parseInt(uid));
                 JsonObjectWrapper response = PlayerService.getUinfo(uinfo, true);

@@ -86,7 +86,6 @@ public class RoomService{
 	public void UserLogout(int userId)
 	{
 		this.usersMap.remove(userId);
-		log.warn("userId: " + userId + " logout");
 	}
 	
 	public Player[] userToArray()

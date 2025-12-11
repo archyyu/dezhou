@@ -110,6 +110,7 @@ public class UserResponse {
         private int handsWon;
         private double winRate;
         private int biggestWin;
+        
         private int biggestLoss;
         private int totalBets;
         private int totalWinnings;

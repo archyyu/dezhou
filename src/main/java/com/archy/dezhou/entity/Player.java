@@ -38,7 +38,20 @@ public class Player extends User
 	private boolean isAllIn;
 	private boolean isDealer;
 	private boolean isCurrentTurn;
-	
+	private boolean isOnline;
+	private String avatarUrl;
+
+	private int totalGames;
+	private int gamesWon;
+	private int gamesLost;
+	private int handsPlayed;
+	private int handsWon;
+	private double winRate;
+	private int biggestWin;
+	private int biggestLoss;
+	private int totalBets;
+	private int totalWinnings;
+
 	private List<Card> cards;
 
 	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
