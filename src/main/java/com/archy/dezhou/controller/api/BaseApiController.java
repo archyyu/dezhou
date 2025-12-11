@@ -1,9 +1,6 @@
 package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.entity.ApiResponse;
-import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.User;
-import com.archy.dezhou.global.UserModule;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -53,18 +50,6 @@ public abstract class BaseApiController {
     }
 
     /**
-     * Get current user by ID
-     */
-    protected Player getCurrentUser(String uid) {
-        try {
-            int userId = Integer.parseInt(uid);
-            return UserModule.getInstance().getUserByUserId(userId);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    /**
      * Validate required parameters
      */
     protected boolean validateRequiredParams(String... params) {
@@ -76,10 +61,5 @@ public abstract class BaseApiController {
         return true;
     }
 
-    /**
-     * Get user by ID (for backward compatibility)
-     */
-    protected User getUserById(int uid) {
-        return UserModule.getInstance().getUserById(uid);
-    }
+    
 }

@@ -9,17 +9,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-import com.archy.dezhou.entity.room.Room;
-import com.archy.dezhou.global.UserModule;
-
-
+import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.thread.roomUnit.base.IRoomDealUnit;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class RoomDealUnit implements IRoomDealUnit
 {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
+
+	@Resource
+	private RoomService roomService;
 
 	public RoomDealUnit()
 	{
@@ -30,9 +33,9 @@ public class RoomDealUnit implements IRoomDealUnit
 	public void heartbeat()
 	{
 		long start = System.currentTimeMillis();
-		
-		List<Room> roomListCpy = new ArrayList<Room>();
-		roomListCpy.addAll(UserModule.getInstance().getRoomList());
+
+		List<GameRoom> roomListCpy = new ArrayList<GameRoom>();
+		roomListCpy.addAll(roomService.getRoomList());
 		roomListCpy.forEach(room -> {
 			room.beatHeart(start);
 		});

@@ -2,8 +2,12 @@ package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.User;
-import com.archy.dezhou.entity.room.Room;
-import com.archy.dezhou.global.UserModule;
+import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.service.RoomService;
+import com.archy.dezhou.service.UserService;
+
+import jakarta.annotation.Resource;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/messages")
 public class MessageApiController extends BaseApiController {
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private RoomService roomService;
 
     /**
      * Send a message to a room
@@ -29,7 +39,7 @@ public class MessageApiController extends BaseApiController {
         
         try {
             // Validate the room exists
-            Room room = UserModule.getInstance().getRoomByName(roomName);
+            GameRoom room = roomService.getRoomByName(roomName);
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
@@ -77,7 +87,7 @@ public class MessageApiController extends BaseApiController {
     /**
      * Handle regular room messages
      */
-    private ResponseEntity<ApiResponse<?>> handleRoomMessage(Room room, User user, String message, String messageType) {
+    private ResponseEntity<ApiResponse<?>> handleRoomMessage(GameRoom room, User user, String message, String messageType) {
         // TODO: Implement actual room message broadcasting
         // This would send the message to all users in the specified room
         
@@ -104,7 +114,7 @@ public class MessageApiController extends BaseApiController {
             @RequestParam(required = false) String since) {
         
         try {
-            Room room = UserModule.getInstance().getRoomByName(roomName);
+            GameRoom room = roomService.getRoomByName(roomName);
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }

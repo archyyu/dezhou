@@ -230,16 +230,6 @@ public class GameApiController extends BaseApiController {
     }
 
     /**
-     * Convert ActionscriptObject to XML string (for backward compatibility)
-     */
-    private String actionscriptObjectToXml(ActionscriptObject obj) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        byte[] xmlBytes = SFSObjectSerializer.obj2xml(obj, 0, "", sb);
-        return new String(xmlBytes);
-    }
-
-    /**
      * Get current game state for a room
      */
     @GetMapping("/{roomId}/state")
@@ -273,12 +263,12 @@ public class GameApiController extends BaseApiController {
             @PathVariable String uid) {
         
         try {
-            Player user = getCurrentUser(uid);
+            Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
             if (user == null) {
                 return errorResponse("UserNotFound");
             }
-            
-            Room room = UserModule.getInstance().getRoomByName(roomId);
+
+            GameRoom room = roomService.getRoomByName(roomId);
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
@@ -298,7 +288,7 @@ public class GameApiController extends BaseApiController {
             playerStatus.put("seatId", player.getSeatId());
             playerStatus.put("chips", player.getChips());
             playerStatus.put("currentBet", player.getCurrentBet());
-            playerStatus.put("hasLooked", player.isLooked());
+            // playerStatus.put("hasLooked", player.hasLooked().toString());
             playerStatus.put("isActive", player.isActive());
             playerStatus.put("isAllIn", player.isAllIn());
             

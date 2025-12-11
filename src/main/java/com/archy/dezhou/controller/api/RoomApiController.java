@@ -5,6 +5,7 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.service.PlayerService;
 import com.archy.dezhou.service.RoomService;
+import com.archy.dezhou.service.UserService;
 
 import jakarta.annotation.Resource;
 
@@ -29,6 +30,9 @@ public class RoomApiController extends BaseApiController {
     @Resource
     private PlayerService playerService;
 
+    @Resource
+    private UserService userService;
+
     // Get room list endpoint - replaces LIST command
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<?>> getRoomList(
@@ -52,7 +56,7 @@ public class RoomApiController extends BaseApiController {
         
         try {
             GameRoom room = this.roomService.getRoomByName(roomName);
-            Player user = getCurrentUser(uid);
+            Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
             
             if (room == null || user == null) {
                 return errorResponse("UserNotLogined");
@@ -90,7 +94,7 @@ public class RoomApiController extends BaseApiController {
             @RequestParam String uid) {
         
         try {
-            Player user = getCurrentUser(uid);
+            Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
@@ -128,7 +132,7 @@ public class RoomApiController extends BaseApiController {
             }
         } catch (NumberFormatException e) {
             // If parsing fails, return all rooms
-            for (Room room : roomlist) {
+            for (GameRoom room : roomlist) {
                 result.add(new RoomResponse.RoomListItem(room));
             }
         }
@@ -139,7 +143,7 @@ public class RoomApiController extends BaseApiController {
     // Get room details endpoint
     @GetMapping("/{roomName}")
     public ResponseEntity<ApiResponse<RoomResponse>> getRoomDetails(@PathVariable String roomName) {
-        Room room = UserModule.getInstance().getRoomByName(roomName);
+        GameRoom room = this.roomService.getRoomByName(roomName);
         if (room != null) {
             RoomResponse response = new RoomResponse(room);
             return successResponse(response);
@@ -151,9 +155,9 @@ public class RoomApiController extends BaseApiController {
     // Get user's current room endpoint
     @GetMapping("/current")
     public ResponseEntity<ApiResponse<?>> getCurrentRoom(@RequestParam String uid) {
-        Player user = getCurrentUser(uid);
+        Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
         if (user != null) {
-            GameRoom room = UserModule.getInstance().getRoom(user.getRoomId());
+            GameRoom room = this.roomService.getRoom(user.getRoomId());
             if (room != null) {
                 return successResponse(room);
             } else {

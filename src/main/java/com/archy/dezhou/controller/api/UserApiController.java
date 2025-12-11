@@ -5,8 +5,11 @@ import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.entity.response.UserResponse;
-import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.service.PlayerService;
+import com.archy.dezhou.service.RoomService;
+import com.archy.dezhou.service.UserService;
+
+import jakarta.annotation.Resource;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserApiController extends BaseApiController {
+
+    @Resource
+    private PlayerService playerService;
+
+    @Resource
+    private RoomService roomService;
+
+    @Resource
+    private UserService userService;
 
     // User login endpoint - replaces USERLOGIN command
     @PostMapping("/login")
@@ -205,9 +217,9 @@ public class UserApiController extends BaseApiController {
         }
 
         try {
-            Player uinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
-            Player cuinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(cuid));
-            
+            Player uinfo = userService.getUserByUserId(Integer.parseInt(uid));
+            Player cuinfo = userService.getUserByUserId(Integer.parseInt(cuid));
+
             if (uinfo == null) {
                 return errorResponse("YouAreNotLogined!");
             }
@@ -228,7 +240,7 @@ public class UserApiController extends BaseApiController {
     // User logout endpoint - replaces LOGOUT command
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<?>> userLogout(@RequestParam String uid) {
-        Player user = getCurrentUser(uid);
+        Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
         if (user != null) {
             return successResponse("loginoutOk");
         } else {

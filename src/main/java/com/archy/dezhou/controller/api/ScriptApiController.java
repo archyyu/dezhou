@@ -1,12 +1,14 @@
 package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserModule;
 import com.archy.dezhou.service.PlayerService;
+import com.archy.dezhou.service.RoomService;
+import com.archy.dezhou.service.UserService;
+
+import jakarta.annotation.Resource;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,16 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/v1/script")
 public class ScriptApiController extends BaseApiController {
+
+
+    @Resource
+    private PlayerService playerService;
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private RoomService roomService;
 
     /**
      * Mobile device registration and auto-login endpoint
@@ -58,7 +70,7 @@ public class ScriptApiController extends BaseApiController {
             
             // Check if user is already registered
             if (!uid.equals("-1")) {
-                user = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+                user = this.userService.getUserByUserId(Integer.parseInt(uid));
             }
             
             log.info("Mobile registration - userid=" + userid + ", mobile=" + mobile + 
@@ -100,8 +112,8 @@ public class ScriptApiController extends BaseApiController {
                      userid != null && userid.length() > 0) {
                 
                 log.info("User already online: " + userid);
-                
-                User uinfo = UserModule.getInstance().getUserByUserId(Integer.parseInt(uid));
+
+                User uinfo = this.userService.getUserByUserId(Integer.parseInt(uid));
                 ActionscriptObject response = PlayerService.getUinfo(uinfo, true);
                 response.put("Ver", ConstList.gameVersion);
                 
@@ -163,7 +175,7 @@ public class ScriptApiController extends BaseApiController {
     @GetMapping("/users/{uid}/sync")
     public ResponseEntity<ApiResponse<?>> getUserScriptSyncInfo(@PathVariable String uid) {
         try {
-            User user = getUserById(Integer.parseInt(uid));
+            User user = this.userService.getUserById(Integer.parseInt(uid));
             if (user == null) {
                 return errorResponse("UserNotFound");
             }
@@ -194,7 +206,7 @@ public class ScriptApiController extends BaseApiController {
             @RequestParam String key) {
         
         try {
-            User user = getUserById(Integer.parseInt(uid));
+            User user = this.userService.getUserById(Integer.parseInt(uid));
             if (user == null) {
                 return errorResponse("UserNotFound");
             }
@@ -211,15 +223,6 @@ public class ScriptApiController extends BaseApiController {
         }
     }
 
-    /**
-     * Convert ActionscriptObject to XML string (for backward compatibility)
-     */
-    private String actionscriptObjectToXml(ActionscriptObject obj) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        byte[] xmlBytes = SFSObjectSerializer.obj2xml(obj, 0, "", sb);
-        return new String(xmlBytes);
-    }
 
     /**
      * Get device compatibility information

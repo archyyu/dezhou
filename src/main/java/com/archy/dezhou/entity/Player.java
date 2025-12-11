@@ -34,6 +34,7 @@ public class Player extends User
 	private int currentBet;
 	private boolean hasLooked;
 	private boolean isActive;
+	private boolean isReady;
 	private boolean isAllIn;
 	private boolean isDealer;
 	private boolean isCurrentTurn;
