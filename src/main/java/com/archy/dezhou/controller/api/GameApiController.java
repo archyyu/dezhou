@@ -126,7 +126,7 @@ public class GameApiController extends BaseApiController {
             
             // Handle flush achievements command
             if (ConstList.CMD_FLUSHACH.equals(cmd)) {
-                return handleFlushAchievements();
+                return successResponse(handleFlushAchievements());
             }
             
             return errorResponse("InvalidOtherCommand");

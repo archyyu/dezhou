@@ -73,9 +73,6 @@ public class ScriptApiController extends BaseApiController {
                 user = this.userService.getUserByUserId(Integer.parseInt(uid));
             }
             
-            log.info("Mobile registration - userid=" + userid + ", mobile=" + mobile + 
-                    ", key=" + (key != null ? "[REDACTED]" : "null") + ", uid=" + uid);
-            
             // New user registration
             if (user == null && userid != null && userid.length() > 4 && 
                 key != null && key.length() > 25 && uid.equals("-1")) {

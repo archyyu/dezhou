@@ -85,7 +85,7 @@ public class LegacyApiController extends BaseApiController {
      * Health check for legacy API
      */
     @GetMapping("/health")
-    public ResponseEntity<ApiResponse<String>> legacyHealthCheck() {
+    public ResponseEntity<ApiResponse<?>> legacyHealthCheck() {
         return successResponse("Legacy API endpoints have been migrated to modern REST controllers");
     }
 

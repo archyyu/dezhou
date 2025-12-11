@@ -12,41 +12,48 @@ public abstract class BaseApiController {
     /**
      * Create a successful API response
      */
-    protected <T> ResponseEntity<ApiResponse<T>> successResponse(T data) {
-        ApiResponse<T> response = new ApiResponse<>();
-        response.setSuccess(true);
-        response.setData(data);
-        response.setTimestamp(System.currentTimeMillis());
-        return ResponseEntity.ok(response);
+    @SuppressWarnings("unchecked")
+    protected ResponseEntity<ApiResponse<?>> successResponse(Object data) {
+        return ResponseEntity.ok(ApiResponse.success(data));
     }
 
-    protected <T> ResponseEntity<ApiResponse<T>> successResponse(String msg) {
-        ApiResponse<T> response = new ApiResponse<>();
-        response.setSuccess(true);
-        response.setMessage(msg);
-        response.setTimestamp(System.currentTimeMillis());
-        return ResponseEntity.ok(response);
+    @SuppressWarnings("unchecked")
+    protected ResponseEntity<ApiResponse<?>> successResponse(String msg) {
+        return ResponseEntity.ok(ApiResponse.success(msg));
     }
 
     /**
      * Create an error API response
      */
+    @SuppressWarnings("unchecked")
     protected ResponseEntity<ApiResponse<?>> errorResponse(String errorMessage) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(errorMessage));
+        ApiResponse<?> errorResponse = ApiResponse.error(errorMessage);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     /**
      * Create an error API response with custom status code
      */
-    protected ResponseEntity<ApiResponse<?>> errorResponse(String errorMessage, int statusCode) {
-        return ResponseEntity.status(statusCode).body(ApiResponse.error(errorMessage));
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> errorResponse(String errorMessage, int statusCode) {
+        ApiResponse<?> errorResponse = ApiResponse.error(errorMessage);
+        return ResponseEntity.status(statusCode).body((ApiResponse<T>) errorResponse);
     }
 
     /**
      * Create a custom API response
      */
-    protected ResponseEntity<ApiResponse<?>> customResponse(boolean success, String status, String code, String message, Object data) {
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> customResponse(boolean success, String status, String code, String message, T data) {
         return ResponseEntity.ok(new ApiResponse<>(success, status, code, message, data));
+    }
+
+    /**
+     * Create a custom API response with HTTP status code
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> customResponse(boolean success, String status, String code, String message, T data, int httpStatus) {
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<>(success, status, code, message, data));
     }
 
     /**

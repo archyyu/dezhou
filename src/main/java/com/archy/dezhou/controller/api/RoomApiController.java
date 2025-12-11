@@ -50,7 +50,7 @@ public class RoomApiController extends BaseApiController {
 
     // Join room endpoint - replaces JOIN command
     @PostMapping("/{roomName}/join")
-    public ResponseEntity<ApiResponse<String>> joinRoom(
+    public ResponseEntity<ApiResponse<?>> joinRoom(
             @PathVariable String roomName,
             @RequestParam String uid) {
         
@@ -89,7 +89,7 @@ public class RoomApiController extends BaseApiController {
 
     // Leave room endpoint - replaces LEAVE command
     @PostMapping("/{roomName}/leave")
-    public ResponseEntity<ApiResponse<String>> leaveRoom(
+    public ResponseEntity<ApiResponse<?>> leaveRoom(
             @PathVariable String roomName,
             @RequestParam String uid) {
         
@@ -142,7 +142,7 @@ public class RoomApiController extends BaseApiController {
 
     // Get room details endpoint
     @GetMapping("/{roomName}")
-    public ResponseEntity<ApiResponse<RoomResponse>> getRoomDetails(@PathVariable String roomName) {
+    public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomName) {
         GameRoom room = this.roomService.getRoomByName(roomName);
         if (room != null) {
             RoomResponse response = new RoomResponse(room);
