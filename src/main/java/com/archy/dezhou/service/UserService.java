@@ -19,6 +19,8 @@ public class UserService {
 
     private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
 
+    private Map<Integer, User> userMap = new HashMap<Integer, User>();
+
     public User getUserById(int userId){
         return userMapper.selectByPrimaryKey(userId);
     }
@@ -28,4 +30,7 @@ public class UserService {
         return usersMap.get(userId);
     }
 
+    public void addUser(User user){
+        userMap.put(user.getUid(),user);
+    }
 }

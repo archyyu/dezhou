@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.Puke;
 
 public class FivePukeItem
@@ -37,9 +37,9 @@ public class FivePukeItem
 		return list;
 	}
 	
-	public ActionscriptObject toAobj()
+	public JsonObjectWrapper toAobj()
 	{
-		ActionscriptObject aso = new ActionscriptObject();
+		JsonObjectWrapper aso = new JsonObjectWrapper();
 		for(int i = 0;i<this.list.size();i++)
 		{
 			aso.put(i,this.list.get(i).toAobj());

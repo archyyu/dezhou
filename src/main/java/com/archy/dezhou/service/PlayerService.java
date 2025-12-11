@@ -9,11 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.container.MD5;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
+
+import jakarta.annotation.Resource;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -29,7 +31,10 @@ public class PlayerService
 
 	private static Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-	private static SqlSessionFactory	sqlMapper	= null;
+	private static SqlSessionFactory sqlMapper = null;
+
+	@Resource
+	private UserService userService;
 
 	@SuppressWarnings("unchecked")
 	public static User NewUserInfoFromDb(String uid)
@@ -54,9 +59,9 @@ public class PlayerService
 	}
 
 
-	public static ActionscriptObject UpdateUserInfo(User user, ActionscriptObject passwordInfo)
+	public static JsonObjectWrapper UpdateUserInfo(User user, JsonObjectWrapper passwordInfo)
 	{
-		ActionscriptObject UpdateStatus = new ActionscriptObject();
+		JsonObjectWrapper UpdateStatus = new JsonObjectWrapper();
 
 		String name = "";
 		try
@@ -135,9 +140,9 @@ public class PlayerService
 
 
 	@SuppressWarnings("unchecked")
-	public static ActionscriptObject RankList()
+	public static JsonObjectWrapper RankList()
 	{
-		ActionscriptObject rankList = new ActionscriptObject();
+		JsonObjectWrapper rankList = new JsonObjectWrapper();
 
 		SqlSession sessionRank = sqlMapper.openSession();
 		List<Object> userInfoRankList = null;
@@ -161,7 +166,7 @@ public class PlayerService
 
 			for (int i = 0; i < j; i++)
 			{
-				ActionscriptObject oneUser = new ActionscriptObject();
+				JsonObjectWrapper oneUser = new JsonObjectWrapper();
 
 				oneUser.put("name", (((User)userInfoRankList.get(i)).getAccount()));
 				oneUser.put("uid", (((User)userInfoRankList.get(i)).getUid()));
@@ -186,7 +191,7 @@ public class PlayerService
 	 * 关键字：action，UserLogin
 	 */
 	@SuppressWarnings("unchecked")
-	public static byte[] UserLogin(String userName, String Password, boolean isauto,
+	public String UserLogin(String userName, String Password, boolean isauto,
 			String mobileUserId, String key, int loginType, boolean needResetPwd)
 	{
 		int uid = -1;
@@ -240,7 +245,7 @@ public class PlayerService
 		}
 		else
 		{
-			return BackletKit.errorXml("ErrorUserNameLogined").getBytes();
+			return "ErrorUserNameLogined";
 		}
 
 		if(userInfoList != null && userInfoList.size() > 0)
@@ -266,12 +271,12 @@ public class PlayerService
 				user.setLogintime(s);
 
 
-				UserModule.getInstance().addUser(user);
+				this.userService.addUser(user);
 
 
 				user.setUid(uid);
 
-				ActionscriptObject response = getUinfo(user, true);
+				JsonObjectWrapper response = getUinfo(user, true);
 				if (isauto)
 				{
 					response.put("isauto", "yes");
@@ -292,16 +297,16 @@ public class PlayerService
 				StringBuffer sb = new StringBuffer();
 				sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 
-				return SFSObjectSerializer.obj2xml(response, 0, "", sb);
+				return response.toJSONString();
 			}
 			catch (Exception ex)
 			{
-				return BackletKit.errorXml("Loginedfail").getBytes();
+				return "Loginedfail";
 			}
 		}
 		else
 		{
-			return BackletKit.errorXml("ErrorUserNameOrPassword").getBytes();
+			return "ErrorUserNameOrPassword";
 		}
 
 	}
@@ -311,7 +316,7 @@ public class PlayerService
 	 * action:响应用户的动作。响应用户的注册动作。 关键字：action，Register
 	 */
 	@SuppressWarnings("deprecation")
-	public static byte[] Register(String userName, String password,
+	public String Register(String userName, String password,
 			String email, String gendar, String birthday, String UserId, String key)
 	{
 		int rcount = -1;
@@ -321,11 +326,11 @@ public class PlayerService
 
 		if (userName.equals("") || userName == null)
 		{
-			return BackletKit.errorXml("userNameIsRequired").getBytes();
+			return "userNameIsRequired";
 		}
 		else if (password.equals("") || password == null)
 		{
-			return BackletKit.errorXml("userPassWordIsRequired").getBytes();
+			return "userPassWordIsRequired";
 		}
 
 
@@ -385,24 +390,22 @@ public class PlayerService
 
 		if (ifSuccess && rcount == 0)
 		{
-			EchoUserInfo = BackletKit.okXml("registerOk");
+			EchoUserInfo = "registerOk";
 		}
 		else if (rcount > 0)
 		{
-			EchoUserInfo = BackletKit.errorXml(
-					"NameIsRepeated");
+			EchoUserInfo = "NameIsRepeated";
 		}
 		else if (rcount < 0)
 		{
-			EchoUserInfo = BackletKit.errorXml(
-					"MysqlError");
+			EchoUserInfo = "MysqlError";
 		}
-		return EchoUserInfo.getBytes();
+		return EchoUserInfo;
 	}
 
 
 	@SuppressWarnings({ "unchecked" })
-	public static HashMap<String, String> AutoRegister(String userid, String key)
+	public HashMap<String, String> AutoRegister(String userid, String key)
 	{
 		int rcount = 0;
 		int userId = 0;
@@ -622,12 +625,12 @@ public class PlayerService
 		return resetpasswd;
 	}
 
-	public static ActionscriptObject getExtraObject(ActionscriptObject response, User uinfo )
+	public static JsonObjectWrapper getExtraObject(JsonObjectWrapper response, User uinfo )
 	{
 		response.put("Ver", ConstList.gameVersion);
 
 		int experience = uinfo.getExprience();
-		int[] l = Utils.retLevelAndExp(experience);
+		int[] l = new int[3];
 		uinfo.setLevel(l[0]);
 
 		response.put("lv", uinfo.getLevel() + "");
@@ -641,15 +644,15 @@ public class PlayerService
 	public static HashMap<String, HashMap<String, Integer>> refreshUserShowDj(User uinfo, User user)
 	{
 		HashMap<String, HashMap<String, Integer>> props = new HashMap<String, HashMap<String, Integer>>();
-		ActionscriptObject djObjList = getUsedDj(uinfo, user);
+		JsonObjectWrapper djObjList = getUsedDj(uinfo, user);
 		HashMap<String, Integer> equipDJHashMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> equipGiftHashMap = new HashMap<String, Integer>();
-		ActionscriptObject mydjList = (ActionscriptObject) djObjList.get("djlist");
+		JsonObjectWrapper mydjList = djObjList.getObj("djlist");
 		if (mydjList != null && mydjList.size() > 0)
 		{
 			for (int i = 0; i < mydjList.size(); i++)
 			{
-				ActionscriptObject daoju = (ActionscriptObject) mydjList.get(i);
+				JsonObjectWrapper daoju = mydjList.getObj(i);
 				int gtype = Integer.parseInt((String) daoju.get("gtype"));
 				switch (gtype)
 				{
@@ -662,10 +665,10 @@ public class PlayerService
 
 			}
 		}
-		ActionscriptObject myGiftList = (ActionscriptObject) djObjList.get("mgift");
+		JsonObjectWrapper myGiftList = djObjList.getObj("mgift");
 		if (myGiftList != null && myGiftList.size() > 0)
 		{
-			ActionscriptObject daoju = (ActionscriptObject) myGiftList.get(0);
+			JsonObjectWrapper daoju = myGiftList.getObj(0);
 			equipGiftHashMap.put((String) daoju.get("gtype"), 1);
 		}
 
@@ -680,11 +683,11 @@ public class PlayerService
 		return props;
 	}
 
-	public static ActionscriptObject getUsedDj(User uinfo, User user)
+	public static JsonObjectWrapper getUsedDj(User uinfo, User user)
 	{
 		String uid = uinfo.getUid() + "";
-		ActionscriptObject response = new ActionscriptObject();
-		ActionscriptObject reqObj = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
+		JsonObjectWrapper reqObj = new JsonObjectWrapper();
 		reqObj.put("uid", uid);
 		reqObj.put("type", "inUse");
 		reqObj.put("rn", "admin");
@@ -697,17 +700,17 @@ public class PlayerService
 		return response;
 	}
 
-	public static ActionscriptObject getUserAch(User uinfo)
+	public static JsonObjectWrapper getUserAch(User uinfo)
 	{
-		ActionscriptObject response = new ActionscriptObject();
-		ActionscriptObject user = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
+		JsonObjectWrapper user = new JsonObjectWrapper();
 		user.put("uid", String.valueOf(uinfo.getUid()));
 		user.put("tm", String.valueOf(uinfo.getAMoney()));
 		user.put("gl", String.valueOf(uinfo.getGold()));
-		user.put("lae",Utils.retLevelAndExp(uinfo.getExprience()));
+		user.put("lae", 0); //TODO uinfo.getLastAddExprience()
 
-		user.put("lvl", Utils.retLevelAndExp(uinfo.getExprience())[0]+"");
-		user.put("lev", Utils.retLevelAndExp(uinfo.getExprience()));
+		// user.put("lvl", Utils.retLevelAndExp(uinfo.getExprience())[0]+"");
+		// user.put("lev", Utils.retLevelAndExp(uinfo.getExprience()));
 
 
 		response.put("user", user);
@@ -738,7 +741,7 @@ public class PlayerService
 	}
 
 
-	public static int[][] getDiamondList(ActionscriptObject djList,
+	public static int[][] getDiamondList(JsonObjectWrapper djList,
 			User uinfo)
 	{
 		int[][] diamondList = new int[][]
@@ -748,12 +751,12 @@ public class PlayerService
 		{ 115, 0 },
 		{ 116, 0 }, };
 
-		ActionscriptObject mydjList = (ActionscriptObject) djList.get("djlist");
+		JsonObjectWrapper mydjList = djList.getObj("djlist");
 		if (mydjList != null && mydjList.size() > 0)
 		{
 			for (int i = 0; i < mydjList.size(); i++)
 			{
-				ActionscriptObject daoju = (ActionscriptObject) mydjList.get(i);
+				JsonObjectWrapper daoju = mydjList.getObj(i);
 				int gtype = Integer.parseInt((String) daoju.get("gtype"));
 				switch (gtype)
 				{
@@ -776,16 +779,16 @@ public class PlayerService
 		return diamondList;
 	}
 
-	public static int getVipid(ActionscriptObject djList, User uinfo)
+	public static int getVipid(JsonObjectWrapper djList, User uinfo)
 	{
 
 		int vipid = -1;
-		ActionscriptObject mydjList = (ActionscriptObject) djList.get("djlist");
+		JsonObjectWrapper mydjList = (JsonObjectWrapper) djList.get("djlist");
 		if (mydjList != null && mydjList.size() > 0)
 		{
 			for (int i = 0; i < mydjList.size(); i++)
 			{
-				ActionscriptObject daoju = (ActionscriptObject) mydjList.get(i);
+				JsonObjectWrapper daoju = (JsonObjectWrapper) mydjList.get(i);
 				int gtype = Integer.parseInt((String) daoju.get("gtype"));
 				switch (gtype)
 				{
@@ -833,9 +836,9 @@ public class PlayerService
 		return s;
 	}
 
-	public static ActionscriptObject getUinfo(User uinfo, boolean isSelf)
+	public static JsonObjectWrapper getUinfo(User uinfo, boolean isSelf)
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		response.put("uid", "" + uinfo.getUid());
 		response.put("nm", uinfo.getAccount() + "");
 		// response.put("tm", uinfo.getTmoney()+"");
@@ -887,7 +890,7 @@ public class PlayerService
 
 
         int experience = uinfo.getExprience();
-        int[] l = Utils.retLevelAndExp(experience);
+        int[] l = new int[] {0, 0, 0};
         uinfo.setLevel(l[0]);
         response.put("lv", uinfo.getLevel() + "");
         response.put("curjy", l[1] + "");

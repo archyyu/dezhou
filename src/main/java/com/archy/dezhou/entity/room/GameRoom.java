@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
@@ -58,10 +58,10 @@ public class GameRoom
 		return players;
 	}
 	
-	public ActionscriptObject playerSitDown(int seatId, Player player, int cb)
+	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb)
 	{
-		ActionscriptObject response = new ActionscriptObject();
-		ActionscriptObject userAobj = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
+		JsonObjectWrapper userAobj = new JsonObjectWrapper();
 		if(player == null)
 		{
 			return null;
@@ -132,7 +132,7 @@ public class GameRoom
 		return response;
 	}
 	
-	public ActionscriptObject playerStandUp(Integer uid, boolean notifyMySelf)
+	public JsonObjectWrapper playerStandUp(Integer uid, boolean notifyMySelf)
 	{
 
 		log.info("roomName: " + this.getName() + " try standup users: "  + uid);
@@ -166,10 +166,10 @@ public class GameRoom
 		this.pokerGame.playerStandup(player.getSeatId());
 
 
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		response.put("_cmd",ConstList.CMD_STANDUP);
 
-		ActionscriptObject playerAs = new ActionscriptObject();
+		JsonObjectWrapper playerAs = new JsonObjectWrapper();
 		playerAs.putNumber("sid",seatId);
 		playerAs.put("un",player.getAccount());
 		playerAs.putNumber("yt",player.getYourTurn());
@@ -495,7 +495,7 @@ public class GameRoom
 		return this.pokerGame;
 	}
 
-	public void notifyRoomPlayerButOne(ActionscriptObject aObj, ConstList.MessageType msgType, Integer uId)
+	public void notifyRoomPlayerButOne(JsonObjectWrapper aObj, ConstList.MessageType msgType, Integer uId)
 	{
 		long timeStamp = System.currentTimeMillis();
 		Set<User> users = new HashSet<User>();
@@ -520,7 +520,7 @@ public class GameRoom
 		}
 	}
 
-	public void notifyRoomPlayer(ActionscriptObject aObj, ConstList.MessageType msgType)
+	public void notifyRoomPlayer(JsonObjectWrapper aObj, ConstList.MessageType msgType)
 	{
 		long timeStamp = System.currentTimeMillis();
 		Set<User> users = new HashSet<User>();
@@ -537,9 +537,9 @@ public class GameRoom
 		//通知房间其他用户
 	}
 
-	public ActionscriptObject toAsObj()
+	public JsonObjectWrapper toAsObj()
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 
 		response.put("_cmd",ConstList.CMD_ROOMINFO);
 		response.put("ig", this.isGame()?"yes":"no");
@@ -567,13 +567,13 @@ public class GameRoom
 			response.put("fpk",this.pokerGame.fiveSharePkToAsob());
 		}
 
-		ActionscriptObject as_plist = new ActionscriptObject();
+		JsonObjectWrapper as_plist = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			ActionscriptObject as_player = new ActionscriptObject();
+			JsonObjectWrapper as_player = new JsonObjectWrapper();
 			Player player = entry.getValue();
 
-			ActionscriptObject dj_func = new ActionscriptObject();
+			JsonObjectWrapper dj_func = new JsonObjectWrapper();
 
 			as_player.put("dj_func", dj_func);
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
@@ -244,9 +244,9 @@ public class Player extends User
 		this.pkLevel = this.maxFivePukeList.getLevel();
 	}
 	
-	public ActionscriptObject toAsObj()
+	public JsonObjectWrapper toAsObj()
 	{
-		ActionscriptObject asObj = new ActionscriptObject();
+		JsonObjectWrapper asObj = new JsonObjectWrapper();
 		
 		asObj.putNumber("sid",this.getSeatId());
 		asObj.put("un",this.getAccount());
@@ -258,7 +258,29 @@ public class Player extends User
 		
 		return asObj;
 	}
-	
+
+	/**
+	 * Convert player to modern JSON object
+	 * @return JsonObjectWrapper representation of player
+	 */
+	public JsonObjectWrapper toJsonObj()
+	{
+		JsonObjectWrapper jsonObj = new JsonObjectWrapper();
+		
+		jsonObj.putNumber("sid", this.getSeatId());
+		jsonObj.put("un", this.getAccount());
+		jsonObj.put("uid", this.getUid());
+		jsonObj.putNumber("tb", this.getTempBet());
+		jsonObj.putNumber("yt", this.getYourTurn());
+		jsonObj.putNumber("gs", this.getGameState().value());
+		jsonObj.putNumber("cm", this.getRmoney());
+		jsonObj.putNumber("tm", this.getAMoney());
+		jsonObj.putNumber("lev", this.getLevel());
+		jsonObj.putBool("isp", this.isPlaying());
+		
+		return jsonObj;
+	}
+
 	public int getDropCardNum()
 	{
 		return this.dropCardNum;

@@ -12,7 +12,7 @@ The Dezhou Poker Server controllers have been successfully updated to use the ne
 
 **Before:**
 ```java
-ActionscriptObject gameState = new ActionscriptObject();
+JsonObjectWrapper gameState = new JsonObjectWrapper();
 gameState.put("roomId", room.getRoomId());
 gameState.put("roomName", room.getName());
 // ... more put calls
@@ -26,7 +26,7 @@ return successResponse(gameState);
 ```
 
 **Changes:**
-- ✅ Replaced `ActionscriptObject` with `GameStateResponse`
+- ✅ Replaced `JsonObjectWrapper` with `GameStateResponse`
 - ✅ Added import for `GameStateResponse`
 - ✅ Clean, type-safe response
 
@@ -67,7 +67,7 @@ return successResponse(response);
 
 **Before:**
 ```java
-ActionscriptObject asResponse;
+JsonObjectWrapper asResponse;
 if (uid.equals(cuid)) {
     asResponse = PlayerService.getUinfo(uinfo, true);
 } else {
@@ -84,7 +84,7 @@ return successResponse(response);
 ```
 
 **Changes:**
-- ✅ Replaced `ActionscriptObject` with `UserResponse`
+- ✅ Replaced `JsonObjectWrapper` with `UserResponse`
 - ✅ Added import for `UserResponse`
 - ✅ Maintained sensitive data handling logic
 - ✅ Clean, type-safe response

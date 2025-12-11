@@ -1,6 +1,6 @@
 package com.archy.dezhou.controller.api;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
@@ -114,7 +114,7 @@ public class ScriptApiController extends BaseApiController {
                 log.info("User already online: " + userid);
 
                 User uinfo = this.userService.getUserByUserId(Integer.parseInt(uid));
-                ActionscriptObject response = PlayerService.getUinfo(uinfo, true);
+                JsonObjectWrapper response = PlayerService.getUinfo(uinfo, true);
                 response.put("Ver", ConstList.gameVersion);
                 
                 if ("yes".equals(resetPassword)) {
@@ -122,13 +122,13 @@ public class ScriptApiController extends BaseApiController {
                 }
                 
                 // Add diamond and VIP information
-                ActionscriptObject djObjList = PlayerService.getUsedDj(uinfo, user);
+                JsonObjectWrapper djObjList = PlayerService.getUsedDj(uinfo, user);
                 int[][] diamondList = PlayerService.getDiamondList(djObjList, uinfo);
                 response.put("diamond", PlayerService.getDiamondListStr(diamondList));
                 response.put("vip", PlayerService.getVipid(djObjList, uinfo) + "");
                 
                 // Convert to XML for backward compatibility
-                String xmlResponse = actionscriptObjectToXml(response);
+                String xmlResponse = JsonObjectWrapperToXml(response);
                 return successResponse(xmlResponse);
             } else {
                 return errorResponse("EmulatorCantAutoLogin");
@@ -181,11 +181,11 @@ public class ScriptApiController extends BaseApiController {
             }
             
             // Get user info with script-related data
-            ActionscriptObject response = PlayerService.getUinfo(user, true);
+            JsonObjectWrapper response = PlayerService.getUinfo(user, true);
             response.put("Ver", ConstList.gameVersion);
             
             // Add diamond and VIP information
-            ActionscriptObject djObjList = PlayerService.getUsedDj(user, user);
+            JsonObjectWrapper djObjList = PlayerService.getUsedDj(user, user);
             int[][] diamondList = PlayerService.getDiamondList(djObjList, user);
             response.put("diamond", PlayerService.getDiamondListStr(diamondList));
             response.put("vip", PlayerService.getVipid(djObjList, user) + "");

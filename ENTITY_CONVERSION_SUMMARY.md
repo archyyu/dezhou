@@ -11,7 +11,7 @@ The Dezhou Poker Server has been successfully enhanced with proper Java entity c
 **Before:**
 ```java
 // Legacy XML response pattern
-ActionscriptObject obj = new ActionscriptObject();
+JsonObjectWrapper obj = new JsonObjectWrapper();
 obj.put("key", "value");
 String xml = SFSObjectSerializer.obj2xml(obj, 0, "", sb);
 return successResponse(xml);
@@ -211,7 +211,7 @@ return successResponse(response);
 ### Before (XML Response)
 ```java
 // In GameApiController
-ActionscriptObject gameState = room.toAsObj();
+JsonObjectWrapper gameState = room.toAsObj();
 StringBuffer sb = new StringBuffer();
 sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 byte[] xmlBytes = SFSObjectSerializer.obj2xml(gameState, 0, "", sb);

@@ -18,7 +18,7 @@ import com.archy.dezhou.service.RoomService;
 
 import jakarta.annotation.Resource;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.puker.PukerKit;
@@ -412,9 +412,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject fiveSharePkToAsob()
+	public JsonObjectWrapper fiveSharePkToAsob()
 	{
-		ActionscriptObject aso = new ActionscriptObject();
+		JsonObjectWrapper aso = new JsonObjectWrapper();
 		for(int i = 0;i<this.fiveSharePk.size();i++)
 		{
 			aso.put(i,this.fiveSharePk.get(i).toAobj());
@@ -547,9 +547,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject toAsObj()
+	public JsonObjectWrapper toAsObj()
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		
 		response.put("ig","yes");
 		response.putNumber("turn",this.roundNum);
@@ -566,10 +566,10 @@ public class PukerGame
 		response.putNumber("wt_sid",this.currentPlayer.getSeatId());
 		response.put("wt_uid",this.currentPlayer.getUid());
 		
-		ActionscriptObject as_plist = new ActionscriptObject();
+		JsonObjectWrapper as_plist = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			ActionscriptObject as_player = new ActionscriptObject();
+			JsonObjectWrapper as_player = new JsonObjectWrapper();
 			Player player = entry.getValue();
 
 
@@ -613,9 +613,9 @@ public class PukerGame
 	
 	public void notifyRoomPlayerPokeGameOver()
 	{
-		ActionscriptObject asObj = new ActionscriptObject();
+		JsonObjectWrapper asObj = new JsonObjectWrapper();
 		
-		ActionscriptObject winList = new ActionscriptObject();
+		JsonObjectWrapper winList = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Integer> entry : this.winMap.entrySet())
 		{
 			Player player = this.playerMap.get(entry.getKey());
@@ -623,9 +623,9 @@ public class PukerGame
 			{
 				continue;
 			}
-			ActionscriptObject winPlayer = new ActionscriptObject();
+			JsonObjectWrapper winPlayer = new JsonObjectWrapper();
 			
-			winPlayer.put("rlist",new ActionscriptObject());
+			winPlayer.put("rlist",new JsonObjectWrapper());
 			winPlayer.putNumber("sid",entry.getKey());
 			winPlayer.putNumber("tbet",entry.getValue());
 			winPlayer.putNumber("gs",player.getPkLevel());
@@ -635,9 +635,9 @@ public class PukerGame
 		}
 		
 		asObj.put("wlist",winList);
-		asObj.put("blist",new ActionscriptObject());
+		asObj.put("blist",new JsonObjectWrapper());
 		
-		ActionscriptObject cmList = new ActionscriptObject();
+		JsonObjectWrapper cmList = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
 			if(entry.getValue().getPlayerState() == ConstList.PlayerCareerState.PLAYER_STATE_LEAVE)
@@ -655,14 +655,14 @@ public class PukerGame
 	
 	public void notifyRoomPlayerPokeGameStart()
 	{
-		ActionscriptObject response = this.toAsObj();
+		JsonObjectWrapper response = this.toAsObj();
 		response.put("_cmd",ConstList.CMD_SBOT);
 		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
 	public void notifyRoomWhoTurn()
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		
 		response.put("_cmd",ConstList.CMD_WHO_TURN);
 		response.putNumber("mbet",this.maxBet);
@@ -827,12 +827,12 @@ public class PukerGame
 	
 	public void notifyRoomPlayerRoundOver()
 	{
-		ActionscriptObject response = new ActionscriptObject();
-		ActionscriptObject uList = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
+		JsonObjectWrapper uList = new JsonObjectWrapper();
 		
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			ActionscriptObject pl = new ActionscriptObject();
+			JsonObjectWrapper pl = new JsonObjectWrapper();
 			pl.putNumber("sid",entry.getKey());
 			pl.putNumber("pkl",entry.getValue().getPkLevel());
 			uList.put("sid" + entry.getKey(),pl);
@@ -848,9 +848,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerLookCard(Player player)
+	public JsonObjectWrapper playerLookCard(Player player)
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
@@ -864,7 +864,7 @@ public class PukerGame
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LOOK_CARD);
 		player.setYourTurn(0);
 		
-		ActionscriptObject as_player = player.toAsObj();
+		JsonObjectWrapper as_player = player.toAsObj();
 		
 		response.put("_cmd", ConstList.CMD_LOOK_CARD);
 		response.put("user", as_player);
@@ -882,9 +882,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerAddBet(Player player,int bet)
+	public JsonObjectWrapper playerAddBet(Player player,int bet)
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
@@ -926,7 +926,7 @@ public class PukerGame
 			this.maxBetSeatId = player.getSeatId();
 		}
 		
-		ActionscriptObject as_player = player.toAsObj();
+		JsonObjectWrapper as_player = player.toAsObj();
 		response.put("_cmd",ConstList.CMD_ADD_BET);
 		response.put("user",as_player);
 		
@@ -938,9 +938,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerFollowBet(Player player,int bet)
+	public JsonObjectWrapper playerFollowBet(Player player,int bet)
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
@@ -983,7 +983,7 @@ public class PukerGame
 		}
 		
 		response.put("_cmd",ConstList.CMD_FOLLOW_BET);
-		ActionscriptObject as_player = player.toAsObj();
+		JsonObjectWrapper as_player = player.toAsObj();
 		response.put("user",as_player);
 		
 		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet );
@@ -993,10 +993,10 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerDropCard(Player player)
+	public JsonObjectWrapper playerDropCard(Player player)
 	{
 		
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
@@ -1028,9 +1028,9 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerAllIn(Player player,int bet)
+	public JsonObjectWrapper playerAllIn(Player player,int bet)
 	{
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
@@ -1072,7 +1072,7 @@ public class PukerGame
 	}
 	
 	
-	public ActionscriptObject playerStandUp(Player player)
+	public JsonObjectWrapper playerStandUp(Player player)
 	{
 		if(player == null)
 		{
@@ -1084,7 +1084,7 @@ public class PukerGame
 			return null;
 		}
 		
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
@@ -1092,7 +1092,7 @@ public class PukerGame
 		player.addAmoney(player.getRmoney());
 		player.clearRoomMoney();
 		
-		ActionscriptObject as_player = player.toAsObj();
+		JsonObjectWrapper as_player = player.toAsObj();
 		as_player.putBool("isp",false);
 		as_player.putBool("ip",true);
 		
@@ -1122,10 +1122,10 @@ public class PukerGame
     }
 	
 	
-	public ActionscriptObject playerLeave(Player player)
+	public JsonObjectWrapper playerLeave(Player player)
 	{
 		this.playerMap.remove(player.getSeatId());
-		ActionscriptObject response = new ActionscriptObject();
+		JsonObjectWrapper response = new JsonObjectWrapper();
 
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
@@ -1134,7 +1134,7 @@ public class PukerGame
 
 		player.setRoomId(-1);
 
-		ActionscriptObject as_player = player.toAsObj();
+		JsonObjectWrapper as_player = player.toAsObj();
 		
 		response.put("_cmd",ConstList.CMD_LEAVE);
 		response.put("_user",as_player);

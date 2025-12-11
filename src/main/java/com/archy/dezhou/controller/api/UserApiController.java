@@ -1,6 +1,6 @@
 package com.archy.dezhou.controller.api;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
@@ -47,13 +47,12 @@ public class UserApiController extends BaseApiController {
         }
 
         try {
-            byte[] responseBytes = PlayerService.UserLogin(name, password, false, 
-                    userid != null ? userid : "", 
-                    key != null ? key : "", 
+            String responseString = playerService.UserLogin(name, password, false,
+                    userid != null ? userid : "",
+                    key != null ? key : "",
                     0, false);
             
             // Convert legacy byte[] response to modern format
-            String responseString = new String(responseBytes);
             return successResponse(responseString);
         } catch (Exception e) {
             return errorResponse("LoginFailed: " + e.getMessage());
@@ -82,12 +81,11 @@ public class UserApiController extends BaseApiController {
             }
             
             try {
-                byte[] responseBytes = PlayerService.Register(name, password, email, gendar, birthday, 
-                        userid != null ? userid : "", 
+                String responseBytes = playerService.Register(name, password, email, gendar, birthday,
+                        userid != null ? userid : "",
                         key != null ? key : "");
-                
-                String responseString = new String(responseBytes);
-                return successResponse(responseString);
+
+                return successResponse(responseBytes);
             } catch (Exception e) {
                 return errorResponse("RegistrationFailed: " + e.getMessage());
             }
@@ -100,21 +98,20 @@ public class UserApiController extends BaseApiController {
         }
 
         try {
-            HashMap<String, String> userinfoList = PlayerService.AutoRegister(
+            HashMap<String, String> userinfoList = playerService.AutoRegister(
                     userid != null ? userid : "", 
                     key != null ? key : "");
             
             if (userinfoList != null && userinfoList.get("name") != null && userinfoList.get("password") != null) {
-                byte[] loginResponse = PlayerService.UserLogin(
+                String loginResponse = this.playerService.UserLogin(
                         userinfoList.get("name"), 
                         userinfoList.get("password"), 
                         true, 
                         userid != null ? userid : "", 
                         key != null ? key : "", 
                         0, false);
-                
-                String responseString = new String(loginResponse);
-                return successResponse(responseString);
+
+                return successResponse(loginResponse);
             } else {
                 return errorResponse("AutoRigesterFailed");
             }
@@ -135,8 +132,8 @@ public class UserApiController extends BaseApiController {
             @RequestParam(required = false) String mobile,
             @RequestParam(required = false) String np,  // new password
             @RequestParam(required = false) String op) { // old password
-        
-        Player currentUser = getCurrentUser(uid);
+
+        Player currentUser = this.userService.getUserById(Integer.parseInt(uid));
         if (currentUser == null) {
             return errorResponse("UserNotLogined");
         }
@@ -158,14 +155,14 @@ public class UserApiController extends BaseApiController {
             if (mobile != null && !mobile.isEmpty()) uinfo.setMobile(mobile);
 
             // Handle password update
-            ActionscriptObject PassWordInfo = new ActionscriptObject();
+            JsonObjectWrapper PassWordInfo = new JsonObjectWrapper();
             if (np != null && !np.isEmpty() && op != null && !op.isEmpty()) {
                 PassWordInfo.put("op", op);
                 PassWordInfo.put("np", np);
             }
 
-            ActionscriptObject updateStatus = PlayerService.UpdateUserInfo(uinfo, PassWordInfo);
-            ActionscriptObject asResponse = PlayerService.getUinfo(uinfo, true);
+            JsonObjectWrapper updateStatus = PlayerService.UpdateUserInfo(uinfo, PassWordInfo);
+            JsonObjectWrapper asResponse = PlayerService.getUinfo(uinfo, true);
 
             if (updateStatus == null) {
                 asResponse.put("status", "registerUpdatefail");
@@ -227,7 +224,7 @@ public class UserApiController extends BaseApiController {
                 return errorResponse("HeIsNotLogined!!");
             }
             
-            // Use the new UserResponse entity instead of ActionscriptObject
+            // Use the new UserResponse entity instead of JsonObjectWrapper
             boolean includeSensitiveData = uid.equals(cuid);
             UserResponse response = new UserResponse(includeSensitiveData ? uinfo : cuinfo, includeSensitiveData);
             

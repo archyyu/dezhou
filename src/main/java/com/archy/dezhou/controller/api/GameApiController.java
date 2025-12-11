@@ -1,6 +1,7 @@
 package com.archy.dezhou.controller.api;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.response.GameStateResponse;
@@ -61,9 +62,9 @@ public class GameApiController extends BaseApiController {
             if (player != null) {
                 player.clearDropCardNum();
             }
-            
-            ActionscriptObject result = null;
-            
+
+            JsonObjectWrapper result = null;
+
             // Handle different game commands
             switch (cmd) {
                 case ConstList.CMD_ROOMINFO:
@@ -137,34 +138,34 @@ public class GameApiController extends BaseApiController {
 
     // Helper methods for each game command
 
-    private ActionscriptObject handleRoomInfo(GameRoom room) {
+    private JsonObjectWrapper handleRoomInfo(GameRoom room) {
         return room.toAsObj();
     }
 
-    private ActionscriptObject handleLookCard(PukerGame game, Player player) {
+    private JsonObjectWrapper handleLookCard(PukerGame game, Player player) {
         return game.playerLookCard(player);
     }
 
-    private ActionscriptObject handleAddBet(PukerGame game, Player player, Map<String, String> params) {
+    private JsonObjectWrapper handleAddBet(PukerGame game, Player player, Map<String, String> params) {
         int bet = getIntParam(params, "cb", 0);
         return game.playerAddBet(player, bet);
     }
 
-    private ActionscriptObject handleFollowBet(PukerGame game, Player player, Map<String, String> params) {
+    private JsonObjectWrapper handleFollowBet(PukerGame game, Player player, Map<String, String> params) {
         int bet = getIntParam(params, "cb", 0);
         return game.playerFollowBet(player, bet);
     }
 
-    private ActionscriptObject handleDropCard(PukerGame game, Player player) {
+    private JsonObjectWrapper handleDropCard(PukerGame game, Player player) {
         return game.playerDropCard(player);
     }
 
-    private ActionscriptObject handleAllIn(PukerGame game, Player player, Map<String, String> params) {
+    private JsonObjectWrapper handleAllIn(PukerGame game, Player player, Map<String, String> params) {
         int bet = getIntParam(params, "cb", 0);
         return game.playerAllIn(player, bet);
     }
 
-    private ActionscriptObject handleSitDown(GameRoom room, Player user, Map<String, String> params) {
+    private JsonObjectWrapper handleSitDown(GameRoom room, Player user, Map<String, String> params) {
         int seatId = getIntParam(params, "sid", -1);
         int cb = getIntParam(params, "cb", 0);
         
@@ -175,8 +176,8 @@ public class GameApiController extends BaseApiController {
         return room.playerSitDown(seatId, user, cb);
     }
 
-    private ActionscriptObject handleStandUp(GameRoom room, Player user, PukerGame game) {
-        ActionscriptObject result = room.playerStandUp(user.getUid(), false);
+    private JsonObjectWrapper handleStandUp(GameRoom room, Player user, PukerGame game) {
+        JsonObjectWrapper result = room.playerStandUp(user.getUid(), false);
         
         if (game != null && room.isGame() && game.isGameOverWhenDropCard()) {
             game.gameOverHandle();
@@ -185,19 +186,19 @@ public class GameApiController extends BaseApiController {
         return result;
     }
 
-    private ActionscriptObject handleLeave(GameRoom room, Player user, PukerGame game, Player player) {
+    private JsonObjectWrapper handleLeave(GameRoom room, Player user, PukerGame game, Player player) {
         room.playerLeave(user);
         
         if (game != null) {
             return game.playerLeave(player);
         }
-        
-        return new ActionscriptObject();
+
+        return new JsonObjectWrapper();
     }
 
-    private ActionscriptObject handleFlushAchievements() {
+    private JsonObjectWrapper handleFlushAchievements() {
         // TODO: Implement achievements flushing logic
-        return new ActionscriptObject();
+        return new JsonObjectWrapper();
     }
 
     // Utility methods
@@ -245,7 +246,7 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("NoActiveGameInRoom");
             }
             
-            // Use the new GameStateResponse entity instead of ActionscriptObject
+            // Use the new GameStateResponse entity instead of JsonObjectWrapper
             GameStateResponse gameState = new GameStateResponse(room, game);
             
             return successResponse(gameState);
@@ -283,7 +284,7 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("PlayerNotInGame");
             }
             
-            ActionscriptObject playerStatus = new ActionscriptObject();
+            JsonObjectWrapper playerStatus = new JsonObjectWrapper();
             playerStatus.put("playerId", player.getUid());
             playerStatus.put("seatId", player.getSeatId());
             playerStatus.put("chips", player.getChips());

@@ -1,6 +1,6 @@
 package com.archy.dezhou.entity;
 
-import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.container.JsonObjectWrapper;
 
 public class Puke
 {
@@ -33,9 +33,9 @@ public class Puke
 		return tag;
 	}
 	
-	public ActionscriptObject toAobj()
+	public JsonObjectWrapper toAobj()
 	{
-		ActionscriptObject as = new ActionscriptObject();
+		JsonObjectWrapper as = new JsonObjectWrapper();
 		as.put("tag",this.tag);
 		as.putNumber("num",this.num);
 		return as;
