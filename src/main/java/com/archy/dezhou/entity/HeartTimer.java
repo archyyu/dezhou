@@ -1,9 +1,8 @@
-package com.archy.dezhou.util;
+package com.archy.dezhou.entity;
 
-public class HeartTimer
-{
-	
-	private long DestTick = 0;
+public class HeartTimer {
+    
+    private long DestTick = 0;
 	
 	private int Interval = 0;
 	
@@ -38,5 +37,4 @@ public class HeartTimer
 	{
 		this.Interval = interval;
 	}
-	
 }

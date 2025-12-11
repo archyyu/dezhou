@@ -3,24 +3,25 @@ package com.archy.dezhou.entity.room;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.container.ActionscriptObject;
+import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
-import org.apache.log4j.Logger;
 
-import com.archy.dezhou.util.HeartTimer;
-import com.archy.dezhou.util.Utils;
 
-public class Room
+public class GameRoom
 {
 
-	private Logger log = Logger.getLogger(getClass());
+	private Logger log = LoggerFactory.getLogger(getClass());
 
-    private int roomid;
-    private String name;
+	private int roomid;
+	private String name;
 
 	public String creator;
 	private PukerGame pokerGame = null;
@@ -48,6 +49,13 @@ public class Room
 	public void removePlayer(int seatId)
 	{
 		this.playerMap.remove(seatId);
+	}
+
+	public List<Player> getPlayers()
+	{
+		List<Player> players = new ArrayList<Player>();
+		players.addAll(this.playerMap.values());
+		return players;
 	}
 	
 	public ActionscriptObject playerSitDown(int seatId, Player player, int cb)
@@ -110,7 +118,7 @@ public class Room
 		userAobj.put("un", player.getAccount());
 		userAobj.putNumber("ps", player.getPlayerState().value());
 		userAobj.putNumber("gs", player.getGameState().value());
-		userAobj.putNumber("lev", Integer.parseInt(Utils.retLevel(player.getExprience())));
+		userAobj.putNumber("lev", 0);
 		userAobj.putNumber("yt", 0);
 		userAobj.put("big", "");
 		userAobj.put("spr", "");
@@ -136,7 +144,7 @@ public class Room
 			if(entry.getValue().getUid().intValue() == uid)
 			{
 				seatId = entry.getKey();
-                player = entry.getValue();
+				player = entry.getValue();
 				log.info("roomName: " + this.getName() + "  standup users: "  + uid + " ok! ");
 				break;
 			}
@@ -212,7 +220,11 @@ public class Room
 		private HeartTimer timer = null;
 		
 	}
-	
+
+	public int getPlayerCount() {
+		return this.playerMap.size();
+	}
+
 	private volatile IRoomState roomState = new RoomStateReady();
 
 	public int userJoin(Player u)
@@ -410,7 +422,7 @@ public class Room
 	 *
 	 *
 	 **/
-	public Room(String name ,String zone,String creator)
+	public GameRoom(String name ,String zone,String creator)
 	{
 		setRoomID();
 
@@ -422,20 +434,20 @@ public class Room
 		this.pokerGame = new PukerGame(this);
 	}
 
-	public Room(JSONObject obj)
-    {
-        setRoomID();
+	public GameRoom(JSONObject obj)
+	{
+		setRoomID();
 
-        this.name = obj.getString("name");
-        this.creator = "admin";
-        this.bbet = obj.getIntValue("bbet");
-        this.sbet = obj.getIntValue("sbet");
-        this.minbuy = obj.getIntValue("mixbuy");
-        this.maxbuy = obj.getIntValue("maxbuy");
-        this.showname = obj.getString("showname");
+		this.name = obj.getString("name");
+		this.creator = "admin";
+		this.bbet = obj.getIntValue("bbet");
+		this.sbet = obj.getIntValue("sbet");
+		this.minbuy = obj.getIntValue("mixbuy");
+		this.maxbuy = obj.getIntValue("maxbuy");
+		this.showname = obj.getString("showname");
 
-        this.pokerGame = new PukerGame(this);
-    }
+		this.pokerGame = new PukerGame(this);
+	}
 
 	public int howManyUsers()
 	{
@@ -447,25 +459,25 @@ public class Room
 		return this.playerMap.values().contains(player);
 	}
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
 
-    public Integer getMinbuy() {
-        return minbuy;
-    }
+	public Integer getMinbuy() {
+		return minbuy;
+	}
 
-    public void setMinbuy(Integer minbuy) {
-        this.minbuy = minbuy;
-    }
+	public void setMinbuy(Integer minbuy) {
+		this.minbuy = minbuy;
+	}
 
-    public Integer getMaxbuy() {
-        return maxbuy;
-    }
+	public Integer getMaxbuy() {
+		return maxbuy;
+	}
 
-    public void setMaxbuy(Integer maxbuy) {
-        this.maxbuy = maxbuy;
-    }
+	public void setMaxbuy(Integer maxbuy) {
+		this.maxbuy = maxbuy;
+	}
 	
 	public Map<Integer,Player> userListToPlayerMap()
 	{
@@ -566,7 +578,7 @@ public class Room
 			as_player.put("dj_func", dj_func);
 
 			as_player.put("un",player.getAccount());
-			as_player.putNumber("lev",Utils.retLevelAndExp(player.getExprience())[0]);
+			as_player.putNumber("lev",0);
 			as_player.putNumber("sid",entry.getKey());
 			as_player.put("uid",player.getUid());
 
@@ -605,29 +617,29 @@ public class Room
 		return response;
 	}
 	
-    public Integer getBbet() {
-        return bbet;
-    }
+	public Integer getBbet() {
+		return bbet;
+	}
 	
-    public void setBbet(Integer bbet) {
-        this.bbet = bbet;
-    }
+	public void setBbet(Integer bbet) {
+		this.bbet = bbet;
+	}
 
-    public Integer getSbet() {
-        return sbet;
-    }
+	public Integer getSbet() {
+		return sbet;
+	}
 
-    public void setSbet(Integer sbet) {
-        this.sbet = sbet;
-    }
+	public void setSbet(Integer sbet) {
+		this.sbet = sbet;
+	}
 
-    public String getShowname() {
-        return showname;
-    }
+	public String getShowname() {
+		return showname;
+	}
 
-    public void setShowname(String showname) {
-        this.showname = showname;
-    }
+	public void setShowname(String showname) {
+		this.showname = showname;
+	}
 
 	private class RoomStateReady implements IRoomState
 	{

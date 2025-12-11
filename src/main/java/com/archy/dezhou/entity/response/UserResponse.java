@@ -152,7 +152,6 @@ public class UserResponse {
      * User achievements
      */
     @Data
-    @NoArgsConstructor
     public static class UserAchievements {
         private List<String> unlockedAchievements;
         private List<String> availableAchievements;

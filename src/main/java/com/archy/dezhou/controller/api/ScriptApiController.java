@@ -5,8 +5,9 @@ import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.PlayerService;
 import com.archy.dezhou.global.UserModule;
+import com.archy.dezhou.service.PlayerService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

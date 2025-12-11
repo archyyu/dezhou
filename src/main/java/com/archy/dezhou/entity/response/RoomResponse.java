@@ -1,5 +1,6 @@
 package com.archy.dezhou.entity.response;
 
+import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.Room;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -106,8 +107,8 @@ public class RoomResponse {
         private String creator;
         private String showname;
         private String status;
-        
-        public RoomListItem(Room room) {
+
+        public RoomListItem(GameRoom room) {
             this.roomId = room.getRoomId();
             this.name = room.getName();
             this.currentPlayers = room.getPlayerCount();
@@ -120,8 +121,8 @@ public class RoomResponse {
             this.showname = room.getShowname();
             this.status = determineRoomStatus(room);
         }
-        
-        private String determineRoomStatus(Room room) {
+
+        private String determineRoomStatus(GameRoom room) {
             int currentPlayers = room.getPlayerCount();
             if (currentPlayers >= room.getMaxUsers()) {
                 return "full";

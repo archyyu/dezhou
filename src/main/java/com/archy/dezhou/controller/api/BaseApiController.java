@@ -23,6 +23,14 @@ public abstract class BaseApiController {
         return ResponseEntity.ok(response);
     }
 
+    protected <T> ResponseEntity<ApiResponse<T>> successResponse(String msg) {
+        ApiResponse<T> response = new ApiResponse<>();
+        response.setSuccess(true);
+        response.setMessage(msg);
+        response.setTimestamp(System.currentTimeMillis());
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * Create an error API response
      */

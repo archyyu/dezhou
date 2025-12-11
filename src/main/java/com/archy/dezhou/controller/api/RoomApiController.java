@@ -1,8 +1,13 @@
 package com.archy.dezhou.controller.api;
 
+import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.room.Room;
-import com.archy.dezhou.global.UserModule;
+import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.service.PlayerService;
+import com.archy.dezhou.service.RoomService;
+
+import jakarta.annotation.Resource;
+
 import com.archy.dezhou.entity.response.RoomResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +23,15 @@ import java.util.List;
 @RequestMapping("/api/v1/room")
 public class RoomApiController extends BaseApiController {
 
+    @Resource
+    private RoomService roomService;
+
+    @Resource
+    private PlayerService playerService;
+
     // Get room list endpoint - replaces LIST command
     @GetMapping("/list")
-    public ResponseEntity<ApiResponse<List<RoomResponse.RoomListItem>>> getRoomList(
+    public ResponseEntity<ApiResponse<?>> getRoomList(
             @RequestParam(required = false, defaultValue = "rg") String rt,
             @RequestParam(required = false, defaultValue = "-1") String bb,
             @RequestParam(required = false, defaultValue = "-1") String sb) {
@@ -40,7 +51,7 @@ public class RoomApiController extends BaseApiController {
             @RequestParam String uid) {
         
         try {
-            Room room = UserModule.getInstance().getRoomByName(roomName);
+            GameRoom room = this.roomService.getRoomByName(roomName);
             Player user = getCurrentUser(uid);
             
             if (room == null || user == null) {
@@ -48,7 +59,7 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Leave old room if user is already in one
-            Room oldRoom = UserModule.getInstance().getRoom(user.getRoomId());
+            GameRoom oldRoom = this.roomService.getRoom(user.getRoomId());
             if (oldRoom != null) {
                 oldRoom.playerLeave(user);
             }
@@ -83,8 +94,8 @@ public class RoomApiController extends BaseApiController {
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
-            
-            Room room = UserModule.getInstance().getRoomByName(roomName);
+
+            GameRoom room = this.roomService.getRoomByName(roomName);
             if (room == null) {
                 return errorResponse("YourParmsIsInValid");
             }
@@ -103,14 +114,14 @@ public class RoomApiController extends BaseApiController {
 
     // Helper method to generate room list using modern entities
     private List<RoomResponse.RoomListItem> getRoomListFromMemory(String roomtype, String bb, String sb) {
-        List<Room> roomlist = UserModule.getInstance().getRoomList();
+        List<GameRoom> roomlist = this.roomService.getRoomList();
         List<RoomResponse.RoomListItem> result = new ArrayList<>();
         
         try {
             int minBet = Integer.parseInt(sb);
             int maxBet = Integer.parseInt(bb);
-            
-            for (Room room : roomlist) {
+
+            for (GameRoom room : roomlist) {
                 if (room.getBbet() >= minBet && room.getBbet() <= maxBet) {
                     result.add(new RoomResponse.RoomListItem(room));
                 }
@@ -139,10 +150,10 @@ public class RoomApiController extends BaseApiController {
 
     // Get user's current room endpoint
     @GetMapping("/current")
-    public ResponseEntity<ApiResponse<Room>> getCurrentRoom(@RequestParam String uid) {
+    public ResponseEntity<ApiResponse<?>> getCurrentRoom(@RequestParam String uid) {
         Player user = getCurrentUser(uid);
         if (user != null) {
-            Room room = UserModule.getInstance().getRoom(user.getRoomId());
+            GameRoom room = UserModule.getInstance().getRoom(user.getRoomId());
             if (room != null) {
                 return successResponse(room);
             } else {

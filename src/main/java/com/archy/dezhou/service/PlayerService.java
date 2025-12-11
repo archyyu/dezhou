@@ -1,4 +1,4 @@
-package com.archy.dezhou.global;
+package com.archy.dezhou.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -9,23 +9,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.archy.dezhou.backlet.BackletKit;
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.container.MD5;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
+import com.archy.dezhou.global.ConstList;
+
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.log4j.Logger;
 
 import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.util.Utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+
+@Service
 public class PlayerService
 {
 
-	protected static Logger log = Logger.getLogger(PlayerService.class);
+	private static Logger log = LoggerFactory.getLogger(PlayerService.class);
 
 	private static SqlSessionFactory	sqlMapper	= null;
 
@@ -36,7 +41,7 @@ public class PlayerService
 		List<Object> getUserInfo = null;
 		try
 		{
-			getUserInfo =   session.selectList("ndb.getUserInfo", uid);
+			getUserInfo = session.selectList("ndb.getUserInfo", uid);
 			session.commit();
 		}
 		catch (Exception e)

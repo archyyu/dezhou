@@ -1,11 +1,12 @@
 package com.archy.dezhou.entity.response;
 
 import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
-import com.archy.dezhou.entity.room.Room;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class GameStateResponse {
     /**
      * Create GameStateResponse from Room and Game
      */
-    public GameStateResponse(Room room, PukerGame game) {
+    public GameStateResponse(GameRoom room, PukerGame game) {
         this.roomId = room.getRoomId();
         this.roomName = room.getName();
         this.currentPlayers = room.getPlayerCount();
@@ -40,11 +41,11 @@ public class GameStateResponse {
         
         if (game != null) {
             // Add game-specific information
-            this.currentTurnPlayerId = game.getCurrentTurnPlayerId();
-            this.currentBetAmount = game.getCurrentBet();
-            this.potAmount = game.getPotAmount();
-            this.gamePhase = game.getGamePhase();
-            this.communityCards = game.getCommunityCards();
+            this.currentTurnPlayerId = ""; // game.getCurrentTurnPlayerId();
+            this.currentBetAmount = 0; // game.getCurrentBet();
+            this.potAmount = 0; // game.getPotAmount();
+            this.gamePhase = "betting"; // game.getGamePhase();
+            this.communityCards = new ArrayList<>(); // game.getCommunityCards();
             
             // Convert players to PlayerState objects
             this.players = room.getPlayers().stream()
@@ -52,7 +53,7 @@ public class GameStateResponse {
                 .toList();
             
             // Add game settings
-            this.settings = new GameSettings(room, game);
+            // this.settings = new GameSettings(room, game);
         }
     }
 
@@ -81,7 +82,7 @@ public class GameStateResponse {
             this.seatId = player.getSeatId();
             this.chips = player.getChips();
             this.currentBet = player.getCurrentBet();
-            this.hasLooked = player.isLooked();
+            this.hasLooked = player.isHasLooked();
             this.isActive = player.isActive();
             this.isAllIn = player.isAllIn();
             this.isDealer = player.isDealer();
@@ -131,8 +132,8 @@ public class GameStateResponse {
         private int timePerTurn;
         private String gameType; // "Texas Hold'em", etc.
         private String bettingStructure; // "No Limit", "Pot Limit", etc.
-        
-        public GameSettings(Room room, PukerGame game) {
+
+        public GameSettings(GameRoom room, PukerGame game) {
             this.smallBet = room.getSbet();
             this.bigBet = room.getBbet();
             this.minBuyIn = room.getMinbuy();

@@ -9,24 +9,31 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserModule;
+import com.archy.dezhou.service.RoomService;
+
+import jakarta.annotation.Resource;
+
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
-import org.apache.log4j.Logger;
-
 import com.archy.dezhou.entity.puker.PukerKit;
 
 
 public class PukerGame
 {
 	
-	private Logger log = Logger.getLogger(getClass());
-	
-	private Room room = null;
-	
+	@Resource
+	private RoomService	roomService;
+
+	private Logger log = LoggerFactory.getLogger(getClass());
+
+	private GameRoom room = null;
+
 	//当前的庄家座位号
 	private int bankSeatId = 0;
 	
@@ -64,11 +71,19 @@ public class PukerGame
 	
 	Map<Integer,Integer> roundPoolBet = new HashMap<Integer,Integer>();
 	
-	public PukerGame(Room room)
+	public PukerGame(GameRoom room)
 	{
 		this.room = room;
 	}
 	
+	public String getCurrentTurnPlayerId()
+	{
+		if(this.currentPlayer == null)
+		{
+			return "0";
+		}
+		return this.currentPlayer.getUid() + "";
+	}
 
 	public void beatHeart( long now )
 	{
@@ -90,7 +105,7 @@ public class PukerGame
 				if(tempPlayer.getDropCardNum() >= 2)
 				{
 
-                    Room room = UserModule.getInstance().getRoom(tempPlayer.getRoomId());
+                    GameRoom room = this.roomService.getRoom(tempPlayer.getRoomId());
                     if(room != null)
                     {
                         log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId()

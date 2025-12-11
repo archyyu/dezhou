@@ -16,3 +16,15 @@ create table dezhou_user (
 	primary key(uid),
 	UNIQUE KEY uidx_account (account)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table dezhou_room (
+	id int(11) auto_increment,
+	showname varchar(50) default '',
+	name varchar(50) default '',
+	bbet int(11) default 0,
+	sbet int(11) default 0,
+	maxbuy int(11) default 0,
+	minbuy int(11) default 0,
+	roomtype varchar(10) default '',
+	primary key(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

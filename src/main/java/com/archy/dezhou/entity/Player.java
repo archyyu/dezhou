@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+
 import com.archy.dezhou.container.ActionscriptObject;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
+
+import lombok.Data;
+
 import com.archy.dezhou.entity.puker.FivePukeItem;
 import com.archy.dezhou.entity.puker.PukerKit;
+import com.archy.dezhou.entity.response.GameStateResponse.Card;
 
+@Data
 public class Player extends User
 {
 
@@ -23,6 +29,16 @@ public class Player extends User
 	private int tempGold = 0;
 	
 	private int totalGambleBet = 0;
+
+	private int chips;
+	private int currentBet;
+	private boolean hasLooked;
+	private boolean isActive;
+	private boolean isAllIn;
+	private boolean isDealer;
+	private boolean isCurrentTurn;
+	
+	private List<Card> cards;
 
 	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
 

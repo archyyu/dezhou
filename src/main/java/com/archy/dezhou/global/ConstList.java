@@ -1,19 +1,9 @@
 package com.archy.dezhou.global;
 
-import java.io.StringReader;
-
-import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import com.archy.dezhou.util.XLoad;
 
 public class ConstList
 {
 
-
-	
 	public static String gameVersion = null;
 
 

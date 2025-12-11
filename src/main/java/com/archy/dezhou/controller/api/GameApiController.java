@@ -1,13 +1,17 @@
 package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.container.ActionscriptObject;
-import com.archy.dezhou.container.SFSObjectSerializer;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.response.GameStateResponse;
+import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
-import com.archy.dezhou.entity.room.Room;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.global.UserModule;
+import com.archy.dezhou.service.RoomService;
+import com.archy.dezhou.service.UserService;
+
+import jakarta.annotation.Resource;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +24,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/game")
 public class GameApiController extends BaseApiController {
+
+
+    @Resource
+    private RoomService roomService;
+
+    @Resource
+    private UserService userService;
 
     /**
      * Common game operations endpoint
@@ -38,8 +49,8 @@ public class GameApiController extends BaseApiController {
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
-            
-            Room room = UserModule.getInstance().getRoom(user.getRoomId());
+
+            GameRoom room = this.roomService.getRoom(user.getRoomId());
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
@@ -126,7 +137,7 @@ public class GameApiController extends BaseApiController {
 
     // Helper methods for each game command
 
-    private ActionscriptObject handleRoomInfo(Room room) {
+    private ActionscriptObject handleRoomInfo(GameRoom room) {
         return room.toAsObj();
     }
 
@@ -153,7 +164,7 @@ public class GameApiController extends BaseApiController {
         return game.playerAllIn(player, bet);
     }
 
-    private ActionscriptObject handleSitDown(Room room, Player user, Map<String, String> params) {
+    private ActionscriptObject handleSitDown(GameRoom room, Player user, Map<String, String> params) {
         int seatId = getIntParam(params, "sid", -1);
         int cb = getIntParam(params, "cb", 0);
         
@@ -164,7 +175,7 @@ public class GameApiController extends BaseApiController {
         return room.playerSitDown(seatId, user, cb);
     }
 
-    private ActionscriptObject handleStandUp(Room room, Player user, PukerGame game) {
+    private ActionscriptObject handleStandUp(GameRoom room, Player user, PukerGame game) {
         ActionscriptObject result = room.playerStandUp(user.getUid(), false);
         
         if (game != null && room.isGame() && game.isGameOverWhenDropCard()) {
@@ -174,7 +185,7 @@ public class GameApiController extends BaseApiController {
         return result;
     }
 
-    private ActionscriptObject handleLeave(Room room, Player user, PukerGame game, Player player) {
+    private ActionscriptObject handleLeave(GameRoom room, Player user, PukerGame game, Player player) {
         room.playerLeave(user);
         
         if (game != null) {
@@ -194,8 +205,8 @@ public class GameApiController extends BaseApiController {
     private Player validateUserAndRoom(String uid, String roomIdStr) {
         try {
             int uidInt = Integer.parseInt(uid);
-            Player user = UserModule.getInstance().getUserByUserId(uidInt);
-            
+            Player user = this.userService.getUserByUserId(uidInt);
+
             if (user == null) {
                 return null;
             }
@@ -234,7 +245,7 @@ public class GameApiController extends BaseApiController {
     @GetMapping("/{roomId}/state")
     public ResponseEntity<ApiResponse<?>> getGameState(@PathVariable String roomId) {
         try {
-            Room room = UserModule.getInstance().getRoomByName(roomId);
+            GameRoom room = this.roomService.getRoomByName(roomId);
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
