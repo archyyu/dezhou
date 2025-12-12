@@ -6,9 +6,9 @@ spring:
     name: dezhou-poker-server
   
   datasource:
-    url: jdbc:mysql://localhost:33306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
     username: root
-    password: aida87014999
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
     
   jpa:

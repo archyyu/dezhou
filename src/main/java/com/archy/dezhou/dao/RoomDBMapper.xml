@@ -26,7 +26,7 @@
     from dezhou_room
     where name = #{name,jdbcType=VARCHAR}
   </select>
-  <insert id="insertSelective" parameterType="com.archy.dezhou.entity.Room" >
+  <insert id="insertSelective" parameterType="com.archy.dezhou.entity.RoomDB" >
     insert into dezhou_room
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -81,7 +81,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.archy.dezhou.entity.Room" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.archy.dezhou.entity.RoomDB" >
     update dezhou_room
     <set >
       <if test="showname != null" >
