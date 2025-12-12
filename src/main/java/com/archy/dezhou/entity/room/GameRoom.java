@@ -299,6 +299,7 @@ public class GameRoom
 
 	public void beatHeart(long now)
 	{
+		log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
 		now = System.currentTimeMillis();
 		List<Player> users = new ArrayList<Player>();
 		users.addAll(this.playerMap.values());

@@ -1,6 +1,7 @@
 package com.archy.dezhou.thread.roomUnit;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +24,13 @@ public class RoomDealUnit implements IRoomDealUnit
 
 	@Resource
 	private RoomService roomService;
-
-	public RoomDealUnit()
-	{
-		
-	}
 	
-	@Scheduled(fixedDelay = 10)
+	// @Scheduled(fixedDelay = 10, initialDelay = 1000, timeUnit = java.util.concurrent.TimeUnit.MILLISECONDS)
+	@Scheduled(fixedDelay = 1000, initialDelay = 5000, timeUnit = TimeUnit.MILLISECONDS)
 	public void heartbeat()
 	{
+
+		log.info("RoomDealUnit heartbeat");
 		long start = System.currentTimeMillis();
 
 		List<GameRoom> roomListCpy = new ArrayList<GameRoom>();
