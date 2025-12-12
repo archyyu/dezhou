@@ -17,9 +17,7 @@ public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
-
-    private Map<Integer, User> userMap = new HashMap<Integer, User>();
+    private Map<Integer, Player> playersMap = new HashMap<Integer, Player>();
 
     public User getUserById(int userId){
         return userMapper.selectByPrimaryKey(userId);
@@ -27,10 +25,20 @@ public class UserService {
 
     public Player getUserByUserId(int userId)
     {
-        return usersMap.get(userId);
+        Player player = playersMap.get(userId);
+        if (player == null)
+        {
+            User user = getUserById(userId);
+            if(user != null)
+            {
+                player = new Player(user);
+                playersMap.put(userId, player);
+            }
+        }
+        return player;
     }
 
-    public void addUser(User user){
-        userMap.put(user.getUid(),user);
+    public boolean addUser(User user){
+        return this.userMapper.insertSelective(user) > 0;
     }
 }

@@ -63,9 +63,9 @@ public class Player extends User
 	
 	private volatile int dropCardNum = 0;
 	
-	public Player()
+	public Player(User user)
 	{
-		
+		super(user);
 	}
 
 	public int getTempBet()

@@ -2,6 +2,9 @@ package com.archy.dezhou.entity;
 
 import java.util.logging.Logger;
 
+import lombok.Data;
+
+@Data
 public class User
 {
 
@@ -43,11 +46,23 @@ public class User
 
 	private Integer roomId;
 
-
-
 	public User()
 	{
+	}
 
+	public User(User user)
+	{
+		this.uid = user.getUid();
+		this.account = user.getAccount();
+		this.password = user.getPassword();
+		this.isPlaying = user.isPlaying();
+		this.roommoney = user.getRoommoney();
+		this.allmoney = user.getAllmoney();
+		this.exprience = user.getExprience();
+		this.gold = user.getGold();
+		this.mobile = user.getMobile();
+		this.email = user.getEmail();
+		this.level = user.getLevel();
 	}
 
     public Integer getRoomId() {

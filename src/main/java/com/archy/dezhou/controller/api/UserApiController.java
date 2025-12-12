@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * User API Controller - Replaces PlayerManageBacklet
@@ -206,27 +205,22 @@ public class UserApiController extends BaseApiController {
     // User info endpoint - replaces UINFO command
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<?>> getUserInfo(
-            @RequestParam String uid,
-            @RequestParam String cuid) {
-        
-        if (!validateRequiredParams(uid, cuid)) {
+            @RequestParam String uid) {
+
+        if (!validateRequiredParams(uid)) {
             return errorResponse("ParmsIsInvalid");
         }
 
         try {
             Player uinfo = userService.getUserByUserId(Integer.parseInt(uid));
-            Player cuinfo = userService.getUserByUserId(Integer.parseInt(cuid));
 
             if (uinfo == null) {
                 return errorResponse("YouAreNotLogined!");
             }
-            if (cuinfo == null) {
-                return errorResponse("HeIsNotLogined!!");
-            }
-            
+
             // Use the new UserResponse entity instead of JsonObjectWrapper
-            boolean includeSensitiveData = uid.equals(cuid);
-            UserResponse response = new UserResponse(includeSensitiveData ? uinfo : cuinfo, includeSensitiveData);
+            boolean includeSensitiveData = true; // Adjust based on your logic
+            UserResponse response = new UserResponse(includeSensitiveData ? uinfo : null, includeSensitiveData);
             
             return successResponse(response);
         } catch (Exception e) {
