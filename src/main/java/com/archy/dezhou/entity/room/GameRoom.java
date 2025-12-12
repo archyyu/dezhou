@@ -13,6 +13,7 @@ import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
+import com.archy.dezhou.entity.RoomDB;
 
 
 public class GameRoom
@@ -33,6 +34,22 @@ public class GameRoom
 	public boolean isPlayerInRoom(Player user)
 	{
 		return this.playerMap.containsValue(user);
+	}
+
+	public GameRoom(RoomDB roomDB)
+	{
+		setRoomID();
+
+		this.name = roomDB.getName();
+		// this.zone = roomDB.getZone();
+		// this.creator = roomDB.getCreator();
+		this.bbet = roomDB.getBbet();
+		this.sbet = roomDB.getSbet();
+		this.minbuy = roomDB.getMinbuy();
+		this.maxbuy = roomDB.getMaxbuy();
+		this.showname = roomDB.getShowname();
+
+		this.pokerGame = new PukerGame(this);
 	}
 
 

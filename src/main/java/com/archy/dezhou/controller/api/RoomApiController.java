@@ -10,6 +10,8 @@ import com.archy.dezhou.service.UserService;
 import jakarta.annotation.Resource;
 
 import com.archy.dezhou.entity.response.RoomResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -121,20 +123,18 @@ public class RoomApiController extends BaseApiController {
         List<GameRoom> roomlist = this.roomService.getRoomList();
         List<RoomResponse.RoomListItem> result = new ArrayList<>();
         
-        try {
+        if (StringUtils.isNumeric(bb) && StringUtils.isNumeric(sb)) {
             int minBet = Integer.parseInt(sb);
             int maxBet = Integer.parseInt(bb);
 
-            for (GameRoom room : roomlist) {
+            roomlist.forEach(room -> {
                 if (room.getBbet() >= minBet && room.getBbet() <= maxBet) {
                     result.add(new RoomResponse.RoomListItem(room));
                 }
-            }
-        } catch (NumberFormatException e) {
-            // If parsing fails, return all rooms
-            for (GameRoom room : roomlist) {
-                result.add(new RoomResponse.RoomListItem(room));
-            }
+            });
+        } else {
+            roomlist.forEach(room -> result.add(new RoomResponse.RoomListItem(room)));
+            return result;
         }
         
         return result;

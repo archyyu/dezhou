@@ -12,6 +12,7 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.room.GameRoom;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 
 @Service
@@ -23,6 +24,17 @@ public class RoomService{
     public RoomDB getRoomById(int roomId){
         return roomDBMapper.selectByPrimaryKey(roomId);
     }
+
+	@PostConstruct
+	public void init() {
+
+		List<RoomDB> roomDBList = roomDBMapper.selectAllRooms();
+		roomDBList.forEach(roomDB -> {
+			GameRoom room = new GameRoom(roomDB);
+			this.roomsMap.put(room.getRoomId(), room);
+		});
+
+	}
 
 
     private Map<Integer,GameRoom> roomsMap = new HashMap<Integer,GameRoom>();
