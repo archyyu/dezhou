@@ -33,6 +33,20 @@ public class GameApiController extends BaseApiController {
     private UserService userService;
 
     /**
+     * Protected getter for roomService - used for testing
+     */
+    protected RoomService getRoomService() {
+        return roomService;
+    }
+
+    /**
+     * Protected getter for userService - used for testing
+     */
+    protected UserService getUserService() {
+        return userService;
+    }
+
+    /**
      * Common game operations endpoint
      * Handles various game commands like look card, bet, follow, etc.
      */
