@@ -37,6 +37,18 @@ public class UserService {
         }
         return player;
     }
+    
+    public Player getUserByUsername(String username)
+    {
+        User user = userMapper.selectByAccount(username);
+        if(user != null)
+        {
+            Player player = new Player(user);
+            playersMap.put(user.getUid(), player);
+            return player;
+        }
+        return null;
+    }
 
     public boolean addUser(User user){
         return this.userMapper.insertSelective(user) > 0;
