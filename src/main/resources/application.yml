@@ -6,9 +6,9 @@ spring:
     name: dezhou-poker-server
   
   datasource:
-    url: jdbc:mysql://localhost:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:33306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
     username: root
-    password: root
+    password: aida87014999
     driver-class-name: com.mysql.cj.jdbc.Driver
     
   jpa:
@@ -20,9 +20,18 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 mybatis:
-  config-location: classpath:mybatis.xml
+  # MyBatis configuration moved directly into application.yml
   mapper-locations: classpath:com/archy/dezhou/dao/*.xml
   type-aliases-package: com.archy.dezhou.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    default-fetch-size: 100
+    default-statement-timeout: 30
+    # MySQL specific settings
+    jdbc-type-for-null: 'null'
 
 # Server configuration (from server.json)
 

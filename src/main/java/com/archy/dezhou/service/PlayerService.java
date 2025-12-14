@@ -914,12 +914,12 @@ public class PlayerService
 
 	public static Player selectPlayerById(Integer uid)
     {
-	    return new Player();
+	    return null;
     }
 
     public static Player selectPlayerByAccount(String account)
     {
-	    return new Player();
+	    return null;
     }
 
     public static boolean savePlayer(Player player)
