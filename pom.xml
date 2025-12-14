@@ -119,6 +119,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Karate API Testing -->
+        <dependency>
+            <groupId>com.intuit.karate</groupId>
+            <artifactId>karate-junit5</artifactId>
+            <version>1.4.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Legacy dependencies (keep for compatibility) -->
         <dependency>
             <groupId>io.netty</groupId>
