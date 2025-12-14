@@ -16,11 +16,11 @@ public class ApiTestRunner {
 
     @Karate.Test
     Karate testGameApi() {
-        return Karate.run("game-api").relativeTo(getClass());
+        return Karate.run("classpath:karate/com/archy/dezhou/game-api").relativeTo(getClass());
     }
 
     @Karate.Test
     Karate testRoomApi() {
-        return Karate.run("room-api").relativeTo(getClass());
+        return Karate.run("classpath:karate/com/archy/dezhou/room-api").relativeTo(getClass());
     }
 }

@@ -12,6 +12,8 @@ import jakarta.annotation.Resource;
 import com.archy.dezhou.entity.response.RoomResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,8 @@ public class RoomApiController extends BaseApiController {
     @Resource
     private UserService userService;
 
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     // Get room list endpoint - replaces LIST command
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<?>> getRoomList(
@@ -44,6 +48,7 @@ public class RoomApiController extends BaseApiController {
         
         try {
             List<RoomResponse.RoomListItem> roomList = getRoomListFromMemory(rt, bb, sb);
+            log.info("room/list size:" + roomList.size());
             return successResponse(roomList);
         } catch (Exception e) {
             return errorResponse("RoomListRetrievalFailed: " + e.getMessage());
