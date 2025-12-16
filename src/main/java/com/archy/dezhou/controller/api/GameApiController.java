@@ -7,12 +7,15 @@ import com.archy.dezhou.entity.response.GameStateResponse;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
 
 import jakarta.annotation.Resource;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,6 +34,9 @@ public class GameApiController extends BaseApiController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private JwtTokenProvider jwtTokenProvider;
 
     /**
      * Protected getter for roomService - used for testing
@@ -64,7 +70,7 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
 
-            GameRoom room = this.roomService.getRoom(user.getRoomId());
+            GameRoom room = this.roomService.getRoom(user.getRoomid());
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
@@ -218,6 +224,22 @@ public class GameApiController extends BaseApiController {
 
     private Player validateUserAndRoom(String uid, String roomIdStr) {
         try {
+            // First try to get user from security context (JWT authentication)
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Player) {
+                Player authenticatedUser = (Player) authentication.getPrincipal();
+                
+                // Verify that the uid parameter matches the authenticated user
+                if (uid != null && !uid.isEmpty()) {
+                    int uidInt = Integer.parseInt(uid);
+                    if (authenticatedUser.getUid() == uidInt) {
+                        return authenticatedUser;
+                    }
+                }
+                return authenticatedUser;
+            }
+            
+            // Fallback to legacy authentication (for compatibility)
             int uidInt = Integer.parseInt(uid);
             Player user = this.userService.getUserByUserId(uidInt);
 

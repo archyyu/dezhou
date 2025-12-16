@@ -9,13 +9,16 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
+
+import lombok.Data;
+
 import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.RoomDB;
 
-
+@Data
 public class GameRoom
 {
 
@@ -30,10 +33,30 @@ public class GameRoom
 	private Set<Player> spectatorList = Collections.synchronizedSet( new HashSet<Player>() );
 	private boolean isLimbo;
 	private String zone;
+	private Integer minbuy;
+	private Integer maxbuy;
+
+	private Integer bbet;
+	private Integer sbet;
+	private String showname;
+	private String roomtype;
+
+	private Integer maxPlayers;
+	private Integer minPlayers;
+
+	private String gameType;
+
+	private static AtomicInteger autoId = new AtomicInteger(0);
+
+	private Map<Integer,Player> playerMap = new Hashtable<Integer,Player>();
 
 	public boolean isPlayerInRoom(Player user)
 	{
 		return this.playerMap.containsValue(user);
+	}
+
+	public GameRoom() {
+		setRoomID();
 	}
 
 	public GameRoom(RoomDB roomDB)
@@ -52,13 +75,40 @@ public class GameRoom
 		this.pokerGame = new PukerGame(this);
 	}
 
+	public GameRoom(String name ,String zone,String creator)
+	{
+		setRoomID();
+
+		this.name = name;
+		this.zone = zone;
+		this.creator = creator;
+
+
+		this.pokerGame = new PukerGame(this);
+	}
+
+	public GameRoom(JSONObject obj)
+	{
+		setRoomID();
+
+		this.name = obj.getString("name");
+		this.creator = "admin";
+		this.bbet = obj.getIntValue("bbet");
+		this.sbet = obj.getIntValue("sbet");
+		this.minbuy = obj.getIntValue("mixbuy");
+		this.maxbuy = obj.getIntValue("maxbuy");
+		this.showname = obj.getString("showname");
+
+		this.pokerGame = new PukerGame(this);
+	}
+
 
 	public int getMaxSpectator()
 	{
 		return 100000;
 	}
 	
-	public void addPlayer(int seatId,Player player)
+	private void addPlayer(int seatId,Player player)
 	{
 		this.playerMap.put(seatId,player);
 	}
@@ -266,27 +316,6 @@ public class GameRoom
 		return 0;
 	}
 
-	public int getRoomId()
-	{
-		return roomid;
-	}
-
-	public String getZone()
-	{
-		return zone;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-
 	public boolean isTemp()
 	{
 		return false;
@@ -379,8 +408,6 @@ public class GameRoom
 	{
 		return creator;
 	}
-	private Integer minbuy;
-	private Integer maxbuy;
 
 	private void setRoomID()
 	{
@@ -432,40 +459,7 @@ public class GameRoom
 		}
 		return this.pokerGame.getSecsPassByTurn();
 	}
-	private Integer bbet;
-	private Integer sbet;
-	private String showname;
-
-	/**
-	 *
-	 *
-	 **/
-	public GameRoom(String name ,String zone,String creator)
-	{
-		setRoomID();
-
-		this.name = name;
-		this.zone = zone;
-		this.creator = creator;
-
-
-		this.pokerGame = new PukerGame(this);
-	}
-
-	public GameRoom(JSONObject obj)
-	{
-		setRoomID();
-
-		this.name = obj.getString("name");
-		this.creator = "admin";
-		this.bbet = obj.getIntValue("bbet");
-		this.sbet = obj.getIntValue("sbet");
-		this.minbuy = obj.getIntValue("mixbuy");
-		this.maxbuy = obj.getIntValue("maxbuy");
-		this.showname = obj.getString("showname");
-
-		this.pokerGame = new PukerGame(this);
-	}
+	
 
 	public int howManyUsers()
 	{
@@ -503,10 +497,6 @@ public class GameRoom
 		map.putAll(this.playerMap);
 		return map;
 	}
-	
-	private static AtomicInteger autoId = new AtomicInteger(0);
-	
-	private Map<Integer,Player> playerMap = new Hashtable<Integer,Player>();
 	
 	public PukerGame getPokerGame()
 	{
@@ -552,7 +542,7 @@ public class GameRoom
 			users.addAll(this.spectatorList);
 		}
 
-		//通知房间其他用户
+		//notify all the uers, game start
 	}
 
 	public JsonObjectWrapper toAsObj()

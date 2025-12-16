@@ -33,6 +33,13 @@ mybatis:
     # MySQL specific settings
     jdbc-type-for-null: 'null'
 
+# JWT Configuration
+jwt:
+  secret: dezhou-secret-key-1234567890
+  expiration: 86400000 # 24 hours in milliseconds
+  header: Authorization
+  prefix: Bearer 
+
 # Server configuration (from server.json)
 
 logging:

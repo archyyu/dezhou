@@ -3,6 +3,7 @@ package com.archy.dezhou.controller.api;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.PlayerService;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
@@ -10,6 +11,8 @@ import com.archy.dezhou.service.UserService;
 import jakarta.annotation.Resource;
 
 import com.archy.dezhou.entity.response.RoomResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,9 @@ public class RoomApiController extends BaseApiController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private JwtTokenProvider jwtTokenProvider;
+
     private Logger log = LoggerFactory.getLogger(getClass());
 
     // Get room list endpoint - replaces LIST command
@@ -62,15 +68,21 @@ public class RoomApiController extends BaseApiController {
             @RequestParam String uid) {
         
         try {
-            GameRoom room = this.roomService.getRoomByName(roomName);
-            Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
+            // Get user from JWT authentication or fallback to legacy
+            Player user = getAuthenticatedUser(uid);
             
-            if (room == null || user == null) {
+            if (user == null) {
                 return errorResponse("UserNotLogined");
             }
             
+            GameRoom room = this.roomService.getRoomByName(roomName);
+            
+            if (room == null) {
+                return errorResponse("RoomNotFound");
+            }
+            
             // Leave old room if user is already in one
-            GameRoom oldRoom = this.roomService.getRoom(user.getRoomId());
+            GameRoom oldRoom = this.roomService.getRoom(user.getRoomid());
             if (oldRoom != null) {
                 oldRoom.playerLeave(user);
             }
@@ -82,7 +94,7 @@ public class RoomApiController extends BaseApiController {
             
             // Join the new room
             int ret = room.userJoin(user);
-            user.setRoomId(room.getRoomId());
+            user.setRoomId(room.getRoomid());
             
             if (ret == 0) {
                 return successResponse("UserEnterRoomOk");
@@ -160,9 +172,9 @@ public class RoomApiController extends BaseApiController {
     // Get user's current room endpoint
     @GetMapping("/current")
     public ResponseEntity<ApiResponse<?>> getCurrentRoom(@RequestParam String uid) {
-        Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
+        Player user = getAuthenticatedUser(uid);
         if (user != null) {
-            GameRoom room = this.roomService.getRoom(user.getRoomId());
+            GameRoom room = this.roomService.getRoom(user.getRoomid());
             if (room != null) {
                 return successResponse(room);
             } else {
@@ -170,6 +182,36 @@ public class RoomApiController extends BaseApiController {
             }
         } else {
             return errorResponse("UserNotLogined");
+        }
+    }
+    
+    // Helper method to get authenticated user
+    private Player getAuthenticatedUser(String uid) {
+        try {
+            // First try to get user from security context (JWT authentication)
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Player) {
+                Player authenticatedUser = (Player) authentication.getPrincipal();
+                
+                // Verify that the uid parameter matches the authenticated user
+                if (uid != null && !uid.isEmpty()) {
+                    int uidInt = Integer.parseInt(uid);
+                    if (authenticatedUser.getUid() == uidInt) {
+                        return authenticatedUser;
+                    }
+                }
+                return authenticatedUser;
+            }
+            
+            // Fallback to legacy authentication (for compatibility)
+            if (uid != null && !uid.isEmpty()) {
+                int uidInt = Integer.parseInt(uid);
+                return this.userService.getUserByUserId(uidInt);
+            }
+            
+            return null;
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

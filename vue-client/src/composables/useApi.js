@@ -37,20 +37,24 @@ export function useApi() {
 
   return {
     // Authentication
-    login: (credentials) => api.post('/auth/login', credentials),
-    register: (userData) => api.post('/auth/register', userData),
+    login: (credentials) => api.post('/api/v1/user/login', null, { params: credentials }),
+    register: (userData) => api.post('/api/v1/user/register', null, { params: userData }),
     
     // Game
-    getRooms: () => api.get('/rooms'),
-    joinRoom: (roomId) => api.post(`/rooms/${roomId}/join`),
-    leaveRoom: (roomId) => api.post(`/rooms/${roomId}/leave`),
+    getRooms: () => api.get('/api/v1/room/list'),
+    joinRoom: (roomName, uid) => api.post(`/api/v1/room/${roomName}/join`, null, { params: { uid } }),
+    leaveRoom: (roomName, uid) => api.post(`/api/v1/room/${roomName}/leave`, null, { params: { uid } }),
     
     // Game actions
-    gameAction: (action) => api.post('/game/action', action),
+    gameAction: (roomId, uid, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
+      params: { uid, cmd } 
+    }),
     
     // User
-    getUserProfile: () => api.get('/user/profile'),
-    updateProfile: (profileData) => api.put('/user/profile', profileData),
+    getUserProfile: (uid) => api.get('/api/v1/user/info', { params: { uid } }),
+    updateProfile: (uid, profileData) => api.put('/api/v1/user/profile', null, { 
+      params: { uid, ...profileData } 
+    }),
     
     // Generic methods
     get: (url) => api.get(url),

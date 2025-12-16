@@ -6,6 +6,7 @@ public class ConstList
 
 	public static String gameVersion = null;
 
+	public static final String GAME_TYPE_TEXAS_HOLDEM = "texas_holden";
 
 	public static final String CMD_LOOK_CARD = "1"; // 看牌
 	public static final String CMD_ADD_BET = "2"; // 加注
@@ -52,7 +53,7 @@ public class ConstList
 
 
 
-    public static final int DROPCARDTIMEEXPIRED = 16 * 1000;
+    public static final int DROPCARDTIMEEXPIRED = 5 * 1000;
 
 
 	public enum CardState

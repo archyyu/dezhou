@@ -5,6 +5,7 @@ import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.entity.response.UserResponse;
+import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.PlayerService;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
@@ -12,9 +13,12 @@ import com.archy.dezhou.service.UserService;
 import jakarta.annotation.Resource;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User API Controller - Replaces PlayerManageBacklet
@@ -32,6 +36,9 @@ public class UserApiController extends BaseApiController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private JwtTokenProvider jwtTokenProvider;
 
     // User login endpoint - replaces USERLOGIN command
     @PostMapping("/login")
@@ -51,8 +58,22 @@ public class UserApiController extends BaseApiController {
                     key != null ? key : "",
                     0, false);
             
-            // Convert legacy byte[] response to modern format
-            return successResponse(responseString);
+            // Get the user from the response
+            Player user = userService.getUserByUsername(name);
+            
+            if (user == null) {
+                return errorResponse("UserNotFound");
+            }
+            
+            // Generate JWT token
+            String token = jwtTokenProvider.generateToken(user);
+            
+            // Create response with token and user info
+            Map<String, Object> loginResponse = new HashMap<>();
+            loginResponse.put("token", token);
+            loginResponse.put("user", responseString);
+            
+            return successResponse(loginResponse);
         } catch (Exception e) {
             return errorResponse("LoginFailed: " + e.getMessage());
         }
@@ -84,7 +105,28 @@ public class UserApiController extends BaseApiController {
                         userid != null ? userid : "",
                         key != null ? key : "");
 
-                return successResponse(responseBytes);
+                // Auto-login after registration
+                String loginResponse = playerService.UserLogin(name, password, false,
+                        userid != null ? userid : "",
+                        key != null ? key : "",
+                        0, false);
+                
+                // Get the user from the response
+                Player user = userService.getUserByUsername(name);
+                
+                if (user == null) {
+                    return errorResponse("UserNotFoundAfterRegistration");
+                }
+                
+                // Generate JWT token
+                String token = jwtTokenProvider.generateToken(user);
+                
+                // Create response with token and user info
+                Map<String, Object> registerResponse = new HashMap<>();
+                registerResponse.put("token", token);
+                registerResponse.put("user", responseBytes);
+                
+                return successResponse(registerResponse);
             } catch (Exception e) {
                 return errorResponse("RegistrationFailed: " + e.getMessage());
             }
@@ -110,7 +152,22 @@ public class UserApiController extends BaseApiController {
                         key != null ? key : "", 
                         0, false);
 
-                return successResponse(loginResponse);
+                // Get the user from the response
+                Player user = userService.getUserByUsername(userinfoList.get("name"));
+                
+                if (user == null) {
+                    return errorResponse("UserNotFoundAfterAutoRegistration");
+                }
+                
+                // Generate JWT token
+                String token = jwtTokenProvider.generateToken(user);
+                
+                // Create response with token and user info
+                Map<String, Object> autoRegisterResponse = new HashMap<>();
+                autoRegisterResponse.put("token", token);
+                autoRegisterResponse.put("user", loginResponse);
+                
+                return successResponse(autoRegisterResponse);
             } else {
                 return errorResponse("AutoRigesterFailed");
             }
@@ -132,7 +189,8 @@ public class UserApiController extends BaseApiController {
             @RequestParam(required = false) String np,  // new password
             @RequestParam(required = false) String op) { // old password
 
-        Player currentUser = this.userService.getUserByUserId(Integer.parseInt(uid));
+        // Get user from JWT authentication or fallback to legacy
+        Player currentUser = getAuthenticatedUser(uid);
         if (currentUser == null) {
             return errorResponse("UserNotLogined");
         }
@@ -212,7 +270,8 @@ public class UserApiController extends BaseApiController {
         }
 
         try {
-            Player uinfo = userService.getUserByUserId(Integer.parseInt(uid));
+            // Get user from JWT authentication or fallback to legacy
+            Player uinfo = getAuthenticatedUser(uid);
 
             if (uinfo == null) {
                 return errorResponse("YouAreNotLogined!");
@@ -231,7 +290,7 @@ public class UserApiController extends BaseApiController {
     // User logout endpoint - replaces LOGOUT command
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<?>> userLogout(@RequestParam String uid) {
-        Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
+        Player user = getAuthenticatedUser(uid);
         if (user != null) {
             return successResponse("loginoutOk");
         } else {
@@ -247,5 +306,35 @@ public class UserApiController extends BaseApiController {
         
         // TODO: Implement achievements logic
         return successResponse("Achievements endpoint");
+    }
+    
+    // Helper method to get authenticated user
+    private Player getAuthenticatedUser(String uid) {
+        try {
+            // First try to get user from security context (JWT authentication)
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof Player) {
+                Player authenticatedUser = (Player) authentication.getPrincipal();
+                
+                // Verify that the uid parameter matches the authenticated user
+                if (uid != null && !uid.isEmpty()) {
+                    int uidInt = Integer.parseInt(uid);
+                    if (authenticatedUser.getUid() == uidInt) {
+                        return authenticatedUser;
+                    }
+                }
+                return authenticatedUser;
+            }
+            
+            // Fallback to legacy authentication (for compatibility)
+            if (uid != null && !uid.isEmpty()) {
+                int uidInt = Integer.parseInt(uid);
+                return this.userService.getUserByUserId(uidInt);
+            }
+            
+            return null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

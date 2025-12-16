@@ -77,13 +77,19 @@ const handleLogin = async () => {
     error.value = ''
     
     const response = await login({
-      account: form.value.account,
+      name: form.value.account,
       password: form.value.password
     })
     
-    // Store token
-    localStorage.setItem('token', response.data.token)
-    localStorage.setItem('user', JSON.stringify(response.data.user))
+    // Store token and user data from the new response format
+    if (response.data && response.data.data) {
+      localStorage.setItem('token', response.data.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.data.user))
+    } else {
+      // Fallback for legacy response format
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+    }
     
     // Redirect to rooms
     router.push('/rooms')
