@@ -31,7 +31,7 @@ public class RoomService{
 		List<RoomDB> roomDBList = roomDBMapper.selectAllRooms();
 		roomDBList.forEach(roomDB -> {
 			GameRoom room = new GameRoom(roomDB);
-			this.roomsMap.put(room.getRoomId(), room);
+			this.roomsMap.put(room.getRoomid(), room);
 		});
 
 	}
@@ -60,7 +60,7 @@ public class RoomService{
 	
 	public void addRoom(GameRoom room)
 	{
-		roomsMap.put(room.getRoomId(),room);
+		roomsMap.put(room.getRoomid(),room);
 	}
 	
 	public List<GameRoom> getRoomList()
@@ -70,7 +70,7 @@ public class RoomService{
 	
 	public int destroyRoom(GameRoom room)
 	{
-		roomsMap.remove(room.getRoomId());
+		roomsMap.remove(room.getRoomid());
 		return 0;
 	}
 	

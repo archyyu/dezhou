@@ -82,7 +82,7 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Leave old room if user is already in one
-            GameRoom oldRoom = this.roomService.getRoom(user.getRoomId());
+            GameRoom oldRoom = this.roomService.getRoom(user.getRoomid());
             if (oldRoom != null) {
                 oldRoom.playerLeave(user);
             }
@@ -94,7 +94,7 @@ public class RoomApiController extends BaseApiController {
             
             // Join the new room
             int ret = room.userJoin(user);
-            user.setRoomId(room.getRoomId());
+            user.setRoomId(room.getRoomid());
             
             if (ret == 0) {
                 return successResponse("UserEnterRoomOk");
@@ -174,7 +174,7 @@ public class RoomApiController extends BaseApiController {
     public ResponseEntity<ApiResponse<?>> getCurrentRoom(@RequestParam String uid) {
         Player user = getAuthenticatedUser(uid);
         if (user != null) {
-            GameRoom room = this.roomService.getRoom(user.getRoomId());
+            GameRoom room = this.roomService.getRoom(user.getRoomid());
             if (room != null) {
                 return successResponse(room);
             } else {

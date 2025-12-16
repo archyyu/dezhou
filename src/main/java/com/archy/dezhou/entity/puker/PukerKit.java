@@ -15,10 +15,13 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 
+@Component
 public class PukerKit
 {
 	
@@ -159,7 +162,7 @@ public class PukerKit
 	 * 生成扑克集合
 	 *
 	 */
-	public static  Map<Integer,Puke> Puke()
+	public static Map<Integer,Puke> Puke()
 	{
 		Map<Integer,Puke> map = new HashMap<Integer,Puke>(52);
 		int i = 65;

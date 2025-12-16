@@ -33,7 +33,7 @@ public class GameStateResponse {
      * Create GameStateResponse from Room and Game
      */
     public GameStateResponse(GameRoom room, PukerGame game) {
-        this.roomId = room.getRoomId();
+        this.roomId = room.getRoomid();
         this.roomName = room.getName();
         this.currentPlayers = room.getPlayerCount();
         this.maxPlayers = room.getMaxUsers();

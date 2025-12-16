@@ -255,6 +255,7 @@ public class Player extends User
 		this.fivePk = this.maxFivePukeList.getList();
 		this.pkValue = this.maxFivePukeList.getPkValue();
 		this.pkLevel = this.maxFivePukeList.getLevel();
+		
 	}
 	
 	public JsonObjectWrapper toAsObj()

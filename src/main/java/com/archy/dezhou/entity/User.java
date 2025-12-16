@@ -65,7 +65,7 @@ public class User
 		this.level = user.getLevel();
 	}
 
-    public Integer getRoomId() {
+    public Integer getRoomid() {
         return roomId;
     }
 

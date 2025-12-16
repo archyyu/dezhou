@@ -93,7 +93,7 @@ public class MessageApiController extends BaseApiController {
         
         // Create a message object to return
         MessageResponse messageResponse = new MessageResponse();
-        messageResponse.setRoomId(room.getRoomId());
+        messageResponse.setRoomId(room.getRoomid());
         messageResponse.setRoomName(room.getName());
         messageResponse.setSenderId(user.getUid());
         messageResponse.setSenderName(user.getAccount());
@@ -123,7 +123,7 @@ public class MessageApiController extends BaseApiController {
             // For now, return a placeholder response
             
             MessageHistory history = new MessageHistory();
-            history.setRoomId(room.getRoomId());
+            history.setRoomId(room.getRoomid());
             history.setRoomName(room.getName());
             history.setMessageCount(0);
             history.setMessages(new MessageResponse[0]);
@@ -187,7 +187,7 @@ public class MessageApiController extends BaseApiController {
         private long timestamp;
 
         // Getters and Setters
-        public int getRoomId() { return roomId; }
+        public int getRoomid() { return roomId; }
         public void setRoomId(int roomId) { this.roomId = roomId; }
         public String getRoomName() { return roomName; }
         public void setRoomName(String roomName) { this.roomName = roomName; }
@@ -213,7 +213,7 @@ public class MessageApiController extends BaseApiController {
         private MessageResponse[] messages;
 
         // Getters and Setters
-        public int getRoomId() { return roomId; }
+        public int getRoomid() { return roomId; }
         public void setRoomId(int roomId) { this.roomId = roomId; }
         public String getRoomName() { return roomName; }
         public void setRoomName(String roomName) { this.roomName = roomName; }

@@ -75,6 +75,10 @@ public class PukerGame
 	{
 		this.room = room;
 	}
+
+	public void initGame() {
+
+	}
 	
 	public String getCurrentTurnPlayerId()
 	{
@@ -85,12 +89,14 @@ public class PukerGame
 		return this.currentPlayer.getUid() + "";
 	}
 
+	public GameRoom getGameRoom() {
+		return this.room;
+	}
+
 	public void beatHeart( long now )
 	{
-		
 		if(this.currentPlayer == null)
 		{
-			
 			return ;
 		}
 		if(this.currentPlayer.isDropCardExpired(now))
@@ -105,7 +111,7 @@ public class PukerGame
 				if(tempPlayer.getDropCardNum() >= 2)
 				{
 
-                    GameRoom room = this.roomService.getRoom(tempPlayer.getRoomId());
+                    GameRoom room = this.roomService.getRoom(tempPlayer.getRoomid());
                     if(room != null)
                     {
                         log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId()
@@ -173,6 +179,7 @@ public class PukerGame
 	{
 		this.playerMap.clear();
 		this.playerMap.putAll( this.room.userListToPlayerMap() );
+
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
 		    entry.getValue().setPlaying(true);
@@ -508,7 +515,6 @@ public class PukerGame
 		}
 		
 		this.currentPlayer = null;
-//		this.balanceBet();	
 		this.getPlayerMaxHandPuke();
 		this.round = 0;
 		this.balanceBet();

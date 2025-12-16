@@ -32,7 +32,7 @@ public class RoomResponse {
      * Create RoomResponse from GameRoom
      */
     public RoomResponse(GameRoom room) {
-        this.roomId = room.getRoomId();
+        this.roomId = room.getRoomid();
         this.name = room.getName();
         this.creator = room.getCreator();
         this.showname = room.getShowname();
@@ -108,7 +108,7 @@ public class RoomResponse {
         private String status;
 
         public RoomListItem(GameRoom room) {
-            this.roomId = room.getRoomId();
+            this.roomId = room.getRoomid();
             this.name = room.getName();
             this.currentPlayers = room.getPlayerCount();
             this.maxPlayers = room.getMaxUsers();
