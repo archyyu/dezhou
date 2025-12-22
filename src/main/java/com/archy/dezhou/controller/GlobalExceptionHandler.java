@@ -1,6 +1,7 @@
 package com.archy.dezhou.controller;
 
 import com.archy.dezhou.entity.ApiResponse;
+import com.archy.dezhou.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,8 +46,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handle resource not found exceptions
      */
-    @ExceptionHandler(com.archy.dezhou.exception.ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<?>> handleResourceNotFoundException(com.archy.dezhou.exception.ResourceNotFoundException ex) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         logger.warn("Resource not found:", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("ResourceNotFound: " + ex.getMessage()));
@@ -118,14 +119,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private String getSafeErrorMessage(Exception ex) {
         String message = ex.getMessage();
         return (message != null && !message.isEmpty()) ? message : "An unexpected error occurred";
-    }
-
-    /**
-     * Custom exception for resource not found scenarios
-     */
-    public static class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message) {
-            super(message);
-        }
     }
 }

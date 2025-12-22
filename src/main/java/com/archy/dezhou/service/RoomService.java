@@ -47,9 +47,14 @@ public class RoomService{
 		return roomsMap.get(id);
 	}
 	
-	public GameRoom getRoomByName(int roomId)
+	public GameRoom getRoomByName(String roomName)
 	{
-		return this.roomsMap.get(roomId);
+		for (GameRoom room : this.roomsMap.values()) {
+			if (room.getName().equals(roomName)) {
+				return room;
+			}
+		}
+		return null;
 	}
 	
 	public GameRoom createGameRoom(String uid, String userName, int roomTypeId) {
