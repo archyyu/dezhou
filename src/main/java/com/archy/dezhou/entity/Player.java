@@ -170,7 +170,7 @@ public class Player extends User
 		this.tempGold = tempGold;
 	}
 	
-	private long yourTurnTimeStramp = 0;
+	private volatile long yourTurnTimeStramp = 0;
 	
 	public long getYourTurnTimeStramp()
 	{

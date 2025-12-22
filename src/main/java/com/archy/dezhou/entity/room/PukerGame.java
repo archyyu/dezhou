@@ -67,6 +67,8 @@ public class PukerGame
 	//玩家list
 	private Queue<Player> playerList = new LinkedList<Player>();
 	
+	List<Puke> allPukes = new ArrayList<>();
+
 	//扑克牌Map
 	List<Puke> fiveSharePk = new ArrayList<Puke>();
 	
