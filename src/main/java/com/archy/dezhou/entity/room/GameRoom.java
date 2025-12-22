@@ -2,6 +2,7 @@ package com.archy.dezhou.entity.room;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,9 +121,10 @@ public class GameRoom
 
 	public List<Player> getPlayers()
 	{
-		List<Player> players = new ArrayList<Player>();
-		players.addAll(this.playerMap.values());
-		return players;
+		// List<Player> players = new ArrayList<Player>();
+		// players.addAll(this.playerMap.values());
+		// return players;
+		return this.playerMap.values().stream().collect(Collectors.toList());
 	}
 	
 	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb)
@@ -432,7 +434,7 @@ public class GameRoom
 
 	public boolean isGame()
 	{
-		return this.roomState.isGame();
+		return true;
 	}
 
 	public boolean forceRemoveUser(User u)
