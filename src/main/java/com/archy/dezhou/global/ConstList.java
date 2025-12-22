@@ -133,6 +133,28 @@ public class ConstList
 			return this.value;
 		}
 	}
+
+	/**
+	 * round state
+	*/
+	public enum RoundState 
+	{	
+
+		Pre_Flop(1),
+		Flop(2),
+		Turn(3),
+		River(4);
+
+		private int value;
+		RoundState(int v) {
+			this.value = v;
+		}
+		public int value()
+		{
+			return this.value;
+		}
+
+	}
 	
 	
 	public static final int MAXNUMPLAYEROFROOM = 8;

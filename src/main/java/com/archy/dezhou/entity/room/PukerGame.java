@@ -231,17 +231,17 @@ public class PukerGame
 			smallBlind = playerList.get(0);
 			this.firstSeatIdOnRound = bigBlind.getSeatId();
 		}
+
 		bigBlind.addTempBet(this.maxBet);
 		bigBlind.addTotalGambleBet(this.maxBet);
+        bigBlind.deductRmoney(this.maxBet);
 		
 		smallBlind.addTempBet(this.maxBet/2);
 		smallBlind.addTotalGambleBet(this.maxBet/2);
+		smallBlind.deductRmoney(this.maxBet/2);
 		
-		log.info("roomName: " + this.room.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
 		log.info("roomName: " + this.room.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUid() + " deduct Bet " + this.maxBet/2);
-
-        bigBlind.deductRmoney(this.maxBet);
-        smallBlind.deductRmoney(this.maxBet/2);
+		log.info("roomName: " + this.room.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
 		
 	}
 	
@@ -817,7 +817,7 @@ public class PukerGame
 		
 		this.round ++;
 		this.currentRoundBet = 0;
-		this.maxBet = 0;
+		this.maxBet = this.room.getBbet();
 		log.info("roomName: " + this.room.getName() + " 第  " + this.round + " 回合开始");
 		this.settleRoundPlayerOnRoundOver();
 		this.settleNextTurnPlayer();
@@ -942,7 +942,15 @@ public class PukerGame
 		this.turnOverHandle();
 		return response;
 	}
-	
+
+	public JsonObjectWrapper playerFollow(Player player) {
+		int bet = this.maxBet - player.getTempBet();
+		return this.playerFollowBet(player, bet);
+	}
+
+	public JsonObjectWrapper playerRaise(Player player, int bet) {
+		return this.playerFollowBet(player, bet);
+	}
 	
 	public JsonObjectWrapper playerFollowBet(Player player,int bet)
 	{
@@ -992,7 +1000,7 @@ public class PukerGame
 		JsonObjectWrapper as_player = player.toAsObj();
 		response.put("user",as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet );
+		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet + " on round:" + this.round);
 		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
@@ -1265,7 +1273,11 @@ public class PukerGame
 		return this.currentPlayer.getSeatId();
 	}
 	
+	public Player getCurrentPlayer() {
+		return this.currentPlayer;
+	}
 	
+
 	public void settleNextTurnPlayer()
 	{
 		this.popNextPlayer();

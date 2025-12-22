@@ -1,39 +1,50 @@
-package com.archy.dezhou.game;
+package com.archy.dezhou;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.service.RoomService;
-import com.archy.dezhou.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
+// this class is to test the workflow of the texas holdem game
+public class TestGame {
 
+    public static void main(String[] args) {
+        
+        TestGame testGame = new TestGame();
 
-/**
- * Texas Hold'em Game Test - Sets up test users, creates a room, and starts a game
- */
-@ExtendWith(MockitoExtension.class)
-class TexasHoldemGameTest {
+        testGame.setUp();
+        // testGame.detectNextPlayer();
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
 
-    @Mock
-    private UserService userService;
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet(20);
+        testGame.followBet();
 
-    @Mock
-    private RoomService roomService;
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
+
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
+        testGame.followBet();
+
+    }
 
     private List<Player> testPlayers;
     private GameRoom testRoom;
     private PukerGame texasHoldemGame;
 
-    @BeforeEach
+
     void setUp() {
         // Initialize test data
         testPlayers = new ArrayList<>();
@@ -77,7 +88,7 @@ class TexasHoldemGameTest {
         }
     }
 
-    private void createTestRoom() {
+     private void createTestRoom() {
         // Create a Texas Hold'em room
         testRoom = new GameRoom();
         testRoom.setName("TexasHoldemTestRoom");
@@ -97,6 +108,8 @@ class TexasHoldemGameTest {
         
     }
 
+
+
     private void initializeGame() {
         // Create a new Texas Hold'em game
         texasHoldemGame = new PukerGame(testRoom);
@@ -111,10 +124,11 @@ class TexasHoldemGameTest {
         texasHoldemGame.gameStartHandle();
     }
 
-    @Test
     private void hearBeat() {
 
-        for (int i=0;i<5;i++){
+
+
+        for (int i=0;i<3;i++){
 
             texasHoldemGame.beatHeart(System.currentTimeMillis() / 1000);
             
@@ -128,13 +142,38 @@ class TexasHoldemGameTest {
     
     }
 
-    @Test
-    private void followbet() {
-        for (int i=0;i<5;i++) {
-
-            
-
-        }
+    private void detectNextPlayer() {
+        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+        System.err.println("current player seat id:" + currentPlayer.getSeatId());
     }
+
+    private void followBet() {
+        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+
+        texasHoldemGame.playerFollow(currentPlayer);
+    }
+
+
+
+    private void followBet(int bet) {
+        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+
+        texasHoldemGame.playerAddBet(currentPlayer, bet);
+    }
+
+    // private void followbet() {
+
+    //     int smallbet = 5;
+
+    //     for (int i=0 ; i<10 ; i++) {
+    //         Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+    //         if (currentPlayer == null) {
+                
+    //         }
+    //         int bet = 10;
+    //         texasHoldemGame.playerFollowBet(currentPlayer, bet);
+    //     }
+
+    // }
 
 }
