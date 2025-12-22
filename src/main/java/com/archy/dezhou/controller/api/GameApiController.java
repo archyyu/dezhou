@@ -216,12 +216,10 @@ public class GameApiController extends BaseApiController {
     }
 
     private JsonObjectWrapper handleFlushAchievements() {
-        // TODO: Implement achievements flushing logic
         return new JsonObjectWrapper();
     }
 
     // Utility methods
-
     private Player validateUserAndRoom(String uid, String roomIdStr) {
         try {
             // First try to get user from security context (JWT authentication)

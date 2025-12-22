@@ -8,6 +8,7 @@ import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,10 +146,7 @@ public class PukerGame
 		this.autoSetPlayerState();
 		this.dispatchPukers();
 		
-		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
-		{
-			entry.getValue().setPkLevelByPkType();
-		}
+		
 		
 		log.info("roomName: " + this.room.getName() + " 第 " + this.round + " 回合开始");
 		this.settleRoundPlayersOnStart();
@@ -289,12 +287,12 @@ public class PukerGame
 		{
 			sb.append(puke.toString());
 		}
-		log.info("roomName: " + this.room.getName() + " 公共五张牌: " + sb.toString());
+		// log.info("roomName: " + this.room.getName() + " 公共五张牌: " + sb.toString());
 		
 		int n = 1;
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
-			entry.getValue().addPukes(fiveSharePk);
+			// entry.getValue().addPukes(fiveSharePk);
 			entry.getValue().addPuke(PukerKit.getPuke(pukeArray[n-1]));
 			entry.getValue().addPuke(PukerKit.getPuke(pukeArray[n-1 + playerMap.size()]));
 			
@@ -512,6 +510,11 @@ public class PukerGame
 		{
 			entry.getValue().setPlaying(false);
 			//entry.getValue().addCompletePkNum();
+		}
+
+		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
+		{
+			entry.getValue().setPkLevelByPkType();
 		}
 		
 		this.currentPlayer = null;
@@ -818,7 +821,30 @@ public class PukerGame
 		this.round ++;
 		this.currentRoundBet = 0;
 		this.maxBet = this.room.getBbet();
-		log.info("roomName: " + this.room.getName() + " 第  " + this.round + " 回合开始");
+		log.info("roomName: " + this.room.getName() + " round " + this.round + " started");
+
+		if (this.round == 2) {
+			IntStream.range(0, 3).forEach(i -> {
+				log.info("public cards: " + fiveSharePk.get(i).toString());
+				this.playerMap.values().forEach(player -> {
+					player.addPuke(fiveSharePk.get(i));
+			});
+			});
+			
+		}
+		else if (this.round == 3) {
+			log.info("public cards: " + fiveSharePk.get(3).toString());
+			this.playerMap.values().forEach(player -> {
+					player.addPuke(fiveSharePk.get(3));
+				});
+		}
+		else if (this.round == 4) {
+			log.info("public cards: " + fiveSharePk.get(4).toString());
+			this.playerMap.values().forEach(player -> {
+					player.addPuke(fiveSharePk.get(4));
+				});
+		}
+
 		this.settleRoundPlayerOnRoundOver();
 		this.settleNextTurnPlayer();
 		if(this.currentPlayer == null)

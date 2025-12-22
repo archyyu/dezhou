@@ -25,7 +25,7 @@ public class TestGame {
 
         testGame.followBet();
         testGame.followBet();
-        testGame.followBet(20);
+        testGame.followBet();
         testGame.followBet();
 
         testGame.followBet();
