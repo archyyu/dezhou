@@ -5,6 +5,9 @@ import com.archy.dezhou.entity.Player;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +21,27 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
     
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+    
     private final JwtConfig jwtConfig;
-    private final SecretKey secretKey;
+    private SecretKey secretKey;
     
     public JwtTokenProvider(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
-        this.secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+        try {
+            // Try to use the configured secret first
+            if (jwtConfig.getSecret() != null && jwtConfig.getSecret().length() >= 32) {
+                this.secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+            } else {
+                // Fallback to a secure random key if the configured one is too short
+                logger.warn("JWT secret is too short, generating a secure random key");
+                this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to initialize JWT token provider:", e);
+            // Generate a secure random key as fallback
+            this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        }
     }
     
     /**

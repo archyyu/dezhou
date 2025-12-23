@@ -44,34 +44,46 @@ public class UserApiController extends BaseApiController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<?>> userLogin(
             @RequestParam String name,
-            @RequestParam String password,
-            @RequestParam(required = false) String userid,
-            @RequestParam(required = false) String key) {
+            @RequestParam String password) {
+        
+        logger.info("Login attempt for user: {}", name); // Debug logging
         
         if (!validateRequiredParams(name, password)) {
+            logger.warn("Login failed: name or password is null");
             return errorResponse("NameOrPasswordIdNull");
         }
 
         try {
-            String responseString = playerService.UserLogin(name, password, false,
-                    userid != null ? userid : "",
-                    key != null ? key : "",
-                    0, false);
+            logger.debug("Validating user credentials for: {}", name);
+            
             
             // Get the user from the response
-            Player user = userService.getUserByUsername(name);
+            User user = userService.getUserByAccount(name);
             
             if (user == null) {
-                return errorResponse("UserNotFound");
+
+                // auto register
+                // '13800000001', 1, 'male', 'Address 1', '2025-01-01 10:00:00', '1990-01-01', '2025-01-01 10:00:00'),
+                user = new User();
+                user.setAccount(name);
+                user.setGendar("male");
+                user.setMobile("13800000050");
+                user.setAllmoney(10000);
+
+                userService.registerUser(user);
+
+                user = userService.getUserByAccount(name);
             }
+
+            Player player = new Player(user);
             
             // Generate JWT token
-            String token = jwtTokenProvider.generateToken(user);
+            String token = jwtTokenProvider.generateToken(player);
             
             // Create response with token and user info
             Map<String, Object> loginResponse = new HashMap<>();
             loginResponse.put("token", token);
-            loginResponse.put("user", responseString);
+            loginResponse.put("user", player);
             
             return successResponse(loginResponse);
         } catch (Exception e) {

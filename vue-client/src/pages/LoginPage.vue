@@ -81,21 +81,33 @@ const handleLogin = async () => {
       password: form.value.password
     })
     
-    // Store token and user data from the new response format
-    if (response.data && response.data.data) {
+    console.log('Login response:', response.data) // Debug logging
+    
+    // Handle the API response format correctly
+    if (response.data && response.data.success && response.data.data) {
+      // New API response format
       localStorage.setItem('token', response.data.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.data.user))
-    } else {
-      // Fallback for legacy response format
+    } else if (response.data && response.data.token) {
+      // Legacy response format
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
+    } else {
+      throw new Error('Invalid response format: ' + JSON.stringify(response.data))
     }
     
     // Redirect to rooms
     router.push('/rooms')
     
   } catch (err) {
-    error.value = err.response?.data?.message || 'Login failed'
+    console.error('Login error:', err)
+    if (err.response && err.response.data) {
+      error.value = err.response.data.message || 'Login failed: ' + JSON.stringify(err.response.data)
+    } else if (err.message) {
+      error.value = err.message
+    } else {
+      error.value = 'Login failed: ' + err
+    }
   } finally {
     loading.value = false
   }

@@ -1,7 +1,11 @@
 package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.entity.ApiResponse;
+import com.archy.dezhou.entity.Player;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Base API Controller for handling common functionality
@@ -66,6 +70,23 @@ public abstract class BaseApiController {
             }
         }
         return true;
+    }
+
+
+    protected Player getAuthentificatedPlayer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.isAuthenticated() == false) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Player) {
+            return (Player) principal;
+        }
+        return null;
+
     }
 
     

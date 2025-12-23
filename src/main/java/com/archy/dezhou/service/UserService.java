@@ -23,6 +23,14 @@ public class UserService {
         return userMapper.selectByPrimaryKey(userId);
     }
 
+    public User getUserByAccount(String account) {
+        return this.userMapper.selectByAccount(account);
+    }
+
+    public int registerUser(User user) {
+        return this.userMapper.insertSelective(user);
+    }
+
     public Player getUserByUserId(int userId)
     {
         Player player = playersMap.get(userId);

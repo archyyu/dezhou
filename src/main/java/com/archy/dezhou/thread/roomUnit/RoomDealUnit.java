@@ -30,7 +30,7 @@ public class RoomDealUnit implements IRoomDealUnit
 	public void heartbeat()
 	{
 
-		log.info("RoomDealUnit heartbeat");
+		// log.info("RoomDealUnit heartbeat");
 		long start = System.currentTimeMillis();
 
 		List<GameRoom> roomListCpy = new ArrayList<GameRoom>();

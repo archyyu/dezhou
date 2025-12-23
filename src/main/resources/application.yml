@@ -35,7 +35,7 @@ mybatis:
 
 # JWT Configuration
 jwt:
-  secret: dezhou-secret-key-1234567890
+  secret: dezhou-secret-key-1234567890-abcdefghijklmnopqrstuvwxyz
   expiration: 86400000 # 24 hours in milliseconds
   header: Authorization
   prefix: Bearer 

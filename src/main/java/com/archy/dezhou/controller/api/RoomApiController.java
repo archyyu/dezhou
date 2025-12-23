@@ -97,7 +97,7 @@ public class RoomApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
             
-            GameRoom room = this.roomService.getRoomByName(Integer.parseInt(roomId));
+            GameRoom room = this.roomService.getRoomByName(roomId);
             
             if (room == null) {
                 return errorResponse("RoomNotFound");

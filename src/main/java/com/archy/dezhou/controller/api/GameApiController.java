@@ -293,11 +293,10 @@ public class GameApiController extends BaseApiController {
      */
     @GetMapping("/{roomId}/players/{uid}/status")
     public ResponseEntity<ApiResponse<?>> getPlayerGameStatus(
-            @PathVariable String roomId,
-            @PathVariable String uid) {
+            @PathVariable String roomId) {
         
         try {
-            Player user = this.userService.getUserByUserId(Integer.parseInt(uid));
+            Player user = getAuthentificatedPlayer();
             if (user == null) {
                 return errorResponse("UserNotFound");
             }
