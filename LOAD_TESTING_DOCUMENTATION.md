@@ -19,8 +19,9 @@ This document outlines a comprehensive approach to load testing the Puker game s
 
 ### Software Requirements
 - **Monitoring Tools**: Prometheus, Grafana, or similar
-- **Load Generation**: JMeter, Gatling, or custom Java clients
+- **Load Generation**: k6 (recommended), JMeter, Gatling, or custom Java clients
 - **Database**: Same version as production with test data
+- **k6 Installation**: Node.js-based tool for modern load testing
 
 ## Test Scenarios
 
@@ -37,27 +38,46 @@ This document outlines a comprehensive approach to load testing the Puker game s
 - No timeouts or errors
 - System remains responsive
 
-**Implementation**:
-```java
-@Test
-public void testMassiveRoomCreation() {
-    ExecutorService executor = Executors.newFixedThreadPool(100);
-    CountDownLatch latch = new CountDownLatch(1000);
-    
-    for (int i = 0; i < 1000; i++) {
-        executor.submit(() -> {
-            try {
-                GameRoom room = gameService.createRoom("TestRoom" + UUID.randomUUID());
-                assertNotNull(room);
-                assertTrue(room.isActive());
-            } finally {
-                latch.countDown();
-            }
-        });
-    }
-    
-    latch.await(30, TimeUnit.SECONDS);
-    assertEquals(0, latch.getCount());
+**k6 Implementation**:
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+export const options = {
+  stages: [
+    { duration: '1m', target: 50 },  // Ramp-up to 50 RPS
+    { duration: '4m', target: 50 },  // Maintain 50 RPS
+    { duration: '1m', target: 0 },   // Ramp-down
+  ],
+  thresholds: {
+    http_req_failed: ['rate<0.01'],  // <1% errors
+    http_req_duration: ['p(95)<500'], // 95% < 500ms
+  }
+};
+
+export default function () {
+  const roomName = `TestRoom_${randomString(8)}`;
+  const payload = JSON.stringify({
+    name: roomName,
+    roomType: 'TEXAS_HOLDEM',
+    maxPlayers: 8
+  });
+  
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  
+  const res = http.post('http://localhost:8080/api/rooms', payload, params);
+  
+  check(res, {
+    'Room created successfully': (r) => r.status === 201,
+    'Response time acceptable': (r) => r.timings.duration < 500,
+  });
+  
+  sleep(1);
 }
 ```
 
@@ -75,32 +95,52 @@ public void testMassiveRoomCreation() {
 - No duplicate seating
 - Room state remains consistent
 
-**Implementation**:
-```java
-@Test
-public void testConcurrentPlayerJoining() {
-    // Pre-create 500 rooms
-    List<GameRoom> rooms = createTestRooms(500);
-    
-    ExecutorService executor = Executors.newFixedThreadPool(200);
-    CountDownLatch latch = new CountDownLatch(5000);
-    
-    for (GameRoom room : rooms) {
-        for (int i = 0; i < 10; i++) {
-            executor.submit(() -> {
-                try {
-                    Player player = new LoadTestBot(getRandomStrategy());
-                    boolean success = room.addPlayer(player);
-                    assertTrue(success);
-                    assertEquals(10, room.getPlayerCount());
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-    }
-    
-    latch.await(60, TimeUnit.SECONDS);
+**k6 Implementation**:
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { randomIntBetween, randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 },  // Ramp-up to 100 RPS
+    { duration: '8m', target: 100 },  // Maintain 100 RPS
+    { duration: '2m', target: 0 },    // Ramp-down
+  ],
+  thresholds: {
+    http_req_failed: ['rate<0.01'],
+    http_req_duration: ['p(95)<800'],
+  }
+};
+
+// Pre-create rooms (this would be done in setup)
+const roomIds = Array(500).fill().map((_, i) => `room_${i}`);
+
+export default function () {
+  const roomId = roomIds[randomIntBetween(0, 499)];
+  const playerName = `Bot_${randomString(8)}`;
+  
+  const payload = JSON.stringify({
+    roomId: roomId,
+    playerName: playerName,
+    startingChips: 1000,
+    botStrategy: 'ALWAYS_CALL'
+  });
+  
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  
+  const res = http.post('http://localhost:8080/api/rooms/join', payload, params);
+  
+  check(res, {
+    'Player joined successfully': (r) => r.status === 200,
+    'Response time acceptable': (r) => r.timings.duration < 800,
+  });
+  
+  sleep(1);
 }
 ```
 
@@ -122,28 +162,92 @@ public void testConcurrentPlayerJoining() {
 - Consistent game state
 - Acceptable response times (<500ms per action)
 
-**Implementation**:
-```java
-@Test
-public void testGameplayUnderLoad() {
-    List<GameRoom> rooms = createRoomsWithPlayers(200, 8);
+**k6 Implementation**:
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { randomIntBetween, randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+export const options = {
+  stages: [
+    { duration: '5m', target: 200 },  // Ramp-up to 200 RPS
+    { duration: '30m', target: 200 }, // Maintain 200 RPS
+    { duration: '5m', target: 0 },   // Ramp-down
+  ],
+  thresholds: {
+    http_req_failed: ['rate<0.01'],
+    http_req_duration: ['p(95)<500'],
+  }
+};
+
+// Pre-create rooms with players (setup phase)
+const roomIds = Array(200).fill().map((_, i) => `room_${i}`);
+const playerIds = {};
+
+// Initialize phase - join players to rooms
+function setup() {
+  roomIds.forEach(roomId => {
+    playerIds[roomId] = [];
+    for (let i = 0; i < 8; i++) {
+      const playerName = `Bot_${roomId}_${i}`;
+      const payload = JSON.stringify({
+        roomId: roomId,
+        playerName: playerName,
+        startingChips: 1000,
+        botStrategy: getRandomStrategy()
+      });
+      
+      const res = http.post('http://localhost:8080/api/rooms/join', payload, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (res.status === 200) {
+        playerIds[roomId].push(res.json().playerId);
+      }
+    }
+  });
+}
+
+function getRandomStrategy() {
+  const rand = randomIntBetween(1, 10);
+  if (rand <= 7) return 'ALWAYS_CALL';
+  if (rand <= 9) return 'RANDOM_RAISE';
+  return 'SELECTIVE_FOLD';
+}
+
+export default function () {
+  const roomId = roomIds[randomIntBetween(0, 199)];
+  const players = playerIds[roomId];
+  
+  if (players && players.length > 0) {
+    const playerId = players[randomIntBetween(0, players.length - 1)];
     
-    rooms.parallelStream().forEach(room -> {
-        for (int hand = 0; hand < 1000; hand++) {
-            room.startNextHand();
-            
-            while (!room.isHandComplete()) {
-                room.getActivePlayers().forEach(player -> {
-                    if (player instanceof LoadTestBot) {
-                        Action action = ((LoadTestBot) player).decideAction(room.getCurrentState());
-                        room.processPlayerAction(player.getId(), action);
-                    }
-                });
-            }
-            
-            verifyHandResults(room);
-        }
+    // Simulate player action
+    const actionType = getRandomAction();
+    const payload = JSON.stringify({
+      playerId: playerId,
+      action: actionType,
+      amount: actionType === 'RAISE' ? randomIntBetween(20, 100) : 0
     });
+    
+    const res = http.post(`http://localhost:8080/api/rooms/${roomId}/actions`, payload, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    check(res, {
+      'Action processed successfully': (r) => r.status === 200,
+      'Response time acceptable': (r) => r.timings.duration < 500,
+    });
+  }
+  
+  sleep(0.5); // Higher frequency for gameplay
+}
+
+function getRandomAction() {
+  const rand = randomIntBetween(1, 10);
+  if (rand <= 7) return 'CALL';
+  if (rand <= 9) return 'RAISE';
+  return 'FOLD';
 }
 ```
 
@@ -237,124 +341,214 @@ public class LoadTestBot implements Player {
 
 ## Test Execution Framework
 
-### Test Runner Architecture
+### k6 Test Execution
 
-```java
-public class LoadTestRunner {
-    
-    private final GameService gameService;
-    private final MetricsCollector metricsCollector;
-    private final int roomCount;
-    private final int playersPerRoom;
-    
-    public LoadTestRunner(GameService gameService, 
-                         MetricsCollector metricsCollector,
-                         int roomCount,
-                         int playersPerRoom) {
-        this.gameService = gameService;
-        this.metricsCollector = metricsCollector;
-        this.roomCount = roomCount;
-        this.playersPerRoom = playersPerRoom;
+k6 provides a powerful and flexible way to execute load tests with built-in metrics collection and reporting.
+
+**Basic Execution Command**:
+```bash
+k6 run --vus 50 --duration 30s script.js
+```
+
+**Advanced Execution with Cloud Results**:
+```bash
+k6 cloud --stage 1m:50 --stage 4m:50 --stage 1m:0 script.js
+```
+
+### Test Runner Architecture with k6
+
+```javascript
+// load_test_runner.js
+import { execSync } from 'child_process';
+import fs from 'fs';
+
+class LoadTestRunner {
+  constructor(config) {
+    this.config = config;
+    this.results = [];
+  }
+  
+  async executeTest() {
+    try {
+      // Phase 1: Setup
+      await this.setupPhase();
+      
+      // Phase 2: Ramp-up
+      await this.rampUpPhase();
+      
+      // Phase 3: Steady state
+      await this.steadyStatePhase();
+      
+      // Phase 4: Ramp-down
+      await this.rampDownPhase();
+      
+      // Generate report
+      this.generateTestReport();
+      
+    } catch (error) {
+      console.error('Test failed:', error);
+      this.recordError(error);
+    } finally {
+      this.cleanup();
     }
+  }
+  
+  async setupPhase() {
+    console.log('Setting up test environment...');
+    // Initialize database, create test rooms, etc.
+    execSync('node setup_test_data.js');
+  }
+  
+  async rampUpPhase() {
+    console.log('Starting ramp-up phase...');
     
-    public void executeTest() {
-        try {
-            // Phase 1: Ramp-up
-            rampUpPhase();
-            
-            // Phase 2: Steady state
-            steadyStatePhase();
-            
-            // Phase 3: Ramp-down
-            rampDownPhase();
-            
-            // Generate report
-            generateTestReport();
-            
-        } catch (Exception e) {
-            metricsCollector.recordError(e);
-        } finally {
-            cleanup();
-        }
+    // Execute k6 with increasing load
+    for (let stage = 1; stage <= 5; stage++) {
+      const targetVUs = stage * 20;
+      console.log(`Ramping up to ${targetVUs} VUs...`);
+      
+      execSync(`k6 run --vus ${targetVUs} --duration 2m --out json=results/stage_${stage}.json room_creation_test.js`);
+      
+      // Collect and store results
+      this.collectResults(`results/stage_${stage}.json`);
+      
+      // Wait before next stage
+      await new Promise(resolve => setTimeout(resolve, 30000));
     }
+  }
+  
+  async steadyStatePhase() {
+    console.log('Entering steady state phase...');
     
-    private void rampUpPhase() {
-        // Gradually increase load
-        for (int i = 1; i <= 10; i++) {
-            int currentLoad = (roomCount * i) / 10;
-            createAndPopulateRooms(currentLoad);
-            sleep(30000); // 30 seconds between increments
-        }
-    }
+    // Run main test at peak load
+    execSync(`k6 run --stage 5m:200 --stage 30m:200 --stage 5m:0 --out json=results/steady_state.json gameplay_test.js`);
     
-    private void steadyStatePhase() {
-        // Maintain peak load
-        long startTime = System.currentTimeMillis();
-        
-        while (System.currentTimeMillis() - startTime < 30 * 60 * 1000) { // 30 minutes
-            runGameplayCycle();
-            collectMetrics();
-            sleep(5000);
-        }
-    }
+    this.collectResults('results/steady_state.json');
+  }
+  
+  async rampDownPhase() {
+    console.log('Starting ramp-down phase...');
     
-    private void rampDownPhase() {
-        // Gradually reduce load
-        for (int i = 10; i >= 1; i--) {
-            int currentLoad = (roomCount * i) / 10;
-            removeRooms(currentLoad);
-            sleep(30000);
-        }
+    // Gradually reduce load
+    for (let stage = 5; stage >= 1; stage--) {
+      const targetVUs = stage * 20;
+      console.log(`Ramping down to ${targetVUs} VUs...`);
+      
+      execSync(`k6 run --vus ${targetVUs} --duration 2m --out json=results/rampdown_${stage}.json room_creation_test.js`);
+      
+      this.collectResults(`results/rampdown_${stage}.json`);
+      
+      await new Promise(resolve => setTimeout(resolve, 30000));
     }
-    
-    private void createAndPopulateRooms(int count) {
-        // Implementation details
-    }
-    
-    private void runGameplayCycle() {
-        // Implementation details
-    }
-    
-    private void collectMetrics() {
-        metricsCollector.collectSystemMetrics();
-        metricsCollector.collectGameMetrics();
-    }
-    
-    private void generateTestReport() {
-        // Generate comprehensive test report
-    }
-    
-    private void cleanup() {
-        // Clean up all test resources
-    }
+  }
+  
+  collectResults(filePath) {
+    const data = fs.readFileSync(filePath, 'utf8');
+    const results = JSON.parse(data);
+    this.results.push({ file: filePath, data: results });
+  }
+  
+  generateTestReport() {
+    console.log('Generating test report...');
+    // Process collected results and generate HTML/PDF report
+    execSync('node generate_report.js');
+  }
+  
+  recordError(error) {
+    // Log error details
+    fs.appendFileSync('test_errors.log', `${new Date().toISOString()} - ${error.message}\n`);
+  }
+  
+  cleanup() {
+    console.log('Cleaning up test environment...');
+    execSync('node cleanup_test_data.js');
+  }
 }
+
+// Usage
+const runner = new LoadTestRunner({
+  roomCount: 200,
+  playersPerRoom: 8,
+  testDuration: '1h'
+});
+
+runner.executeTest();
 ```
 
 ## Key Metrics to Monitor
 
-### System Metrics
-- **CPU Usage**: Overall and per-core utilization
-- **Memory Usage**: Heap and non-heap memory
-- **GC Activity**: Frequency and duration of garbage collection
-- **Thread Count**: Active and waiting threads
-- **Network I/O**: Bandwidth and connection count
+### k6 Built-in Metrics
+k6 automatically collects comprehensive metrics that map to our monitoring needs:
 
-### Database Metrics
-- **Query Execution Time**: Average and 95th percentile
-- **Connection Pool Usage**: Active and idle connections
-- **Lock Contention**: Deadlocks and wait times
-- **Transaction Rates**: Transactions per second
+**HTTP Metrics**:
+- `http_req_duration`: Request duration (ms)
+- `http_reqs`: Total requests
+- `http_req_failed`: Failed requests
+- `http_req_receiving`: Time spent receiving response
+- `http_req_sending`: Time spent sending request
+- `http_req_waiting`: Time spent waiting for response
+
+**System Metrics**:
+- `vus`: Current virtual users
+- `vus_max`: Maximum virtual users
+- `iterations`: Completed iterations
+- `data_received`: Data received (bytes)
+- `data_sent`: Data sent (bytes)
+
+### Custom Metrics
+You can add custom metrics for game-specific monitoring:
+
+```javascript
+import { Trend, Rate, Counter } from 'k6/metrics';
+
+// Custom metrics
+const handCompletionTime = new Trend('hand_completion_time', true);
+const actionProcessingTime = new Trend('action_processing_time', true);
+const roomStateUpdates = new Counter('room_state_updates');
+const playerJoinErrors = new Rate('player_join_errors');
+
+// Usage in test
+export default function () {
+  const startTime = Date.now();
+  
+  // Perform game action
+  const res = http.post('http://localhost:8080/api/game/action', payload);
+  
+  const duration = Date.now() - startTime;
+  actionProcessingTime.add(duration);
+  
+  if (res.status !== 200) {
+    playerJoinErrors.add(1);
+  }
+}
+```
+
+### Database Metrics (via k6)
+Monitor database performance through API endpoints:
+
+```javascript
+// Database health check endpoint
+export function checkDatabaseHealth() {
+  const res = http.get('http://localhost:8080/api/db/health');
+  
+  check(res, {
+    'Database healthy': (r) => r.json().status === 'healthy',
+    'Connection pool OK': (r) => r.json().poolUsage < 0.9,
+  });
+}
+```
 
 ### Game-Specific Metrics
 - **Hand Completion Rate**: Hands processed per second
-- **Action Processing Time**: Time to process player actions
-- **Room State Updates**: Frequency and duration
-- **Player Join/Leave Times**: Duration of join/leave operations
+- **Action Processing Time**: Time to process player actions (ms)
+- **Room State Updates**: Frequency and duration of state changes
+- **Player Join/Leave Times**: Duration of join/leave operations (ms)
+- **Concurrent Games**: Number of active games simultaneously
 
 ### Error Metrics
 - **Failed Operations**: Count and types of failures
 - **Timeouts**: Operations exceeding time limits
-- **Deadlocks**: Thread contention issues
+- **Deadlocks**: Thread contention issues detected
 - **Resource Leaks**: Unclosed connections or resources
 
 ## Test Data Management
@@ -477,37 +671,181 @@ The system performed well under test conditions, handling up to 200 concurrent r
 
 ## Continuous Load Testing
 
-### Integration with CI/CD
-1. **Smoke Tests**: Quick tests on every build
-2. **Nightly Load Tests**: Comprehensive tests during off-peak
-3. **Pre-Production Tests**: Full load tests before releases
+### Integration with CI/CD using k6
 
-### Automated Test Suite
-```java
-public class AutomatedLoadTestSuite {
+k6 integrates seamlessly with CI/CD pipelines for automated load testing:
+
+**GitHub Actions Example**:
+```yaml
+name: Load Testing
+on: [push, pull_request]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install k6
+        run: sudo apt-get install -y k6
+      - name: Run smoke test
+        run: k6 run --vus 10 --duration 1m tests/smoke_test.js
+
+  nightly-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install k6
+        run: sudo apt-get install -y k6
+      - name: Run nightly load test
+        run: k6 run --stage 2m:50 --stage 5m:50 tests/nightly_test.js
+```
+
+**Jenkins Pipeline Example**:
+```groovy
+pipeline {
+    agent any
     
-    @Test
-    @Tag("smoke")
-    public void smokeTest() {
-        runLoadTest(10, 5, 5); // 10 rooms, 5 players, 5 hands
+    stages {
+        stage('Smoke Test') {
+            steps {
+                sh 'k6 run --vus 20 --duration 2m tests/smoke_test.js'
+            }
+        }
+        
+        stage('Load Test') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'k6 cloud --stage 5m:100 --stage 10m:100 tests/load_test.js'
+            }
+        }
     }
     
-    @Test
-    @Tag("nightly")
-    public void nightlyLoadTest() {
-        runLoadTest(50, 8, 100); // 50 rooms, 8 players, 100 hands
-    }
-    
-    @Test
-    @Tag("preprod")
-    public void preProductionLoadTest() {
-        runLoadTest(150, 8, 500); // 150 rooms, 8 players, 500 hands
-    }
-    
-    private void runLoadTest(int rooms, int players, int hands) {
-        // Test implementation
+    post {
+        always {
+            junit '**/test-results/*.xml'
+            archiveArtifacts artifacts: 'results/**', fingerprint: true
+        }
     }
 }
+```
+
+### Automated Test Suite with k6
+
+```javascript
+// tests/automated_suite.js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { randomIntBetween, randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+// Test configuration
+const testConfig = {
+    smoke: { vus: 10, duration: '1m', rooms: 5, players: 3, hands: 3 },
+    nightly: { vus: 50, duration: '5m', rooms: 20, players: 6, hands: 20 },
+    preprod: { vus: 100, duration: '10m', rooms: 50, players: 8, hands: 50 }
+};
+
+// Get test type from environment variable
+const testType = __ENV.TEST_TYPE || 'smoke';
+const config = testConfig[testType];
+
+export const options = {
+  vus: config.vus,
+  duration: config.duration,
+  thresholds: {
+    http_req_failed: ['rate<0.01'],
+    http_req_duration: ['p(95)<800'],
+  }
+};
+
+// Pre-create test rooms
+const roomIds = [];
+for (let i = 0; i < config.rooms; i++) {
+    roomIds.push(`test_room_${randomString(4)}`);
+}
+
+export function setup() {
+    // Create rooms
+    roomIds.forEach(roomId => {
+        const payload = JSON.stringify({
+            name: roomId,
+            roomType: 'TEXAS_HOLDEM',
+            maxPlayers: config.players
+        });
+        
+        http.post('http://localhost:8080/api/rooms', payload, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    });
+}
+
+export default function () {
+    const roomId = roomIds[randomIntBetween(0, config.rooms - 1)];
+    
+    // Simulate player joining and gameplay
+    const playerName = `Bot_${randomString(6)}`;
+    
+    // Join room
+    const joinPayload = JSON.stringify({
+        roomId: roomId,
+        playerName: playerName,
+        startingChips: 1000,
+        botStrategy: 'ALWAYS_CALL'
+    });
+    
+    const joinRes = http.post('http://localhost:8080/api/rooms/join', joinPayload, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    
+    check(joinRes, {
+        'Player joined successfully': (r) => r.status === 200,
+    });
+    
+    // Simulate gameplay actions
+    if (joinRes.status === 200) {
+        const playerId = joinRes.json().playerId;
+        
+        for (let hand = 0; hand < config.hands; hand++) {
+            const actionType = randomIntBetween(1, 10) <= 7 ? 'CALL' : 'RAISE';
+            const actionPayload = JSON.stringify({
+                playerId: playerId,
+                action: actionType,
+                amount: actionType === 'RAISE' ? randomIntBetween(20, 50) : 0
+            });
+            
+            const actionRes = http.post(`http://localhost:8080/api/rooms/${roomId}/actions`, actionPayload, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            check(actionRes, {
+                'Action processed successfully': (r) => r.status === 200,
+            });
+            
+            sleep(0.5);
+        }
+    }
+}
+
+export function teardown(data) {
+    // Cleanup - remove test rooms
+    roomIds.forEach(roomId => {
+        http.delete(`http://localhost:8080/api/rooms/${roomId}`);
+    });
+}
+```
+
+**Running Different Test Types**:
+```bash
+# Smoke test
+k6 run --env TEST_TYPE=smoke tests/automated_suite.js
+
+# Nightly test
+k6 run --env TEST_TYPE=nightly tests/automated_suite.js
+
+# Pre-production test
+k6 run --env TEST_TYPE=preprod tests/automated_suite.js
 ```
 
 ## Best Practices
@@ -545,40 +883,171 @@ public class AutomatedLoadTestSuite {
 
 ## Appendix
 
-### Test Configuration Examples
+### k6 Installation and Setup
 
-**JMeter Configuration**:
-```
-Thread Group:
-- Number of Threads: 1000
-- Ramp-Up Period: 60 seconds
-- Loop Count: Forever
+**Install k6**:
+```bash
+# macOS
+brew install k6
 
-HTTP Request:
-- Server: localhost:8080
-- Path: /api/game/join
-- Parameters: roomId, playerId
-```
+# Linux (Debian/Ubuntu)
+sudo apt-get install -y k6
 
-**Gatling Configuration**:
-```scala
-val scn = scenario("Player Join Test")
-  .exec(http("join_room")
-    .post("/api/game/join")
-    .body(StringBody("{"roomId":"${roomId}","playerId":"${playerId}"}"))
-    .check(status.is(200)))
-
-setUp(
-  scn.inject(
-    rampUsers(1000) during (60 seconds)
-  )
-).protocols(httpProtocol)
+# Windows (via Chocolatey)
+choco install k6
 ```
 
-### Useful Tools
-- **Load Generation**: JMeter, Gatling, Locust
-- **Monitoring**: Prometheus, Grafana, Datadog
-- **Profiling**: VisualVM, YourKit, JProfiler
-- **Database**: pgAdmin, MySQL Workbench, DBeaver
+**Verify Installation**:
+```bash
+k6 version
+```
+
+### Test Configuration Examples with k6
+
+**Basic Room Creation Test**:
+```javascript
+import http from 'k6/http';
+import { check } from 'k6';
+
+export const options = {
+  vus: 10,
+  duration: '30s',
+  thresholds: {
+    http_req_duration: ['p(95)<500'],
+  }
+};
+
+export default function () {
+  const payload = JSON.stringify({
+    name: 'TestRoom_' + Math.random().toString(36).substring(2, 8),
+    roomType: 'TEXAS_HOLDEM',
+    maxPlayers: 8
+  });
+  
+  const res = http.post('http://localhost:8080/api/rooms', payload, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  
+  check(res, {
+    'Room created': (r) => r.status === 201,
+  });
+}
+```
+
+**Advanced Gameplay Simulation**:
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 50 },
+    { duration: '5m', target: 50 },
+    { duration: '2m', target: 0 }
+  ],
+  thresholds: {
+    http_req_failed: ['rate<0.01'],
+    http_req_duration: ['p(95)<800'],
+  }
+};
+
+// Game state simulation
+const gameState = {
+  rooms: new Map(),
+  players: new Map()
+};
+
+export function setup() {
+  // Initialize game state
+  for (let i = 0; i < 20; i++) {
+    const roomId = `room_${i}`;
+    gameState.rooms.set(roomId, { players: [] });
+    
+    // Create room
+    http.post('http://localhost:8080/api/rooms', JSON.stringify({
+      name: roomId,
+      roomType: 'TEXAS_HOLDEM',
+      maxPlayers: 8
+    }), { headers: { 'Content-Type': 'application/json' } });
+  }
+}
+
+export default function () {
+  const roomId = `room_${randomIntBetween(0, 19)}`;
+  const room = gameState.rooms.get(roomId);
+  
+  if (room.players.length < 8) {
+    // Join player
+    const playerName = `player_${Math.random().toString(36).substring(2, 8)}`;
+    const joinRes = http.post('http://localhost:8080/api/rooms/join', JSON.stringify({
+      roomId: roomId,
+      playerName: playerName,
+      startingChips: 1000
+    }), { headers: { 'Content-Type': 'application/json' } });
+    
+    if (joinRes.status === 200) {
+      const playerId = joinRes.json().playerId;
+      room.players.push(playerId);
+      gameState.players.set(playerId, { roomId: roomId });
+    }
+  } else {
+    // Perform game action
+    const playerId = room.players[randomIntBetween(0, 7)];
+    const actionType = randomIntBetween(1, 10) <= 7 ? 'CALL' : 'RAISE';
+    
+    const actionRes = http.post(`http://localhost:8080/api/rooms/${roomId}/actions`, JSON.stringify({
+      playerId: playerId,
+      action: actionType,
+      amount: actionType === 'RAISE' ? randomIntBetween(20, 100) : 0
+    }), { headers: { 'Content-Type': 'application/json' } });
+    
+    check(actionRes, {
+      'Action successful': (r) => r.status === 200,
+    });
+  }
+  
+  sleep(1);
+}
+
+export function teardown(data) {
+  // Cleanup
+  gameState.rooms.forEach((room, roomId) => {
+    http.delete(`http://localhost:8080/api/rooms/${roomId}`);
+  });
+}
+```
+
+### Useful Tools and Resources
+
+**Load Generation**:
+- **k6**: Modern load testing tool (recommended)
+- **JMeter**: Traditional load testing tool
+- **Gatling**: Scala-based load testing
+- **Locust**: Python-based load testing
+
+**Monitoring**:
+- **Prometheus**: Time-series monitoring
+- **Grafana**: Visualization dashboard
+- **Datadog**: Cloud monitoring platform
+- **k6 Cloud**: Built-in k6 results analysis
+
+**Profiling**:
+- **VisualVM**: Java profiling tool
+- **YourKit**: Commercial Java profiler
+- **JProfiler**: Advanced Java profiler
+- **Async Profiler**: Low-overhead profiler
+
+**Database Tools**:
+- **pgAdmin**: PostgreSQL management
+- **MySQL Workbench**: MySQL management
+- **DBeaver**: Universal database tool
+- **TablePlus**: Modern database GUI
+
+**k6 Resources**:
+- **Documentation**: https://k6.io/docs/
+- **Examples**: https://k6.io/docs/examples/
+- **GitHub**: https://github.com/grafana/k6
+- **Community**: https://community.k6.io/
 
 This comprehensive load testing approach will help ensure the Puker game server can handle production-scale traffic while maintaining performance and stability.

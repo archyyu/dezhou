@@ -67,31 +67,41 @@ public class RoomApiController extends BaseApiController {
         }
     }
 
-    @GetMapping("/typeList")
+    @GetMapping("/roomTypeList")
     public ResponseEntity<ApiResponse<?>> getTypeList() {
         List<RoomDB> dbList = this.roomService.getRoomTypeList();
         return successResponse(dbList);
     }
 
+    @GetMapping("/{roomTypeId}/list")
+    public ResponseEntity<ApiResponse<?>> getMethodName(@PathVariable Integer roomTypeId) {
+
+        List<GameRoom> list = this.roomService.getRoomListByTypeId(roomTypeId);
+        return successResponse(list);
+    }
+    
+
     // user create a room
     @PostMapping("/create/{roomTypeId}")
-    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId, @RequestParam String uid) {
-        
-        GameRoom gameRoom = this.roomService.createGameRoom(uid, uid, Integer.parseInt(roomTypeId));
+    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId) {
+
+        Player player = getAuthentificatedPlayer();
+
+        GameRoom gameRoom = this.roomService.createGameRoom(player.getUid() + "", player.getAccount(), Integer.parseInt(roomTypeId));
         return successResponse(gameRoom);
 
     }
     
 
     // Join room endpoint - replaces JOIN command
-    @PostMapping("/{roomName}/join")
+    @PostMapping("/{roomId}/join")
     public ResponseEntity<ApiResponse<?>> joinRoom(
             @PathVariable String roomId,
             @RequestParam String uid) {
         
         try {
             // Get user from JWT authentication or fallback to legacy
-            Player user = getAuthenticatedUser(uid);
+            Player user = this.getAuthentificatedPlayer();
             
             if (user == null) {
                 return errorResponse("UserNotLogined");
@@ -190,50 +200,5 @@ public class RoomApiController extends BaseApiController {
             return errorResponse("RoomNotFound");
         }
     }
-
-    // Get user's current room endpoint
-    @GetMapping("/current")
-    public ResponseEntity<ApiResponse<?>> getCurrentRoom(@RequestParam String uid) {
-        Player user = getAuthenticatedUser(uid);
-        if (user != null) {
-            GameRoom room = this.roomService.getRoom(user.getRoomid());
-            if (room != null) {
-                return successResponse(room);
-            } else {
-                return successResponse("UserNotInAnyRoom");
-            }
-        } else {
-            return errorResponse("UserNotLogined");
-        }
-    }
     
-    // Helper method to get authenticated user
-    private Player getAuthenticatedUser(String uid) {
-        try {
-            // First try to get user from security context (JWT authentication)
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof Player) {
-                Player authenticatedUser = (Player) authentication.getPrincipal();
-                
-                // Verify that the uid parameter matches the authenticated user
-                if (uid != null && !uid.isEmpty()) {
-                    int uidInt = Integer.parseInt(uid);
-                    if (authenticatedUser.getUid() == uidInt) {
-                        return authenticatedUser;
-                    }
-                }
-                return authenticatedUser;
-            }
-            
-            // Fallback to legacy authentication (for compatibility)
-            if (uid != null && !uid.isEmpty()) {
-                int uidInt = Integer.parseInt(uid);
-                return this.userService.getUserByUserId(uidInt);
-            }
-            
-            return null;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 }

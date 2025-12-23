@@ -37,6 +37,8 @@ public class GameRoom
 	private Integer minbuy;
 	private Integer maxbuy;
 
+	private Integer roomTypeId;
+
 	private Integer bbet;
 	private Integer sbet;
 	private String showname;
@@ -64,7 +66,10 @@ public class GameRoom
 	{
 		setRoomID();
 
+		
+		this.roomTypeId = roomDB.getId();
 		this.name = roomDB.getName();
+		
 		// this.zone = roomDB.getZone();
 		// this.creator = roomDB.getCreator();
 		this.bbet = roomDB.getBbet();

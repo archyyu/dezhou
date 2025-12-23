@@ -70,7 +70,7 @@ public class GameApiController extends BaseApiController {
         
         try {
             // Validate user and room
-            Player user = validateUserAndRoom(uid, roomId);
+            Player user = getAuthentificatedPlayer();
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
@@ -163,17 +163,6 @@ public class GameApiController extends BaseApiController {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    private int getIntParam(Map<String, String> params, String key, int defaultValue) {
-        try {
-            if (params != null && params.containsKey(key)) {
-                return Integer.parseInt(params.get(key));
-            }
-        } catch (NumberFormatException e) {
-            // Return default value if parsing fails
-        }
-        return defaultValue;
     }
 
     /**
