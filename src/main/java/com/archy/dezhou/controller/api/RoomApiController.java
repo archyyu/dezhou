@@ -83,9 +83,11 @@ public class RoomApiController extends BaseApiController {
 
     // user create a room
     @PostMapping("/create/{roomTypeId}")
-    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId, @RequestParam String uid) {
-        
-        GameRoom gameRoom = this.roomService.createGameRoom(uid, uid, Integer.parseInt(roomTypeId));
+    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId) {
+
+        Player player = getAuthentificatedPlayer();
+
+        GameRoom gameRoom = this.roomService.createGameRoom(player.getUid() + "", player.getAccount(), Integer.parseInt(roomTypeId));
         return successResponse(gameRoom);
 
     }

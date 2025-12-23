@@ -70,7 +70,7 @@ public class GameApiController extends BaseApiController {
         
         try {
             // Validate user and room
-            Player user = validateUserAndRoom(uid, roomId);
+            Player user = getAuthentificatedPlayer();
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
