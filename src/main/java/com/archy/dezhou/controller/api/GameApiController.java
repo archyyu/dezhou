@@ -1,5 +1,7 @@
 package com.archy.dezhou.controller.api;
 
+import com.archy.dezhou.command.GameCommand;
+import com.archy.dezhou.command.GameCommandFactory;
 import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
@@ -37,6 +39,9 @@ public class GameApiController extends BaseApiController {
 
     @Resource
     private JwtTokenProvider jwtTokenProvider;
+
+    @Resource
+    private GameCommandFactory gameCommandFactory;
 
     /**
      * Protected getter for roomService - used for testing
@@ -84,42 +89,8 @@ public class GameApiController extends BaseApiController {
 
             JsonObjectWrapper result = null;
 
-            // Handle different game commands
-            switch (cmd) {
-                case ConstList.CMD_ROOMINFO:
-                    result = handleRoomInfo(room);
-                    break;
-                case ConstList.CMD_LOOK_CARD:
-                    result = handleLookCard(game, player);
-                    break;
-                case ConstList.CMD_ADD_BET:
-                    result = handleAddBet(game, player, additionalParams);
-                    break;
-                case ConstList.CMD_FOLLOW_BET:
-                    result = handleFollowBet(game, player, additionalParams);
-                    break;
-                case ConstList.CMD_DROP_CARD:
-                    result = handleDropCard(game, player);
-                    break;
-                case ConstList.CMD_ALL_IN:
-                    result = handleAllIn(game, player, additionalParams);
-                    break;
-                case ConstList.CMD_SITDOWN:
-                    result = handleSitDown(room, user, additionalParams);
-                    break;
-                case ConstList.CMD_STANDUP:
-                    result = handleStandUp(room, user, game);
-                    break;
-                case ConstList.CMD_LEAVE:
-                    result = handleLeave(room, user, game, player);
-                    break;
-                default:
-                    return errorResponse("InvalidGameCommand");
-            }
-            
-            if (result == null) {
-                return errorResponse("GameActionFailed");
-            }
+            GameCommand gameCommand = this.gameCommandFactory.getCommand(cmd);
+            result = gameCommand.execute(game, player, additionalParams);
             
             return successResponse(result);
             
@@ -156,64 +127,6 @@ public class GameApiController extends BaseApiController {
     }
 
     // Helper methods for each game command
-
-    private JsonObjectWrapper handleRoomInfo(GameRoom room) {
-        return room.toAsObj();
-    }
-
-    private JsonObjectWrapper handleLookCard(PukerGame game, Player player) {
-        return game.playerLookCard(player);
-    }
-
-    private JsonObjectWrapper handleAddBet(PukerGame game, Player player, Map<String, String> params) {
-        int bet = getIntParam(params, "cb", 0);
-        return game.playerAddBet(player, bet);
-    }
-
-    private JsonObjectWrapper handleFollowBet(PukerGame game, Player player, Map<String, String> params) {
-        int bet = getIntParam(params, "cb", 0);
-        return game.playerFollowBet(player, bet);
-    }
-
-    private JsonObjectWrapper handleDropCard(PukerGame game, Player player) {
-        return game.playerDropCard(player);
-    }
-
-    private JsonObjectWrapper handleAllIn(PukerGame game, Player player, Map<String, String> params) {
-        int bet = getIntParam(params, "cb", 0);
-        return game.playerAllIn(player, bet);
-    }
-
-    private JsonObjectWrapper handleSitDown(GameRoom room, Player user, Map<String, String> params) {
-        int seatId = getIntParam(params, "sid", -1);
-        int cb = getIntParam(params, "cb", 0);
-        
-        if (seatId < 0 || seatId > 8) {
-            throw new IllegalArgumentException("InvalidSeatId");
-        }
-        
-        return room.playerSitDown(seatId, user, cb);
-    }
-
-    private JsonObjectWrapper handleStandUp(GameRoom room, Player user, PukerGame game) {
-        JsonObjectWrapper result = room.playerStandUp(user.getUid(), false);
-        
-        if (game != null && room.isGame() && game.isGameOverWhenDropCard()) {
-            game.gameOverHandle();
-        }
-        
-        return result;
-    }
-
-    private JsonObjectWrapper handleLeave(GameRoom room, Player user, PukerGame game, Player player) {
-        room.playerLeave(user);
-        
-        if (game != null) {
-            return game.playerLeave(player);
-        }
-
-        return new JsonObjectWrapper();
-    }
 
     private JsonObjectWrapper handleFlushAchievements() {
         return new JsonObjectWrapper();
