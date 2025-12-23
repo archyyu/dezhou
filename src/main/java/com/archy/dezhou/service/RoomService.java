@@ -21,41 +21,52 @@ public class RoomService{
     @Resource
     private RoomDBMapper roomDBMapper;
 
-    public RoomDB getRoomById(int roomId){
-        return roomDBMapper.selectByPrimaryKey(roomId);
-    }
-
-	@PostConstruct
-	public void init() {
-
-		List<RoomDB> roomDBList = roomDBMapper.selectAllRooms();
-		roomDBList.forEach(roomDB -> {
-			GameRoom room = new GameRoom(roomDB);
-			this.roomsMap.put(room.getRoomid(), room);
-		});
-
-	}
-
-
     private Map<Integer,GameRoom> roomsMap = new HashMap<Integer,GameRoom>();
 	
 	private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
+
+	public RoomDB getRoomById(int roomId){
+        return roomDBMapper.selectByPrimaryKey(roomId);
+    }
+
+	// @PostConstruct
+	// public void init() {
+	// 	List<RoomDB> roomDBList = roomDBMapper.selectAllRooms();
+	// 	roomDBList.forEach(roomDB -> {
+	// 		GameRoom room = new GameRoom(roomDB);
+	// 		this.roomsMap.put(room.getRoomid(), room);
+	// 	});
+	// }
+
+	public List<RoomDB> getRoomTypeList() {
+		return this.roomDBMapper.selectAllRooms();
+	}
 	
 	public GameRoom getRoom(int id)
 	{
 		return roomsMap.get(id);
 	}
 	
-	public GameRoom getRoomByName(String name)
+	public GameRoom getRoomByName(String roomName)
 	{
-		for(Map.Entry<Integer, GameRoom> entry : this.roomsMap.entrySet())
-		{
-			if(entry.getValue().getName().equals(name))
-			{
-				return entry.getValue();
+		for (GameRoom room : this.roomsMap.values()) {
+			if (room.getName().equals(roomName)) {
+				return room;
 			}
 		}
 		return null;
+	}
+	
+	public GameRoom createGameRoom(String uid, String userName, int roomTypeId) {
+
+		RoomDB roomDB = this.roomDBMapper.selectByPrimaryKey(roomTypeId);
+
+		GameRoom gameRoom = new GameRoom(roomDB);
+		gameRoom.setCreator(userName);
+
+		this.roomsMap.put(gameRoom.getRoomid(), gameRoom);
+
+		return gameRoom;
 	}
 	
 	public void addRoom(GameRoom room)

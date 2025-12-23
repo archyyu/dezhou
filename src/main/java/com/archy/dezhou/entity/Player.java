@@ -9,6 +9,7 @@ import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -58,9 +59,10 @@ public class Player extends User
 
 	private PlayerGameState gameState = PlayerGameState.PLAYER_STATE_PLAYER;
 
+
+	@JsonIgnore
 	protected Logger log = Logger.getLogger(Player.class.getName());
 
-	
 	private volatile int dropCardNum = 0;
 	
 	public Player(User user)
@@ -170,7 +172,7 @@ public class Player extends User
 		this.tempGold = tempGold;
 	}
 	
-	private long yourTurnTimeStramp = 0;
+	private volatile long yourTurnTimeStramp = 0;
 	
 	public long getYourTurnTimeStramp()
 	{

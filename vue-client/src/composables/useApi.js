@@ -5,8 +5,11 @@ import axios from 'axios'
  */
 export function useApi() {
   // Create axios instance
+  const apiBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+  console.log('API Base URL:', apiBaseURL) // Debug logging
+  
   const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+    baseURL: apiBaseURL,
     headers: {
       'Content-Type': 'application/json'
     }
@@ -42,18 +45,18 @@ export function useApi() {
     
     // Game
     getRooms: () => api.get('/api/v1/room/list'),
-    joinRoom: (roomName, uid) => api.post(`/api/v1/room/${roomName}/join`, null, { params: { uid } }),
-    leaveRoom: (roomName, uid) => api.post(`/api/v1/room/${roomName}/leave`, null, { params: { uid } }),
+    joinRoom: (roomName) => api.post(`/api/v1/room/${roomName}/join`),  // ✅ Removed uid parameter
+    leaveRoom: (roomName) => api.post(`/api/v1/room/${roomName}/leave`),  // ✅ Removed uid parameter
     
     // Game actions
-    gameAction: (roomId, uid, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
-      params: { uid, cmd } 
+    gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
+      params: { cmd }  // ✅ Removed uid parameter
     }),
     
     // User
-    getUserProfile: (uid) => api.get('/api/v1/user/info', { params: { uid } }),
-    updateProfile: (uid, profileData) => api.put('/api/v1/user/profile', null, { 
-      params: { uid, ...profileData } 
+    getUserProfile: () => api.get('/api/v1/user/info'),  // ✅ Removed uid parameter
+    updateProfile: (profileData) => api.put('/api/v1/user/profile', null, { 
+      params: { ...profileData }  // ✅ Removed uid parameter
     }),
     
     // Generic methods

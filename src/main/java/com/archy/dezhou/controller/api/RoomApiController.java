@@ -2,6 +2,7 @@ package com.archy.dezhou.controller.api;
 
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.PlayerService;
@@ -22,6 +23,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
 
 /**
  * Room API Controller - Replaces RoomListBacklet
@@ -61,10 +67,26 @@ public class RoomApiController extends BaseApiController {
         }
     }
 
+    @GetMapping("/typeList")
+    public ResponseEntity<ApiResponse<?>> getTypeList() {
+        List<RoomDB> dbList = this.roomService.getRoomTypeList();
+        return successResponse(dbList);
+    }
+
+    // user create a room
+    @PostMapping("/create/{roomTypeId}")
+    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId, @RequestParam String uid) {
+        
+        GameRoom gameRoom = this.roomService.createGameRoom(uid, uid, Integer.parseInt(roomTypeId));
+        return successResponse(gameRoom);
+
+    }
+    
+
     // Join room endpoint - replaces JOIN command
     @PostMapping("/{roomName}/join")
     public ResponseEntity<ApiResponse<?>> joinRoom(
-            @PathVariable String roomName,
+            @PathVariable String roomId,
             @RequestParam String uid) {
         
         try {
@@ -75,7 +97,7 @@ public class RoomApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
             
-            GameRoom room = this.roomService.getRoomByName(roomName);
+            GameRoom room = this.roomService.getRoomByName(roomId);
             
             if (room == null) {
                 return errorResponse("RoomNotFound");
@@ -109,7 +131,7 @@ public class RoomApiController extends BaseApiController {
     // Leave room endpoint - replaces LEAVE command
     @PostMapping("/{roomName}/leave")
     public ResponseEntity<ApiResponse<?>> leaveRoom(
-            @PathVariable String roomName,
+            @PathVariable String roomId,
             @RequestParam String uid) {
         
         try {
@@ -118,7 +140,7 @@ public class RoomApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
 
-            GameRoom room = this.roomService.getRoomByName(roomName);
+            GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
             if (room == null) {
                 return errorResponse("YourParmsIsInValid");
             }
@@ -158,9 +180,9 @@ public class RoomApiController extends BaseApiController {
     }
 
     // Get room details endpoint
-    @GetMapping("/{roomName}")
-    public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomName) {
-        GameRoom room = this.roomService.getRoomByName(roomName);
+    @GetMapping("/{roomId}")
+    public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomId) {
+        GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
         if (room != null) {
             RoomResponse response = new RoomResponse(room);
             return successResponse(response);

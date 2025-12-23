@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class JwtConfig {
     
-    @Value("${jwt.secret:dezhou-secret-key-1234567890}")
+    @Value("${jwt.secret:dezhou-secret-key-1234567890-abcdefghijklmnop}") // 256+ bits for security
     private String secret;
     
     @Value("${jwt.expiration:86400000}") // 24 hours in milliseconds
