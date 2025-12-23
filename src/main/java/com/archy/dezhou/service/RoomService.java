@@ -1,6 +1,8 @@
 package com.archy.dezhou.service;
 
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +14,6 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.room.GameRoom;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 
 @Service
@@ -28,15 +29,6 @@ public class RoomService{
 	public RoomDB getRoomById(int roomId){
         return roomDBMapper.selectByPrimaryKey(roomId);
     }
-
-	// @PostConstruct
-	// public void init() {
-	// 	List<RoomDB> roomDBList = roomDBMapper.selectAllRooms();
-	// 	roomDBList.forEach(roomDB -> {
-	// 		GameRoom room = new GameRoom(roomDB);
-	// 		this.roomsMap.put(room.getRoomid(), room);
-	// 	});
-	// }
 
 	public List<RoomDB> getRoomTypeList() {
 		return this.roomDBMapper.selectAllRooms();
@@ -77,6 +69,10 @@ public class RoomService{
 	public List<GameRoom> getRoomList()
 	{
 		return new ArrayList<GameRoom>(this.roomsMap.values());
+	}
+
+	public List<GameRoom> getRoomListByTypeId(int roomTypeId) {
+		return this.roomsMap.values().stream().filter(item -> item.getRoomTypeId() == roomTypeId).collect(Collectors.toList());
 	}
 	
 	public int destroyRoom(GameRoom room)

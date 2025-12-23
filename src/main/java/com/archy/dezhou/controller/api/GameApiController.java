@@ -165,17 +165,6 @@ public class GameApiController extends BaseApiController {
         }
     }
 
-    private int getIntParam(Map<String, String> params, String key, int defaultValue) {
-        try {
-            if (params != null && params.containsKey(key)) {
-                return Integer.parseInt(params.get(key));
-            }
-        } catch (NumberFormatException e) {
-            // Return default value if parsing fails
-        }
-        return defaultValue;
-    }
-
     /**
      * Get current game state for a room
      */

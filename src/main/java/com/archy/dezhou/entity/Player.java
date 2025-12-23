@@ -2,6 +2,8 @@ package com.archy.dezhou.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
 
@@ -59,6 +61,7 @@ public class Player extends User
 
 	private PlayerGameState gameState = PlayerGameState.PLAYER_STATE_PLAYER;
 
+	private Queue<JsonObjectWrapper> msgQueue = new ConcurrentLinkedQueue<>();
 
 	@JsonIgnore
 	protected Logger log = Logger.getLogger(Player.class.getName());
@@ -273,6 +276,22 @@ public class Player extends User
 		asObj.putNumber("cm",this.getRmoney());
 		
 		return asObj;
+	}
+
+	public void sendMsg(JsonObjectWrapper msg) {
+		this.msgQueue.offer(msg);
+	}
+
+	public List<JsonObjectWrapper> retrieveMsg() {
+		List<JsonObjectWrapper> list = new ArrayList<>();
+
+		JsonObjectWrapper msg = this.msgQueue.poll();
+		while(msg != null) {
+			list.add(msg);
+			msg = this.msgQueue.poll();
+		}
+
+		return list;
 	}
 
 	/**
