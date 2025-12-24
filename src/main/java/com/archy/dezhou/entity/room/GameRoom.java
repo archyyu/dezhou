@@ -28,6 +28,15 @@ public class GameRoom
 	private int roomid;
 	private String name;
 
+	// Explicit getters for fields
+	public int getRoomid() {
+		return roomid;
+	}
+
+	public String getName() {
+		return name;
+	}
+
 	public String creator;
 	private PukerGame pokerGame = null;
 	//进入房间，但是尚未坐下的玩家

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Game Process Test</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .api-response {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        .game-phase {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .step-button {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="test-container">
+        <h1 class="text-center mb-4">Complete Game Process Test</h1>
+        <p class="text-center text-muted">Test the entire poker game flow from login to gameplay</p>
+        
+        <div class="test-section">
+            <h3>Test Progress</h3>
+            <div class="progress mb-3">
+                <div class="progress-bar" role="progressbar" :style="`width: ${progress}%`">
+                    {{ currentStep }} / {{ totalSteps }}
+                </div>
+            </div>
+            <p><strong>Current Step:</strong> {{ currentStepDescription }}</p>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 1: Login and Get Token</h3>
+            <div v-if="step1Result" class="test-result" :class="step1Success ? 'success' : 'error'">
+                {{ step1Result }}
+            </div>
+            <button @click="testLogin" class="btn btn-primary step-button" :disabled="loading">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Test Login
+            </button>
+            <div v-if="step1Response" class="api-response">
+                <pre>{{ step1Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 2: Join Room</h3>
+            <div class="mb-3">
+                <label class="form-label">Room ID</label>
+                <input v-model="testRoomId" type="number" class="form-control" placeholder="101">
+            </div>
+            <div v-if="step2Result" class="test-result" :class="step2Success ? 'success' : 'error'">
+                {{ step2Result }}
+            </div>
+            <button @click="testJoinRoom" class="btn btn-primary step-button" :disabled="loading || !token">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Join Room
+            </button>
+            <div v-if="step2Response" class="api-response">
+                <pre>{{ step2Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 3: Sit Down at Table</h3>
+            <div class="mb-3">
+                <label class="form-label">Seat ID</label>
+                <input v-model="testSeatId" type="number" class="form-control" placeholder="1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Buy-In Amount</label>
+                <input v-model="testBuyInAmount" type="number" class="form-control" placeholder="1000">
+            </div>
+            <div v-if="step3Result" class="test-result" :class="step3Success ? 'success' : 'error'">
+                {{ step3Result }}
+            </div>
+            <button @click="testSitDown" class="btn btn-primary step-button" :disabled="loading || !token">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Sit Down
+            </button>
+            <div v-if="step3Response" class="api-response">
+                <pre>{{ step3Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 4: Start Game</h3>
+            <div v-if="step4Result" class="test-result" :class="step4Success ? 'success' : 'error'">
+                {{ step4Result }}
+            </div>
+            <button @click="testStartGame" class="btn btn-primary step-button" :disabled="loading || !token">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Start Game
+            </button>
+            <div v-if="step4Response" class="api-response">
+                <pre>{{ step4Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 5: Get Game State</h3>
+            <div v-if="step5Result" class="test-result" :class="step5Success ? 'success' : 'error'">
+                {{ step5Result }}
+            </div>
+            <button @click="testGetGameState" class="btn btn-primary step-button" :disabled="loading || !token">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Get Game State
+            </button>
+            <div v-if="step5Response" class="api-response">
+                <pre>{{ step5Response }}</pre>
+            </div>
+            <div v-if="gameState" class="mt-3">
+                <h5>Current Game State:</h5>
+                <p><strong>Phase:</strong> <span class="game-phase">{{ gameState.gamePhase || 'N/A' }}</span></p>
+                <p><strong>Pot:</strong> {{ gameState.pot || 0 }} chips</p>
+                <p><strong>Current Bet:</strong> {{ gameState.currentBet || 0 }} chips</p>
+                <p><strong>Players:</strong> {{ gameState.players?.length || 0 }}</p>
+                <p><strong>Community Cards:</strong> {{ gameState.communityCards?.length || 0 }}/5</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 6: Game Actions (Player Turn)</h3>
+            <div class="d-flex gap-2 mb-3">
+                <button @click="testGameAction('1')" class="btn btn-info btn-sm" :disabled="loading || !token">
+                    Look Cards (CMD 1)
+                </button>
+                <button @click="testGameAction('2')" class="btn btn-success btn-sm" :disabled="loading || !token">
+                    Add Bet (CMD 2)
+                </button>
+                <button @click="testGameAction('3')" class="btn btn-primary btn-sm" :disabled="loading || !token">
+                    Follow Bet (CMD 3)
+                </button>
+                <button @click="testGameAction('4')" class="btn btn-danger btn-sm" :disabled="loading || !token">
+                    Drop Card (CMD 4)
+                </button>
+                <button @click="testGameAction('5')" class="btn btn-warning btn-sm" :disabled="loading || !token">
+                    All In (CMD 5)
+                </button>
+            </div>
+            <div v-if="step6Result" class="test-result" :class="step6Success ? 'success' : 'error'">
+                {{ step6Result }}
+            </div>
+            <div v-if="step6Response" class="api-response">
+                <pre>{{ step6Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Step 7: Leave Room</h3>
+            <div v-if="step7Result" class="test-result" :class="step7Success ? 'success' : 'error'">
+                {{ step7Result }}
+            </div>
+            <button @click="testLeaveRoom" class="btn btn-danger step-button" :disabled="loading || !token">
+                <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+                Leave Room
+            </button>
+            <div v-if="step7Response" class="api-response">
+                <pre>{{ step7Response }}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test Summary</h3>
+            <div class="summary-stats">
+                <p><strong>Total Steps:</strong> {{ totalSteps }}</p>
+                <p><strong>Completed Steps:</strong> {{ completedSteps }}</p>
+                <p><strong>Success Rate:</strong> {{ successRate }}%</p>
+                <p><strong>Total Time:</strong> {{ totalTime }} seconds</p>
+            </div>
+            <button @click="resetTest" class="btn btn-secondary">Reset Test</button>
+            <button @click="runAllTests" class="btn btn-success ms-2">
+                <span v-if="runningAllTests" class="spinner-border spinner-border-sm"></span>
+                Run All Tests
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    // Test configuration
+                    apiBaseUrl: 'http://localhost:8081',
+                    testUsername: 'testuser',
+                    testPassword: 'password',
+                    testRoomId: '101',
+                    testSeatId: '1',
+                    testBuyInAmount: '1000',
+                    
+                    // Test state
+                    loading: false,
+                    token: '',
+                    userId: '',
+                    gameState: null,
+                    
+                    // Step tracking
+                    currentStep: 0,
+                    totalSteps: 7,
+                    completedSteps: 0,
+                    successfulSteps: 0,
+                    startTime: null,
+                    runningAllTests: false,
+                    
+                    // Step results
+                    step1Result: '', step1Success: false, step1Response: '',
+                    step2Result: '', step2Success: false, step2Response: '',
+                    step3Result: '', step3Success: false, step3Response: '',
+                    step4Result: '', step4Success: false, step4Response: '',
+                    step5Result: '', step5Success: false, step5Response: '',
+                    step6Result: '', step6Success: false, step6Response: '',
+                    step7Result: '', step7Success: false, step7Response: ''
+                };
+            },
+            computed: {
+                progress() {
+                    return (this.completedSteps / this.totalSteps) * 100;
+                },
+                currentStepDescription() {
+                    const steps = [
+                        'Login and Authentication',
+                        'Join Game Room',
+                        'Sit Down at Table',
+                        'Start Game',
+                        'Get Game State',
+                        'Perform Game Actions',
+                        'Leave Room'
+                    ];
+                    return steps[this.currentStep] || 'Test Complete';
+                },
+                successRate() {
+                    return this.completedSteps > 0 ? Math.round((this.successfulSteps / this.completedSteps) * 100) : 0;
+                },
+                totalTime() {
+                    return this.startTime ? Math.floor((Date.now() - this.startTime) / 1000) : 0;
+                }
+            },
+            methods: {
+                async testLogin() {
+                    this.currentStep = 1;
+                    this.loading = true;
+                    this.step1Result = '';
+                    this.step1Response = '';
+                    this.step1Success = false;
+                    
+                    try {
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/user/login`, null, {
+                            params: {
+                                name: this.testUsername,
+                                password: this.testPassword
+                            }
+                        });
+                        
+                        this.step1Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success && response.data.data) {
+                            this.token = response.data.data.token;
+                            this.userId = response.data.data.user.uid;
+                            localStorage.setItem('token', this.token);
+                            
+                            this.step1Result = 'Login successful! Token stored.';
+                            this.step1Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step1Result = 'Login failed: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step1Result = `Login failed: ${error.response ? error.response.data.message : error.message}`;
+                        this.step1Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testJoinRoom() {
+                    this.currentStep = 2;
+                    this.loading = true;
+                    this.step2Result = '';
+                    this.step2Response = '';
+                    this.step2Success = false;
+                    
+                    try {
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/room/${this.testRoomId}/join`, null, {
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step2Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.step2Result = `Joined room ${this.testRoomId} successfully`;
+                            this.step2Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step2Result = 'Failed to join room: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step2Result = `Failed to join room: ${error.response ? error.response.data.message : error.message}`;
+                        this.step2Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testSitDown() {
+                    this.currentStep = 3;
+                    this.loading = true;
+                    this.step3Result = '';
+                    this.step3Response = '';
+                    this.step3Success = false;
+                    
+                    try {
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/game/${this.testRoomId}/actions`, null, {
+                            params: {
+                                cmd: '6', // CMD_SITDOWN
+                                uid: this.userId,
+                                sid: this.testSeatId,
+                                cb: this.testBuyInAmount
+                            },
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step3Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.step3Result = `Sat down at seat ${this.testSeatId} with ${this.testBuyInAmount} chips`;
+                            this.step3Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step3Result = 'Failed to sit down: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step3Result = `Failed to sit down: ${error.response ? error.response.data.message : error.message}`;
+                        this.step3Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testStartGame() {
+                    this.currentStep = 4;
+                    this.loading = true;
+                    this.step4Result = '';
+                    this.step4Response = '';
+                    this.step4Success = false;
+                    
+                    try {
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/game/${this.testRoomId}/actions`, null, {
+                            params: {
+                                cmd: 'sbot', // CMD_SBOT (start game)
+                                uid: this.userId
+                            },
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step4Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.step4Result = 'Game started successfully';
+                            this.step4Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step4Result = 'Failed to start game: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step4Result = `Failed to start game: ${error.response ? error.response.data.message : error.message}`;
+                        this.step4Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testGetGameState() {
+                    this.currentStep = 5;
+                    this.loading = true;
+                    this.step5Result = '';
+                    this.step5Response = '';
+                    this.step5Success = false;
+                    
+                    try {
+                        const response = await axios.get(`${this.apiBaseUrl}/api/v1/game/${this.testRoomId}/state`, {
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step5Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.gameState = response.data.data;
+                            this.step5Result = 'Game state retrieved successfully';
+                            this.step5Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step5Result = 'Failed to get game state: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step5Result = `Failed to get game state: ${error.response ? error.response.data.message : error.message}`;
+                        this.step5Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testGameAction(cmd) {
+                    this.currentStep = 6;
+                    this.loading = true;
+                    this.step6Result = '';
+                    this.step6Response = '';
+                    this.step6Success = false;
+                    
+                    try {
+                        const commandNames = {
+                            '1': 'LOOK_CARD',
+                            '2': 'ADD_BET',
+                            '3': 'FOLLOW_BET',
+                            '4': 'DROP_CARD',
+                            '5': 'ALL_IN'
+                        };
+                        
+                        const params = { cmd, uid: this.userId };
+                        if (cmd === '2') {
+                            params.amount = 100; // Add bet amount
+                        }
+                        
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/game/${this.testRoomId}/actions`, null, {
+                            params: params,
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step6Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.step6Result = `Game action ${commandNames[cmd]} executed successfully`;
+                            this.step6Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step6Result = 'Failed to execute game action: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step6Result = `Failed to execute game action: ${error.response ? error.response.data.message : error.message}`;
+                        this.step6Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async testLeaveRoom() {
+                    this.currentStep = 7;
+                    this.loading = true;
+                    this.step7Result = '';
+                    this.step7Response = '';
+                    this.step7Success = false;
+                    
+                    try {
+                        const response = await axios.post(`${this.apiBaseUrl}/api/v1/room/${this.testRoomId}/leave`, null, {
+                            headers: {
+                                'Authorization': `Bearer ${this.token}`
+                            }
+                        });
+                        
+                        this.step7Response = JSON.stringify(response.data, null, 2);
+                        
+                        if (response.data && response.data.success) {
+                            this.step7Result = `Left room ${this.testRoomId} successfully`;
+                            this.step7Success = true;
+                            this.completedSteps++;
+                            this.successfulSteps++;
+                        } else {
+                            this.step7Result = 'Failed to leave room: Invalid response format';
+                        }
+                    } catch (error) {
+                        this.step7Result = `Failed to leave room: ${error.response ? error.response.data.message : error.message}`;
+                        this.step7Response = error.response ? JSON.stringify(error.response.data, null, 2) : error.message;
+                        this.completedSteps++;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async runAllTests() {
+                    this.runningAllTests = true;
+                    this.startTime = Date.now();
+                    this.completedSteps = 0;
+                    this.successfulSteps = 0;
+                    
+                    // Reset all steps
+                    this.resetTest();
+                    
+                    // Run tests sequentially
+                    await this.testLogin();
+                    if (this.step1Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testJoinRoom();
+                    }
+                    if (this.step2Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testSitDown();
+                    }
+                    if (this.step3Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testStartGame();
+                    }
+                    if (this.step4Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testGetGameState();
+                    }
+                    if (this.step5Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testGameAction('3'); // Follow bet
+                    }
+                    if (this.step6Success) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await this.testLeaveRoom();
+                    }
+                    
+                    this.runningAllTests = false;
+                },
+                
+                resetTest() {
+                    this.currentStep = 0;
+                    this.completedSteps = 0;
+                    this.successfulSteps = 0;
+                    this.startTime = null;
+                    this.token = '';
+                    this.userId = '';
+                    this.gameState = null;
+                    
+                    // Reset all step results
+                    this.step1Result = ''; this.step1Success = false; this.step1Response = '';
+                    this.step2Result = ''; this.step2Success = false; this.step2Response = '';
+                    this.step3Result = ''; this.step3Success = false; this.step3Response = '';
+                    this.step4Result = ''; this.step4Success = false; this.step4Response = '';
+                    this.step5Result = ''; this.step5Success = false; this.step5Response = '';
+                    this.step6Result = ''; this.step6Success = false; this.step6Response = '';
+                    this.step7Result = ''; this.step7Success = false; this.step7Response = '';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

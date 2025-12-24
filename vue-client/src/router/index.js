@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Import page components
 const HomePage = () => import('@/pages/HomePage.vue')
 const LoginPage = () => import('@/pages/LoginPage.vue')
+const RegisterPage = () => import('@/pages/RegisterPage.vue')
 const ApiTestPage = () => import('@/pages/ApiTestPage.vue')
 const RoomsPage = () => import('@/pages/RoomsPage.vue')
 const GamePage = () => import('@/pages/GamePage.vue')
@@ -22,6 +23,12 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginPage,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage,
       meta: { requiresAuth: false }
     },
     {

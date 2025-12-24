@@ -41,8 +41,38 @@ public class Player extends User
 	private boolean isAllIn;
 	private boolean isDealer;
 	private boolean isCurrentTurn;
+
+	// Explicit getters for boolean fields
+	public boolean isHasLooked() {
+		return hasLooked;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public boolean isAllIn() {
+		return isAllIn;
+	}
+
+	public boolean isDealer() {
+		return isDealer;
+	}
+
+	public boolean isCurrentTurn() {
+		return isCurrentTurn;
+	}
 	private boolean isOnline;
 	private String avatarUrl;
+
+	// Explicit getters for fields that might have Lombok issues
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	public String getAvatarUrl() {
+		return avatarUrl;
+	}
 
 	private int totalGames;
 	private int gamesWon;
@@ -55,7 +85,53 @@ public class Player extends User
 	private int totalBets;
 	private int totalWinnings;
 
+	// Explicit getters for statistics fields
+	public int getTotalGames() {
+		return totalGames;
+	}
+
+	public int getGamesWon() {
+		return gamesWon;
+	}
+
+	public int getGamesLost() {
+		return gamesLost;
+	}
+
+	public int getHandsPlayed() {
+		return handsPlayed;
+	}
+
+	public int getHandsWon() {
+		return handsWon;
+	}
+
+	public double getWinRate() {
+		return winRate;
+	}
+
+	public int getBiggestWin() {
+		return biggestWin;
+	}
+
+	public int getBiggestLoss() {
+		return biggestLoss;
+	}
+
+	public int getTotalBets() {
+		return totalBets;
+	}
+
+	public int getTotalWinnings() {
+		return totalWinnings;
+	}
+
 	private List<Card> cards;
+
+	// Explicit getter for cards field
+	public List<Card> getCards() {
+		return cards;
+	}
 
 	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
 
