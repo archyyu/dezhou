@@ -73,7 +73,7 @@
         </div>
         
         <button 
-          @click="sendMessage" 
+          @click="sendMessageNow" 
           class="btn btn-primary" 
           :disabled="loading || !newMessage.content.trim()"
         >
@@ -122,7 +122,7 @@ const refreshMessages = () => {
   loadMessages()
 }
 
-const sendMessage = async () => {
+const sendMessageNow = async () => {
   try {
     loading.value = true
     error.value = ''
