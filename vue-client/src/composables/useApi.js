@@ -43,21 +43,28 @@ export function useApi() {
     login: (credentials) => api.post('/api/v1/user/login', null, { params: credentials }),
     register: (userData) => api.post('/api/v1/user/register', null, { params: userData }),
     
-    // Game
-    getRooms: () => api.get('/api/v1/room/list'),
-    joinRoom: (roomName) => api.post(`/api/v1/room/${roomName}/join`),  // ✅ Removed uid parameter
-    leaveRoom: (roomName) => api.post(`/api/v1/room/${roomName}/leave`),  // ✅ Removed uid parameter
+    // Room management
+    getRoomTypeList: () => api.get('/api/v1/room/roomTypeList'),
+    getRoomsByType: (roomTypeId) => api.get(`/api/v1/room/${roomTypeId}/list`),
+    getAllRooms: () => api.get('/api/v1/room/list'),
+    joinRoom: (roomId) => api.post(`/api/v1/room/${roomId}/join`),
+    leaveRoom: (roomId) => api.post(`/api/v1/room/${roomId}/leave`),
+    createRoom: (roomTypeId) => api.post(`/api/v1/room/create/${roomTypeId}`),
     
     // Game actions
     gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
-      params: { cmd }  // ✅ Removed uid parameter
+      params: { cmd }
     }),
     
     // User
-    getUserProfile: () => api.get('/api/v1/user/info'),  // ✅ Removed uid parameter
+    getUserProfile: () => api.get('/api/v1/user/info'),
     updateProfile: (profileData) => api.put('/api/v1/user/profile', null, { 
-      params: { ...profileData }  // ✅ Removed uid parameter
+      params: { ...profileData }
     }),
+    
+    // Message handling
+    getMessages: () => api.get('/api/v1/user/messages'),
+    sendMessage: (message) => api.post('/api/v1/user/messages', message),
     
     // Generic methods
     get: (url) => api.get(url),

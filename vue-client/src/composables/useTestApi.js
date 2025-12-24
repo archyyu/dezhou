@@ -20,6 +20,12 @@ export function useTestApi() {
       params: { name: username, password: password }
     }),
     
+    // Test room type list
+    testRoomTypeList: () => api.get('/api/v1/room/roomTypeList'),
+    
+    // Test rooms by type
+    testRoomsByType: (roomTypeId) => api.get(`/api/v1/room/${roomTypeId}/list`),
+    
     // Test simple GET request
     testSimpleGet: () => api.get('/api/v1/room/list'),
     

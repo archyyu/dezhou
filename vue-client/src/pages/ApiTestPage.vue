@@ -39,9 +39,43 @@
 
     <div class="card">
       <div class="card-body">
+        <h5 class="card-title">Test Room Type List</h5>
+        <button @click="testRoomTypes" class="btn btn-primary" :disabled="loading">
+          Get Room Types
+        </button>
+        <div v-if="roomTypesResult" class="mt-3 alert alert-success">
+          {{ roomTypesResult }}
+        </div>
+        <div v-if="roomTypesError" class="mt-3 alert alert-danger">
+          {{ roomTypesError }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Test Rooms by Type</h5>
+        <div class="mb-3">
+          <label class="form-label">Room Type ID</label>
+          <input v-model="testRoomTypeId" type="number" class="form-control" placeholder="1">
+        </div>
+        <button @click="testRoomsByType" class="btn btn-primary" :disabled="loading">
+          Get Rooms by Type
+        </button>
+        <div v-if="roomsByTypeResult" class="mt-3 alert alert-success">
+          {{ roomsByTypeResult }}
+        </div>
+        <div v-if="roomsByTypeError" class="mt-3 alert alert-danger">
+          {{ roomsByTypeError }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
         <h5 class="card-title">Test Room List</h5>
         <button @click="testRooms" class="btn btn-primary" :disabled="loading">
-          Get Rooms
+          Get All Rooms
         </button>
         <div v-if="roomsResult" class="mt-3 alert alert-success">
           {{ roomsResult }}
@@ -64,10 +98,15 @@ const loading = ref(false)
 const healthResult = ref('')
 const loginResult = ref('')
 const loginError = ref('')
+const roomTypesResult = ref('')
+const roomTypesError = ref('')
+const roomsByTypeResult = ref('')
+const roomsByTypeError = ref('')
 const roomsResult = ref('')
 const roomsError = ref('')
 const testUsername = ref('testuser')
 const testPassword = ref('password')
+const testRoomTypeId = ref('1')
 
 const testHealth = async () => {
   try {
@@ -95,6 +134,36 @@ const testLogin = async () => {
     if (err.response) {
       loginError.value += '\nResponse: ' + JSON.stringify(err.response.data)
     }
+  } finally {
+    loading.value = false
+  }
+}
+
+const testRoomTypes = async () => {
+  try {
+    loading.value = true
+    roomTypesError.value = ''
+    
+    const response = await testRoomTypeList()
+    roomTypesResult.value = JSON.stringify(response.data, null, 2)
+    
+  } catch (err) {
+    roomTypesError.value = 'Error: ' + (err.response?.data?.message || err.message)
+  } finally {
+    loading.value = false
+  }
+}
+
+const testRoomsByType = async () => {
+  try {
+    loading.value = true
+    roomsByTypeError.value = ''
+    
+    const response = await testRoomsByType(testRoomTypeId.value)
+    roomsByTypeResult.value = JSON.stringify(response.data, null, 2)
+    
+  } catch (err) {
+    roomsByTypeError.value = 'Error: ' + (err.response?.data?.message || err.message)
   } finally {
     loading.value = false
   }

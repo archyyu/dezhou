@@ -12,6 +12,9 @@
         <router-link to="/rooms" class="btn btn-outline-secondary btn-lg px-4">
           View Rooms
         </router-link>
+        <router-link to="/api-test" class="btn btn-info btn-lg px-4 text-white">
+          API Test
+        </router-link>
       </div>
     </div>
     

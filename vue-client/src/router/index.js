@@ -4,6 +4,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 const HomePage = () => import('@/pages/HomePage.vue')
 const LoginPage = () => import('@/pages/LoginPage.vue')
 const ApiTestPage = () => import('@/pages/ApiTestPage.vue')
+const RoomsPage = () => import('@/pages/RoomsPage.vue')
+const GamePage = () => import('@/pages/GamePage.vue')
+const MessagesPage = () => import('@/pages/MessagesPage.vue')
 
 // Create router
 const router = createRouter({
@@ -20,6 +23,24 @@ const router = createRouter({
       name: 'login',
       component: LoginPage,
       meta: { requiresAuth: false }
+    },
+    {
+      path: '/rooms',
+      name: 'rooms',
+      component: RoomsPage,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/game/:roomId',
+      name: 'game',
+      component: GamePage,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/messages',
+      name: 'messages',
+      component: MessagesPage,
+      meta: { requiresAuth: true }
     },
     {
       path: '/api-test',
