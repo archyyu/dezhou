@@ -146,46 +146,35 @@ public class GameRoom
 		return this.playerMap.values().stream().collect(Collectors.toList());
 	}
 	
-	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb)
+	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws Exception
 	{
 		JsonObjectWrapper response = new JsonObjectWrapper();
 		JsonObjectWrapper userAobj = new JsonObjectWrapper();
 		if(player == null)
 		{
-			return null;
+			throw new Exception("playerNotExist");
 		}
 
 		if(this.playerMap.containsKey(seatId))
 		{
-			response.put("_cmd", ConstList.CMD_SITDOWN);
-			userAobj.put("uid", player.getUid());
-			response.put("user", userAobj);
-			response.put("issit", "yes");
-			response.put("sid", seatId);
-			response.put("info", "HaveAlreadySitDowned");
-			log.info("roomName: " + this.getName() +   " 此位置已经有人 seat: " + seatId);
-			return response;
+			throw new Exception("HaveAlreadySitDowned");
 		}
 
 		if(this.playerMap.values().contains(player))
 		{
-			response.put("_cmd", ConstList.CMD_SITDOWN);
-			response.put("roomKey", this.getName());
-			response.put("issit", "yes");
-			response.put("info", "YouHaveSitedAtOtherPlace");
-			log.info("roomName: " + this.getName() +   " 此玩家已经坐下  uid: " + player.getUid());
-			return response;
+			throw new Exception("YouHaveSitedAtOtherPlace");
 		}
 
 
-		log.info("roomName: " + this.getName() + "  " + player.getUid() + " try to sitdown at seatId: " + seatId);
+		log.info("roomName: " + this.getName() + "  " + player.getUid() + " try to sitdown at seatId: " + seatId + ", with cb:" + cb);
 		this.spectatorList.remove(player);
 
 		player.clearRoomMoney();
 		player.addRmoney(cb);
 		player.deductAmoney(cb);
+		player.setSeatId(seatId);
 
-		this.addPlayer(seatId,player);
+		// this.addPlayer(seatId,player);
 
 		if(this.isGame())
 		{
@@ -212,7 +201,7 @@ public class GameRoom
 		userAobj.put("spr", "");
 
 		response.put("_cmd",ConstList.CMD_SITDOWN);
-		response.put("user", userAobj);
+		response.put("user", userAobj.toJSONString());
 		response.put("issit", "no");
 
 		this.addPlayer(seatId,player);

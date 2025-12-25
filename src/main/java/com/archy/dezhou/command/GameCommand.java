@@ -10,6 +10,6 @@ public interface GameCommand {
 
     String getCommandName();
 
-    JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String,String> params);
+    JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String,String> params) throws Exception;
 
 }

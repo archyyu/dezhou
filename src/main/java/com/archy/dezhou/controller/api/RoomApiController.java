@@ -105,6 +105,8 @@ public class RoomApiController extends BaseApiController {
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
+
+            Player player = this.userService.getUserByUserId(user.getUid());
             
             GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
             
@@ -124,8 +126,8 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Join the new room
-            int ret = room.userJoin(user);
-            user.setRoomId(room.getRoomid());
+            int ret = room.userJoin(player);
+            player.setRoomId(room.getRoomid());
             
             if (ret == 0) {
                 return successResponse("UserEnterRoomOk");

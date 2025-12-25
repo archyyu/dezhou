@@ -88,9 +88,19 @@ const handleLogin = async () => {
     // Handle the API response format correctly
     if (response.data && response.data.success && response.data.data) {
       // New API response format - use pure Pinia approach
+      // Store in localStorage for persistence across page refreshes
+      localStorage.setItem('token', response.data.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.data.user))
+      
+      // Initialize Pinia auth store
       initializeAuth(response.data.data.token, response.data.data.user)
     } else if (response.data && response.data.token) {
       // Legacy response format - use pure Pinia approach
+      // Store in localStorage for persistence across page refreshes
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+      
+      // Initialize Pinia auth store
       initializeAuth(response.data.token, response.data.user)
     } else {
       throw new Error('Invalid response format: ' + JSON.stringify(response.data))

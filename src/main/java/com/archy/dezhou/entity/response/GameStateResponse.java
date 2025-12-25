@@ -27,6 +27,7 @@ public class GameStateResponse {
     private String gamePhase; // "betting", "showdown", etc.
     private List<PlayerState> players;
     private List<Card> communityCards;
+    private List<PlayerState> spectaclors;
     private GameSettings settings;
 
     /**
@@ -51,6 +52,8 @@ public class GameStateResponse {
             this.players = room.getPlayers().stream()
                 .map(player -> new PlayerState(player, game))
                 .toList();
+
+            this.spectaclors = room.getSpectatorList().stream().map(player -> new PlayerState(player, game)).toList();
             
             // Add game settings
             // this.settings = new GameSettings(room, game);

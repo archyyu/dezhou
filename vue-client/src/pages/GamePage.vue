@@ -17,10 +17,10 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <h2 class="mb-0">{{ gameState.room.name }}</h2>
+              <h2 class="mb-0">{{ gameState.name }}</h2>
               <p class="text-muted mb-0">
-                {{ gameState.room.roomTypeName }} | 
-                Players: {{ gameState.room.getPlayerCount() }} / {{ gameState.room.maxPlayers }}
+                {{ gameState.roomTypeName }} | 
+                Players: {{ gameState.players.length }} / {{ gameState.maxPlayers }}
               </p>
             </div>
             <div>
@@ -57,9 +57,19 @@
             <button 
               @click="showSeatSelection = true"
               class="btn btn-primary" 
-              :disabled="loading || !canSitDown"
+              :disabled="false"
             >
               Sit Down
+            </button>
+            
+            <!-- Debug info -->
+            <div class="debug-info text-muted small ms-3">
+              Status: {{ playerStatus.value }} | Can Sit: {{ canSitDown }} | Game: {{ gameState.value?.gamePhase || 'N/A' }}
+            </div>
+            
+            <!-- Debug button to force show seat selection -->
+            <button @click="showSeatSelection = true" class="btn btn-sm btn-outline-danger ms-2">
+              🔧 Debug: Show Seats
             </button>
             
             <button 
@@ -229,31 +239,126 @@
       </div>
     </div>
     
-    <!-- Seat Selection Modal -->
+    <!-- Seat Selection Modal - Visual Poker Table -->
     <div v-if="showSeatSelection" class="modal fade show" style="display: block;" tabindex="-1">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Select a Seat</h5>
+            <h5 class="modal-title">🎰 Select Your Seat at the Poker Table</h5>
             <button type="button" class="btn-close" @click="showSeatSelection = false"></button>
           </div>
+          
           <div class="modal-body">
-            <div class="seat-grid">
-              <div class="row">
-                <div v-for="seat in availableSeats" :key="seat" class="col-3 mb-3">
-                  <button 
-                    @click="sitDown(seat)" 
-                    class="btn btn-outline-primary w-100 seat-button"
-                    :disabled="loading"
-                  >
-                    Seat {{ seat }}
-                  </button>
+            <!-- Debug: Show current selections -->
+            <div class="alert alert-info mb-3">
+              <strong>Debug Info:</strong> 
+              Selected Seat: {{ playerSeatId }} | 
+              Current User: {{ user.value?.name || 'None' }} | 
+              Game Phase: {{ 'N/A' }}
+            </div>
+            
+            <div class="poker-table-container">
+              <div class="poker-table">
+                <!-- Dealer Position (Top) -->
+                <div class="seat-position dealer-position">
+                  <div class="seat-card" @click="sitDown(1)" :class="{ 'occupied': isSeatOccupied(1), 'selected': playerSeatId === 1 }">
+                    <div class="seat-number">1</div>
+                    <div class="seat-label">Dealer</div>
+                    <div v-if="isSeatOccupied(1)" class="seat-occupied">👤 Occupied</div>
+                  </div>
                 </div>
+                
+                <!-- Top Right Seat -->
+                <div class="seat-position top-right">
+                  <div class="seat-card" @click="sitDown(2)" :class="{ 'occupied': isSeatOccupied(2), 'selected': playerSeatId === 2 }">
+                    <div class="seat-number">2</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(2)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <!-- Right Side Seats -->
+                <div class="seat-position right-top">
+                  <div class="seat-card" @click="sitDown(3)" :class="{ 'occupied': isSeatOccupied(3), 'selected': playerSeatId === 3 }">
+                    <div class="seat-number">3</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(3)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <div class="seat-position right-bottom">
+                  <div class="seat-card" @click="sitDown(4)" :class="{ 'occupied': isSeatOccupied(4), 'selected': playerSeatId === 4 }">
+                    <div class="seat-number">4</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(4)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <!-- Bottom Right Seat -->
+                <div class="seat-position bottom-right">
+                  <div class="seat-card" @click="sitDown(5)" :class="{ 'occupied': isSeatOccupied(5), 'selected': playerSeatId === 5 }">
+                    <div class="seat-number">5</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(5)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <!-- Bottom Left Seat -->
+                <div class="seat-position bottom-left">
+                  <div class="seat-card" @click="sitDown(6)" :class="{ 'occupied': isSeatOccupied(6), 'selected': playerSeatId === 6 }">
+                    <div class="seat-number">6</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(6)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <!-- Left Side Seats -->
+                <div class="seat-position left-bottom">
+                  <div class="seat-card" @click="sitDown(7)" :class="{ 'occupied': isSeatOccupied(7), 'selected': playerSeatId === 7 }">
+                    <div class="seat-number">7</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(7)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <div class="seat-position left-top">
+                  <div class="seat-card" @click="sitDown(8)" :class="{ 'occupied': isSeatOccupied(8), 'selected': playerSeatId === 8 }">
+                    <div class="seat-number">8</div>
+                    <div class="seat-label">Player</div>
+                    <div v-if="isSeatOccupied(8)" class="seat-occupied">👤 Occupied</div>
+                  </div>
+                </div>
+                
+                <!-- Table Center (Your Position) -->
+                <div class="table-center">
+                  <div class="your-position">
+                    👤 YOUR POSITION
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Seat Legend -->
+            <div class="seat-legend mt-4">
+              <div class="legend-item">
+                <div class="legend-color available"></div>
+                <span>Available</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color occupied"></div>
+                <span>Occupied</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color selected"></div>
+                <span>Your Selection</span>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="showSeatSelection = false">Cancel</button>
+            <button type="button" class="btn btn-primary" @click="confirmSeatSelection" :disabled="playerSeatId === -1">
+              Confirm Seat {{ playerSeatId > 0 ? playerSeatId : '' }}
+            </button>
           </div>
         </div>
       </div>
@@ -318,11 +423,11 @@ const showRaiseInput = ref(false)
 const raiseAmount = ref(0)
 const gameLog = ref([])
 const logContainer = ref(null)
-const playerSeatId = ref(null)
+const playerSeatId = ref(-1)
 const playerStatus = ref('spectator') // spectator, sitting, playing
 const buyInAmount = ref(1000)
 const showBuyInModal = ref(false)
-const showSeatSelection = ref(false)
+const showSeatSelection = ref(true)
 const availableSeats = ref([1, 2, 3, 4, 5, 6, 7, 8])
 
 // Game state polling
@@ -342,7 +447,14 @@ const isGameInProgress = computed(() => {
 })
 
 const canSitDown = computed(() => {
-  return playerStatus.value === 'spectator' && !isGameInProgress.value
+  console.log(user.uid)
+  gameState.value.spectaclors.forEach( item => {
+    if (item.playerid == user.uid) {
+      return true;
+    }
+  });
+  return false;
+  //return playerStatus.value === 'spectator' && !isGameInProgress.value
 })
 
 const canStandUp = computed(() => {
@@ -356,8 +468,8 @@ const canJoinGame = computed(() => {
 onMounted(async () => {
   await loadGameState()
   
-  // Start polling for game state updates
-  gameStateInterval = setInterval(loadGameState, 5000)
+  // Start polling for game state updates (less frequent to reduce load)
+  gameStateInterval = setInterval(loadGameState, 10000)
 })
 
 onUnmounted(() => {
@@ -369,11 +481,23 @@ onUnmounted(() => {
 
 const loadGameState = async () => {
   try {
-    loading.value = true
+    // Skip loading if we're already in the middle of loading
+    if (loading.value) {
+      console.log('Skipping loadGameState - already loading')
+      return
+    }
+    
+    // Only show loading for initial load, not for polling
+    if (!gameState.value) {
+      loading.value = true
+    }
     error.value = ''
     
-    // Get current user using our pure Pinia auth system
-    await getCurrentUser()
+    // Get current user using our pure Pinia auth system (only if not already loaded)
+    if (!user.value) {
+      await getCurrentUser()
+      console.log('Current user from auth store:', user.value)
+    }
     
     // Use the reactive user directly from our auth composable
     if (user.value) {
@@ -382,10 +506,20 @@ const loadGameState = async () => {
       console.log('Loaded user from Pinia auth store:', player.value)
     } else {
       // Fall back to direct API call if needed
-      const userResponse = await getUserProfile()
-      if (userResponse.data) {
-        player.value = userResponse.data
-        gameStore.setUser(userResponse.data)
+      // Try to get user profile - if we have a token, this should work
+      try {
+        const userResponse = await getUserProfile()
+        if (userResponse.data && userResponse.data.success) {
+          player.value = userResponse.data.data
+          gameStore.setUser(userResponse.data.data)
+          console.log('Loaded user from API fallback:', player.value)
+        } else {
+          console.error('Failed to load user from API:', userResponse.data)
+          throw new Error('Could not load user data')
+        }
+      } catch (err) {
+        console.error('API fallback failed:', err)
+        throw new Error('Not authenticated - please login first')
       }
     }
     
@@ -394,11 +528,13 @@ const loadGameState = async () => {
     
     if (stateResponse.data && stateResponse.data.success) {
       gameState.value = stateResponse.data.data
+
+      console.log(gameState.value)
       
       // Update game store
       gameStore.setRoom({
-        roomid: gameState.value.room.roomid,
-        name: gameState.value.room.name,
+        roomid: gameState.value.roomid,
+        name: gameState.value.roomName,
         sbet: 50, // small blind
         bbet: 100, // big blind
         minbuy: 500,
@@ -409,7 +545,9 @@ const loadGameState = async () => {
       const currentPlayer = gameState.value.players.find(p => p.id === player.value.uid)
       if (currentPlayer) {
         player.value = { ...player.value, ...currentPlayer }
+        console.log(currentPlayer)
         playerSeatId.value = currentPlayer.seatId
+        console.log("seatId:" + playerSeatId)
         playerStatus.value = currentPlayer.seatId >= 0 ? 'sitting' : 'spectator'
         
         // If player is sitting and game is in progress, they're playing
@@ -523,8 +661,28 @@ const performAction = async (action) => {
 
 const sitDown = (seatId) => {
   playerSeatId.value = seatId
-  showSeatSelection.value = false
-  showBuyInModal.value = true
+}
+
+/**
+ * Check if a seat is occupied by another player
+ */
+const isSeatOccupied = (seatId) => {
+  if (!gameState.value?.players) return false
+  
+  // Check if any player is sitting at this seat (excluding current player)
+  return gameState.value.players.some(player => 
+    player.seatId === seatId && player.id !== user.value?.uid
+  )
+}
+
+/**
+ * Confirm seat selection and proceed to buy-in
+ */
+const confirmSeatSelection = () => {
+  if (playerSeatId.value > 0) {
+    showSeatSelection.value = false
+    showBuyInModal.value = true
+  }
 }
 
 const startGame = async () => {
@@ -672,8 +830,216 @@ const cancelRaise = () => {
   opacity: 0.5;
 }
 
+/* Poker Table Styles */
+.poker-table-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin: 0 auto;
+}
+
+.poker-table {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a5f3e 0%, #2d8f5f 100%);
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.poker-table::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #0a3d24 0%, #1a5f3e 100%);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.seat-position {
+  position: absolute;
+  z-index: 10;
+}
+
+/* Dealer Position - Top */
+.dealer-position {
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Top Right */
+.top-right {
+  top: 20%;
+  right: 15%;
+}
+
+/* Right Side */
+.right-top {
+  top: 35%;
+  right: 5%;
+}
+
+.right-bottom {
+  bottom: 35%;
+  right: 5%;
+}
+
+/* Bottom Right */
+.bottom-right {
+  bottom: 20%;
+  right: 15%;
+}
+
+/* Bottom Left */
+.bottom-left {
+  bottom: 20%;
+  left: 15%;
+}
+
+/* Left Side */
+.left-bottom {
+  bottom: 35%;
+  left: 5%;
+}
+
+.left-top {
+  top: 35%;
+  left: 5%;
+}
+
+/* Table Center */
+.table-center {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.seat-card {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 3px solid #dee2e6;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.seat-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.seat-card.occupied {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-color: #f5c6cb;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.seat-card.selected {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-color: #c3e6cb;
+  box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+}
+
+.seat-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.seat-label {
+  font-size: 0.7rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.seat-occupied {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #dc3545;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  white-space: nowrap;
+}
+
+.your-position {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px 25px;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.seat-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #dee2e6;
+}
+
+.legend-color.available {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.legend-color.occupied {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+}
+
+.legend-color.selected {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
 .lobby-actions button {
   min-width: 120px;
+}
+
+.debug-info {
+  margin-top: 5px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 .modal-backdrop {
