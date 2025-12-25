@@ -301,9 +301,11 @@
 import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi'
+import { useAuth } from '@/composables/useAuth'
 import { useGameStore } from '@/stores/gameStore'
 
 const { getUserProfile, gameAction, leaveRoom, getRoomInfo } = useApi()
+const { getCurrentUser } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const gameStore = useGameStore()
@@ -370,9 +372,16 @@ const loadGameState = async () => {
     loading.value = true
     error.value = ''
     
-    // Get current user profile
-    const userResponse = await getUserProfile()
-    player.value = userResponse.data
+    // Get current user using our auth composable
+    const currentUser = await getCurrentUser()
+    if (currentUser) {
+      player.value = currentUser
+      console.log('Loaded user:', player.value)
+    } else {
+      // Fall back to direct API call if auth composable fails
+      const userResponse = await getUserProfile()
+      player.value = userResponse.data
+    }
     
     // Fetch actual game state from server
     const stateResponse = await useApi().get(`/api/v1/game/${route.params.roomId}/state`)

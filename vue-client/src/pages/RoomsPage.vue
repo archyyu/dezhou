@@ -7,7 +7,7 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h5 class="card-title mb-0">Room Types</h5>
-          <button @click="createRoom" class="btn btn-success" :disabled="loading">
+          <button @click="createRoomNow" class="btn btn-success" :disabled="loading">
             Create Room
           </button>
         </div>
@@ -62,16 +62,16 @@
                   <h5 class="card-title mb-1">{{ room.name }}</h5>
                   <p class="card-text mb-1">
                     <span class="badge bg-secondary me-2">{{ room.roomTypeName }}</span>
-                    <span class="text-muted">Players: {{ room.getPlayerCount() }} / {{ room.maxPlayers }}</span>
+                    <span class="text-muted">Players: {{ 1 }} / {{ room.maxPlayers }}</span>
                   </p>
                 </div>
                 <div>
                   <button 
-                    @click="joinRoom(room.roomid)" 
+                    @click="joinRoomNow(room.roomid)" 
                     class="btn btn-primary btn-sm" 
-                    :disabled="loading || room.getPlayerCount() >= room.maxPlayers"
+                    :disabled="loading || 1 >= room.maxPlayers"
                   >
-                    {{ room.getPlayerCount() >= room.maxPlayers ? 'Full' : 'Join' }}
+                    {{ 1 >= room.maxPlayers ? 'Full' : 'Join' }}
                   </button>
                 </div>
               </div>
@@ -140,6 +140,7 @@ let createRoomModal = null
 // Room type counts
 const roomTypeCount = computed(() => {
   const counts = {}
+  console.log(rooms)
   rooms.value.forEach(room => {
     counts[room.roomTypeId] = (counts[room.roomTypeId] || 0) + 1
   })
@@ -157,7 +158,7 @@ const loadRoomTypes = async () => {
     loadingRoomTypes.value = true
     error.value = ''
     const response = await getRoomTypeList()
-    roomTypes.value = response.data
+    roomTypes.value = response.data.data
     
     // Select first room type by default
     if (roomTypes.value.length > 0) {
@@ -179,8 +180,10 @@ const loadRoomsForType = async (roomTypeId) => {
   try {
     loadingRooms.value = true
     error.value = ''
+    rooms.value = []
     const response = await getRoomsByType(roomTypeId)
-    rooms.value = response.data
+    rooms.value = response.data.data
+    console.log(rooms)
   } catch (err) {
     error.value = 'Failed to load rooms: ' + (err.response?.data?.message || err.message)
   } finally {
@@ -188,7 +191,7 @@ const loadRoomsForType = async (roomTypeId) => {
   }
 }
 
-const createRoom = () => {
+const createRoomNow = () => {
   if (roomTypes.value.length > 0) {
     newRoomTypeId.value = roomTypes.value[0].id
     newRoomName.value = `Room ${Math.floor(Math.random() * 1000)}`
@@ -201,7 +204,7 @@ const confirmCreateRoom = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await createRoom(newRoomTypeId.value)
+    const response = await createRoom(newRoomTypeId.value, newRoomName.value)
     
     // Refresh room list
     await loadRoomsForType(selectedRoomType.value)
@@ -215,7 +218,7 @@ const confirmCreateRoom = async () => {
   }
 }
 
-const joinRoom = async (roomId) => {
+const joinRoomNow = async (roomId) => {
   try {
     loading.value = true
     error.value = ''

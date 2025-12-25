@@ -49,7 +49,7 @@ export function useApi() {
     getAllRooms: () => api.get('/api/v1/room/list'),
     joinRoom: (roomId) => api.post(`/api/v1/room/${roomId}/join`),
     leaveRoom: (roomId) => api.post(`/api/v1/room/${roomId}/leave`),
-    createRoom: (roomTypeId) => api.post(`/api/v1/room/create/${roomTypeId}`),
+    createRoom: (roomTypeId, roomName) => api.post(`/api/v1/room/create/${roomTypeId}/${roomName}`),
     
     // Game actions
     gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
@@ -57,7 +57,7 @@ export function useApi() {
     }),
     
     // User
-    getUserProfile: () => api.get('/api/v1/user/info'),
+    getUserProfile: (uid) => api.get(`/api/v1/user/info/${uid}`),
     updateProfile: (profileData) => api.put('/api/v1/user/profile', null, { 
       params: { ...profileData }
     }),

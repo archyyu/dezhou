@@ -25,7 +25,7 @@
           <label class="form-label">Password</label>
           <input v-model="testPassword" type="password" class="form-control" placeholder="password">
         </div>
-        <button @click="testLogin" class="btn btn-primary" :disabled="loading">
+        <button @click="testLoginHandler" class="btn btn-primary" :disabled="loading">
           Test Login
         </button>
         <div v-if="loginResult" class="mt-3 alert alert-success">
@@ -120,7 +120,7 @@ const testHealth = async () => {
   }
 }
 
-const testLogin = async () => {
+const testLoginHandler = async () => {
   try {
     loading.value = true
     loginError.value = ''
