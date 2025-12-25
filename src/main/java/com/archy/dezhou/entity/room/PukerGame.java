@@ -131,8 +131,8 @@ public class PukerGame
 	
 	public void gameStartHandle()
 	{
-		log.info("roomName: " + this.room.getName() + " 新一轮扑克比赛开始");
-		for(int i=1;i<5;i++)
+		log.info("roomName: " + this.room.getName() + "第" + (this.roundNum + 1) + "轮扑克比赛开始");
+		for(int i=1;i<5;i++) 
 		{
 			roundPoolBet.put(i,0);
 		}
@@ -147,8 +147,6 @@ public class PukerGame
 		this.autoSetNextBankerSeat();
 		this.autoSetPlayerState();
 		this.dispatchPukers();
-		
-		
 		
 		log.info("roomName: " + this.room.getName() + " 第 " + this.round + " 回合开始");
 		this.settleRoundPlayersOnStart();
