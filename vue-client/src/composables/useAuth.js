@@ -1,23 +1,28 @@
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useApi } from './useApi'
+import { useGameStore } from '@/stores/gameStore'
 
 /**
  * Authentication composable for managing user session and profile
+ * Uses a hybrid approach: Pinia for reactive state + localStorage for persistence
  */
 export function useAuth() {
   const user = ref(null)
   const loading = ref(false)
   const error = ref(null)
   const { getUserProfile } = useApi()
+  const gameStore = useGameStore()
 
   /**
-   * Load user from localStorage
+   * Load user from localStorage and sync with Pinia store
    */
   const loadUserFromStorage = () => {
     try {
       const storedUser = localStorage.getItem('user')
       if (storedUser) {
-        user.value = JSON.parse(storedUser)
+        const parsedUser = JSON.parse(storedUser)
+        user.value = parsedUser
+        gameStore.setUser(parsedUser) // Sync with Pinia store
         return true
       }
       return false
@@ -29,6 +34,7 @@ export function useAuth() {
 
   /**
    * Get current user - tries localStorage first, then API
+   * Always syncs with Pinia store for reactivity
    */
   const getCurrentUser = async (forceRefresh = false) => {
     if (!forceRefresh && loadUserFromStorage()) {
@@ -42,6 +48,7 @@ export function useAuth() {
       const response = await getUserProfile()
       if (response.data) {
         user.value = response.data
+        gameStore.setUser(response.data) // Sync with Pinia store
         // Update localStorage with fresh data
         localStorage.setItem('user', JSON.stringify(response.data))
         return response.data
@@ -64,12 +71,13 @@ export function useAuth() {
   }
 
   /**
-   * Clear authentication data
+   * Clear authentication data from both localStorage and Pinia
    */
   const clearAuth = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     user.value = null
+    gameStore.clearUser()
   }
 
   /**
@@ -79,10 +87,27 @@ export function useAuth() {
     return localStorage.getItem('token')
   }
 
+  /**
+   * Sync user changes to localStorage for persistence
+   */
+  const syncUserToStorage = () => {
+    if (user.value) {
+      localStorage.setItem('user', JSON.stringify(user.value))
+    }
+  }
+
   // Load user from storage on mount
   onMounted(() => {
     loadUserFromStorage()
   })
+
+  // Watch for user changes and sync to localStorage
+  watch(user, (newUser) => {
+    if (newUser) {
+      gameStore.setUser(newUser)
+      syncUserToStorage()
+    }
+  }, { deep: true })
 
   return {
     user,
@@ -92,6 +117,7 @@ export function useAuth() {
     isAuthenticated,
     clearAuth,
     getToken,
-    loadUserFromStorage
+    loadUserFromStorage,
+    syncUserToStorage
   }
 }

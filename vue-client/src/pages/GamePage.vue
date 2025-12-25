@@ -372,15 +372,17 @@ const loadGameState = async () => {
     loading.value = true
     error.value = ''
     
-    // Get current user using our auth composable
+    // Get current user using our auth composable (which syncs with Pinia)
     const currentUser = await getCurrentUser()
     if (currentUser) {
-      player.value = currentUser
-      console.log('Loaded user:', player.value)
+      // Use the reactive user from Pinia store
+      player.value = gameStore.currentUser
+      console.log('Loaded user from Pinia store:', player.value)
     } else {
       // Fall back to direct API call if auth composable fails
       const userResponse = await getUserProfile()
       player.value = userResponse.data
+      gameStore.setUser(userResponse.data) // Sync with Pinia
     }
     
     // Fetch actual game state from server

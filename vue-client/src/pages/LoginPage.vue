@@ -58,9 +58,11 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
 const { login } = useApi()
+const { getCurrentUser } = useAuth()
 
 const form = ref({
   account: '',
@@ -88,10 +90,14 @@ const handleLogin = async () => {
       // New API response format
       localStorage.setItem('token', response.data.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.data.user))
+      // Load user into our auth system (which syncs with Pinia)
+      await getCurrentUser()
     } else if (response.data && response.data.token) {
       // Legacy response format
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
+      // Load user into our auth system (which syncs with Pinia)
+      await getCurrentUser()
     } else {
       throw new Error('Invalid response format: ' + JSON.stringify(response.data))
     }
