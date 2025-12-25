@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
@@ -23,6 +24,7 @@ import com.archy.dezhou.entity.RoomDB;
 public class GameRoom
 {
 
+	@JsonIgnore
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private int roomid;
@@ -38,8 +40,10 @@ public class GameRoom
 	}
 
 	public String creator;
+	@JsonIgnore
 	private PukerGame pokerGame = null;
 	//进入房间，但是尚未坐下的玩家
+	@JsonIgnore
 	private Set<Player> spectatorList = Collections.synchronizedSet( new HashSet<Player>() );
 	private boolean isLimbo;
 	private String zone;
@@ -60,6 +64,7 @@ public class GameRoom
 
 	private static AtomicInteger autoId = new AtomicInteger(0);
 
+	@JsonIgnore
 	private Map<Integer,Player> playerMap = new Hashtable<Integer,Player>();
 
 	public boolean isPlayerInRoom(Player user)
@@ -428,6 +433,8 @@ public class GameRoom
 	private void setRoomID()
 	{
 		roomid = autoId.getAndIncrement();
+		this.minPlayers = 2;
+		this.maxPlayers = 9;
 	}
 
 	public static void resetRoomStaticData()

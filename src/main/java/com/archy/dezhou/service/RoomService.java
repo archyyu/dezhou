@@ -34,8 +34,11 @@ public class RoomService{
 		return this.roomDBMapper.selectAllRooms();
 	}
 	
-	public GameRoom getRoom(int id)
+	public GameRoom getRoom(Integer id)
 	{
+		if (id == null) {
+			return null;
+		}
 		return roomsMap.get(id);
 	}
 	
@@ -49,12 +52,13 @@ public class RoomService{
 		return null;
 	}
 	
-	public GameRoom createGameRoom(String uid, String userName, int roomTypeId) {
+	public GameRoom createGameRoom(String uid, String userName, int roomTypeId, String roomName) {
 
 		RoomDB roomDB = this.roomDBMapper.selectByPrimaryKey(roomTypeId);
 
 		GameRoom gameRoom = new GameRoom(roomDB);
 		gameRoom.setCreator(userName);
+		gameRoom.setName(roomName);
 
 		this.roomsMap.put(gameRoom.getRoomid(), gameRoom);
 
