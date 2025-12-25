@@ -62,7 +62,7 @@ import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
 const { login } = useApi()
-const { getCurrentUser } = useAuth()
+const { initializeAuth, getCurrentUser } = useAuth()
 
 const form = ref({
   account: '',
@@ -87,17 +87,11 @@ const handleLogin = async () => {
     
     // Handle the API response format correctly
     if (response.data && response.data.success && response.data.data) {
-      // New API response format
-      localStorage.setItem('token', response.data.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.data.user))
-      // Load user into our auth system (which syncs with Pinia)
-      await getCurrentUser()
+      // New API response format - use pure Pinia approach
+      initializeAuth(response.data.data.token, response.data.data.user)
     } else if (response.data && response.data.token) {
-      // Legacy response format
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      // Load user into our auth system (which syncs with Pinia)
-      await getCurrentUser()
+      // Legacy response format - use pure Pinia approach
+      initializeAuth(response.data.token, response.data.user)
     } else {
       throw new Error('Invalid response format: ' + JSON.stringify(response.data))
     }

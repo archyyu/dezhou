@@ -1,123 +1,97 @@
-import { ref, onMounted, watch } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
 import { useApi } from './useApi'
-import { useGameStore } from '@/stores/gameStore'
 
 /**
  * Authentication composable for managing user session and profile
- * Uses a hybrid approach: Pinia for reactive state + localStorage for persistence
+ * Pure Pinia implementation - uses authStore for all state management
  */
 export function useAuth() {
-  const user = ref(null)
-  const loading = ref(false)
-  const error = ref(null)
+  const authStore = useAuthStore()
   const { getUserProfile } = useApi()
-  const gameStore = useGameStore()
 
   /**
-   * Load user from localStorage and sync with Pinia store
+   * Get current user from Pinia store, fetch from API if needed
    */
-  const loadUserFromStorage = () => {
-    try {
-      const storedUser = localStorage.getItem('user')
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser)
-        user.value = parsedUser
-        gameStore.setUser(parsedUser) // Sync with Pinia store
-        return true
-      }
-      return false
-    } catch (err) {
-      console.error('Failed to parse user from localStorage:', err)
-      return false
+  const getCurrentUser = async (forceRefresh = false) => {
+    // If we have a user in store and don't need to refresh, return it
+    if (!forceRefresh && authStore.user) {
+      return authStore.user
     }
+
+    // If we have a token but no user, try to fetch user profile
+    if (authStore.token) {
+      try {
+        authStore.setLoading(true)
+        authStore.setError(null)
+        
+        const response = await getUserProfile()
+        if (response.data) {
+          authStore.setUser(response.data)
+          return response.data
+        }
+      } catch (err) {
+        authStore.setError(err.response?.data?.message || err.message || 'Failed to fetch user')
+        console.error('Failed to get current user:', err)
+        return null
+      } finally {
+        authStore.setLoading(false)
+      }
+    }
+    
+    return authStore.user
   }
 
   /**
-   * Get current user - tries localStorage first, then API
-   * Always syncs with Pinia store for reactivity
+   * Initialize authentication from existing session (token + user)
    */
-  const getCurrentUser = async (forceRefresh = false) => {
-    if (!forceRefresh && loadUserFromStorage()) {
-      return user.value
-    }
-
-    try {
-      loading.value = true
-      error.value = null
-      
-      const response = await getUserProfile()
-      if (response.data) {
-        user.value = response.data
-        gameStore.setUser(response.data) // Sync with Pinia store
-        // Update localStorage with fresh data
-        localStorage.setItem('user', JSON.stringify(response.data))
-        return response.data
-      }
-      return null
-    } catch (err) {
-      error.value = err.response?.data?.message || err.message || 'Failed to fetch user'
-      console.error('Failed to get current user:', err)
-      return null
-    } finally {
-      loading.value = false
-    }
+  const initializeAuth = (token, user) => {
+    authStore.initializeFromSession(token, user)
   }
 
   /**
    * Check if user is authenticated
    */
   const isAuthenticated = () => {
-    return !!localStorage.getItem('token') && !!localStorage.getItem('user')
+    return authStore.isAuthenticated
   }
 
   /**
-   * Clear authentication data from both localStorage and Pinia
+   * Clear authentication data
    */
   const clearAuth = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    user.value = null
-    gameStore.clearUser()
+    authStore.clearAuth()
   }
 
   /**
    * Get authentication token
    */
   const getToken = () => {
-    return localStorage.getItem('token')
+    return authStore.token
   }
 
   /**
-   * Sync user changes to localStorage for persistence
+   * Update user profile
    */
-  const syncUserToStorage = () => {
-    if (user.value) {
-      localStorage.setItem('user', JSON.stringify(user.value))
-    }
+  const updateProfile = (profileData) => {
+    authStore.updateUserProfile(profileData)
   }
 
-  // Load user from storage on mount
-  onMounted(() => {
-    loadUserFromStorage()
-  })
-
-  // Watch for user changes and sync to localStorage
-  watch(user, (newUser) => {
-    if (newUser) {
-      gameStore.setUser(newUser)
-      syncUserToStorage()
-    }
-  }, { deep: true })
-
   return {
-    user,
-    loading,
-    error,
+    // Direct access to auth store state
+    user: authStore.currentUser,
+    token: authStore.authToken,
+    loading: authStore.loading,
+    error: authStore.error,
+    isAuthenticated: authStore.isAuth,
+    
+    // Auth actions
     getCurrentUser,
-    isAuthenticated,
+    initializeAuth,
     clearAuth,
     getToken,
-    loadUserFromStorage,
-    syncUserToStorage
+    updateProfile,
+    
+    // Direct store access for advanced use cases
+    authStore
   }
 }

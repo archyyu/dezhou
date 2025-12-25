@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * API composable for making HTTP requests to the backend
@@ -15,9 +16,10 @@ export function useApi() {
     }
   })
 
-  // Add request interceptor for authentication
+  // Add request interceptor for authentication using Pinia store
   api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token')
+    const authStore = useAuthStore()
+    const token = authStore.token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

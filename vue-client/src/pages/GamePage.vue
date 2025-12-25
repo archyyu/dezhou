@@ -305,7 +305,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useGameStore } from '@/stores/gameStore'
 
 const { getUserProfile, gameAction, leaveRoom, getRoomInfo } = useApi()
-const { getCurrentUser } = useAuth()
+const { getCurrentUser, user } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const gameStore = useGameStore()
@@ -372,17 +372,21 @@ const loadGameState = async () => {
     loading.value = true
     error.value = ''
     
-    // Get current user using our auth composable (which syncs with Pinia)
-    const currentUser = await getCurrentUser()
-    if (currentUser) {
-      // Use the reactive user from Pinia store
-      player.value = gameStore.currentUser
-      console.log('Loaded user from Pinia store:', player.value)
+    // Get current user using our pure Pinia auth system
+    await getCurrentUser()
+    
+    // Use the reactive user directly from our auth composable
+    if (user.value) {
+      player.value = user.value
+      gameStore.setUser(user.value) // Also sync with gameStore for consistency
+      console.log('Loaded user from Pinia auth store:', player.value)
     } else {
-      // Fall back to direct API call if auth composable fails
+      // Fall back to direct API call if needed
       const userResponse = await getUserProfile()
-      player.value = userResponse.data
-      gameStore.setUser(userResponse.data) // Sync with Pinia
+      if (userResponse.data) {
+        player.value = userResponse.data
+        gameStore.setUser(userResponse.data)
+      }
     }
     
     // Fetch actual game state from server
