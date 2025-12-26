@@ -12,64 +12,67 @@
     </div>
     
     <div v-if="!loading && gameState" class="game-container">
-      <!-- Game Header -->
-      <div class="game-header card mb-4">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <h2 class="mb-0">{{ gameState.name }}</h2>
-              <p class="text-muted mb-0">
-                {{ gameState.roomTypeName }} | 
-                Players: {{ gameState.players.length }} / {{ gameState.maxPlayers }}
-              </p>
-            </div>
-            <div>
-              <button @click="leaveRoomNow" class="btn btn-danger" :disabled="loading">
-                Leave Room
-              </button>
-            </div>
-          </div>
+      <!-- Room Info Display -->
+      <div class="room-info-display">
+        <div class="room-header">
+          <h2>{{ gameState.name }}</h2>
+          <p class="room-type">{{ gameState.roomTypeName }}</p>
         </div>
-      </div>
-      
-      <!-- Game Status -->
-      <div class="game-status card mb-4">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-              <h5>Current Hand: {{ gameState?.currentHand || 'N/A' }}</h5>
-              <p class="mb-0">Pot: {{ gameState?.pot || 0 }} chips</p>
-              <p class="mb-0">Game Phase: {{ gameState?.gamePhase || 'LOBBY' }}</p>
-            </div>
-            <div>
-              <h5>Current Bet: {{ gameState?.currentBet || 0 }} chips</h5>
-              <p class="mb-0">Your Chips: {{ currentPlayer?.chips || player.allMoney || 0 }}</p>
-              <p class="mb-0">Your Seat: {{ playerSeatId.value || 'Not seated' }}</p>
-            </div>
-            <div>
-              <span class="badge bg-primary me-2">Status: {{ playerStatus.value }}</span>
-              <span v-if="isPlayerTurn" class="badge bg-success">Your Turn!</span>
-            </div>
+        
+        <div class="room-stats">
+          <div class="stat-item">
+            <span class="stat-label">Players</span>
+            <span class="stat-value">{{ gameState.players.length }} / {{ gameState.maxPlayers }}</span>
           </div>
           
-          <!-- Lobby Actions -->
-          <div v-if="!isGameInProgress" class="lobby-actions d-flex gap-2">
+          <div class="stat-item">
+            <span class="stat-label">Current Hand</span>
+            <span class="stat-value">{{ gameState?.currentHand || 'N/A' }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Pot</span>
+            <span class="stat-value">{{ gameState?.pot || 0 }} chips</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Current Bet</span>
+            <span class="stat-value">{{ gameState?.currentBet || 0 }} chips</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Your Chips</span>
+            <span class="stat-value">{{ currentPlayer?.chips || player.allMoney || 0 }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Your Seat</span>
+            <span class="stat-value">{{ playerSeatId.value || 'Not seated' }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Status</span>
+            <span class="stat-value">{{ playerStatus.value }}</span>
+          </div>
+          
+          <div class="stat-item">
+            <span class="stat-label">Game Phase</span>
+            <span class="stat-value">{{ gameState?.gamePhase || 'LOBBY' }}</span>
+          </div>
+        </div>
+        
+        <div class="room-actions">
+          <button @click="leaveRoomNow" class="btn btn-danger" :disabled="loading">
+            Leave Room
+          </button>
+          
+          <div v-if="!isGameInProgress" class="lobby-actions">
             <button 
               @click="showSeatSelection = true"
               class="btn btn-primary" 
               :disabled="false"
             >
               Sit Down
-            </button>
-            
-            <!-- Debug info -->
-            <div class="debug-info text-muted small ms-3">
-              Status: {{ playerStatus.value }} | Can Sit: {{ canSitDown }} | Game: {{ gameState.value?.gamePhase || 'N/A' }}
-            </div>
-            
-            <!-- Debug button to force show seat selection -->
-            <button @click="showSeatSelection = true" class="btn btn-sm btn-outline-danger ms-2">
-              🔧 Debug: Show Seats
             </button>
             
             <button 
@@ -91,13 +94,14 @@
         </div>
       </div>
       
-      <!-- Player Hand -->
-      <div class="player-hand card mb-4">
-        <div class="card-body">
+      <!-- Main Table Area -->
+      <div class="table-area">
+        <!-- Player Hand -->
+        <div class="player-hand">
           <h5>Your Hand</h5>
-          <div class="hand-cards d-flex justify-content-center">
-            <div v-if="currentPlayer?.hand && currentPlayer.hand.length > 0" class="d-flex gap-3">
-              <div v-for="(card, index) in currentPlayer.hand" :key="index" class="card" style="width: 80px;">
+          <div class="hand-cards">
+            <div v-if="currentPlayer?.hand && currentPlayer.hand.length > 0" class="cards-container">
+              <div v-for="(card, index) in currentPlayer.hand" :key="index" class="card">
                 <div class="card-body p-2 text-center">
                   <div class="card-suit" :class="{'text-danger': card.suit === '♥' || card.suit === '♦'}">{{ card.suit }}</div>
                   <div class="card-rank">{{ card.rank }}</div>
@@ -109,13 +113,11 @@
             </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Community Cards -->
-      <div class="community-cards card mb-4">
-        <div class="card-body">
+        
+        <!-- Community Cards -->
+        <div class="community-cards">
           <h5>Community Cards ({{ gameState?.communityCards?.length || 0 }}/5)</h5>
-          <div class="community-cards-container d-flex justify-content-center">
+          <div class="community-cards-container">
             <div v-for="(card, index) in gameState?.communityCards" :key="index" class="card me-2">
               <div class="card-body p-2 text-center">
                 <div class="card-suit" :class="{'text-danger': card.suit === '♥' || card.suit === '♦'}">{{ card.suit }}</div>
@@ -126,29 +128,27 @@
               <div class="card-body p-2"></div>
             </div>
           </div>
-          <div v-if="gameState?.gamePhase" class="text-center mt-2">
+          <div v-if="gameState?.gamePhase" class="game-phase-badge">
             <span class="badge bg-info">
               {{ gamePhaseText(gameState.gamePhase) }}
             </span>
           </div>
         </div>
-      </div>
-      
-      <!-- Player Actions -->
-      <div class="player-actions card mb-4">
-        <div class="card-body">
+        
+        <!-- Player Actions -->
+        <div class="player-actions">
           <h5 v-if="isGameInProgress">
             {{ isPlayerTurn ? 'Your Turn' : `Waiting for Player ${gameState.currentTurnPlayerId}` }}
           </h5>
           <h5 v-else>Game Lobby</h5>
           
-          <div v-if="isGameInProgress && currentPlayer" class="player-info mb-3">
+          <div v-if="isGameInProgress && currentPlayer" class="player-info">
             <p class="mb-0">Your chips: <strong>{{ currentPlayer.chips }}</strong></p>
             <p class="mb-0">Current bet: <strong>{{ gameState.currentBet }}</strong></p>
             <p class="mb-0">Pot: <strong>{{ gameState.pot }}</strong></p>
           </div>
           
-          <div class="action-buttons d-flex justify-content-center gap-2">
+          <div class="action-buttons">
             <!-- Game Actions (only when game is in progress) -->
             <button 
               v-if="isGameInProgress && isPlayerTurn"
@@ -206,7 +206,7 @@
           </div>
           
           <!-- Raise Amount Input (shown when raise is clicked) -->
-          <div v-if="showRaiseInput" class="mt-3">
+          <div v-if="showRaiseInput" class="raise-input">
             <div class="input-group">
               <input 
                 v-model="raiseAmount" 
@@ -224,11 +224,9 @@
             </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Game Log -->
-      <div class="game-log card">
-        <div class="card-body">
+        
+        <!-- Game Log -->
+        <div class="game-log">
           <h5>Game Log</h5>
           <div class="log-container" ref="logContainer">
             <div v-for="(log, index) in gameLog" :key="index" class="log-entry">
@@ -1070,5 +1068,165 @@ const cancelRaise = () => {
 .game-log {
   background-color: #6c757d1a;
   border-left: 4px solid #6c757d;
+}
+
+/* New styles for the simplified layout */
+.room-info-display {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.room-header {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.room-header h2 {
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.room-type {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.room-stats {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 10px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.room-actions {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lobby-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-area {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.player-hand {
+  grid-column: 1;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.community-cards {
+  grid-column: 2;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.player-actions {
+  grid-column: 3;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.game-log {
+  grid-column: 1 / span 3;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.game-phase-badge {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.cards-container .card {
+  width: 80px;
+}
+
+.community-cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.community-cards-container .card {
+  width: 60px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.action-buttons button {
+  width: 100%;
+}
+
+.raise-input {
+  margin-top: 15px;
+}
+
+.player-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
 }
 </style>

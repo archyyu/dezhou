@@ -64,6 +64,8 @@ public class GameRoom
 
 	private static AtomicInteger autoId = new AtomicInteger(0);
 
+	private volatile IRoomState roomState = new RoomStateReady();
+
 	@JsonIgnore
 	private Map<Integer,Player> playerMap = new Hashtable<Integer,Player>();
 
@@ -270,39 +272,11 @@ public class GameRoom
 		return response;
 	}
 	
-	private class RoomStateFight implements IRoomState
-	{
-		
-		public RoomStateFight()
-		{
-			timer = new HeartTimer(1*1000);
-		}
-		
-		@Override
-		public void beatHear(long now)
-		{
-			if( this.timer != null && this.timer.Check(now))
-			{
-				pokerGame.beatHeart(now);
-				this.timer.setNextTick();
-			}
-		}
-
-		@Override
-		public boolean isGame()
-		{
-			return true;
-		}
-		
-		private HeartTimer timer = null;
-		
-	}
+	
 
 	public int getPlayerCount() {
 		return this.playerMap.size();
 	}
-
-	private volatile IRoomState roomState = new RoomStateReady();
 
 	public int userJoin(Player u)
 	{
@@ -661,6 +635,35 @@ public class GameRoom
 		this.showname = showname;
 	}
 
+	// two game states
+	private class RoomStateFight implements IRoomState
+	{
+		
+		public RoomStateFight()
+		{
+			timer = new HeartTimer(1*1000);
+		}
+		
+		@Override
+		public void beatHear(long now)
+		{
+			if( this.timer != null && this.timer.Check(now))
+			{
+				pokerGame.beatHeart(now);
+				this.timer.setNextTick();
+			}
+		}
+
+		@Override
+		public boolean isGame()
+		{
+			return true;
+		}
+		
+		private HeartTimer timer = null;
+		
+	}
+
 	private class RoomStateReady implements IRoomState
 	{
 
@@ -681,7 +684,7 @@ public class GameRoom
 		{
 			if( this.timer != null && this.timer.Check(now))
 			{
-				if(playerMap.size() >= 2 && playerMap.size() >= 2)
+				if(playerMap.size() >= 2)
 				{
 					this.timer = null;
 					roomState = new RoomStateFight();

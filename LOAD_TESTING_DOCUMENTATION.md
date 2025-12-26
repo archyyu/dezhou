@@ -23,6 +23,35 @@ This document outlines a comprehensive approach to load testing the Puker game s
 - **Database**: Same version as production with test data
 - **k6 Installation**: Node.js-based tool for modern load testing
 
+## Authentication Requirements
+
+All API endpoints in the Puker game server require JWT authentication. Before running any load tests, users must:
+
+1. **Login** to obtain a JWT token via the `/api/login` endpoint
+2. **Include the token** in the `Authorization: Bearer <token>` header for all subsequent requests
+3. **Handle token expiration** - tokens may need to be refreshed during long-running tests
+
+The test scenarios below have been updated to include proper authentication flows using k6's `setup()` function to obtain tokens before running the main test iterations.
+
+## Game Command Reference
+
+The Puker game server uses numeric command codes for game actions:
+
+| Action | Command Code | Description |
+|--------|--------------|-------------|
+| Look Cards | `1` | CMD_LOOK_CARD - Reveal player's hand |
+| Call | `2` | CMD_ADD_BET - Add bet (call when amount = current bet) |
+| Raise | `2` | CMD_ADD_BET - Add bet (raise when amount > current bet) |
+| Follow Bet | `3` | CMD_FOLLOW_BET - Call current bet |
+| Fold | `4` | CMD_DROP_CARD - Fold current hand |
+| All In | `5` | CMD_ALL_IN - Bet all remaining chips |
+| Sit Down | `6` | CMD_SITDOWN - Join a table seat |
+| Stand Up | `7` | CMD_STANDUP - Leave table seat |
+| Leave Room | `8` | CMD_LEAVE - Exit room completely |
+| Start Game | `sbot` | CMD_SBOT - Start game/deal initial cards |
+
+The complete gameplay simulation uses these commands in the proper sequence: login → create room → join room → start game (sbot) → betting actions (2, 3, 4).
+
 ## Test Scenarios
 
 ### Scenario 1: Room Creation Stress Test
@@ -56,7 +85,42 @@ export const options = {
   }
 };
 
-export default function () {
+// Setup function to authenticate and get JWT token
+export function setup() {
+  // Login to get authentication token
+  const loginPayload = JSON.stringify({
+    name: `loadtest_user_${randomString(6)}`,
+    password: 'testpassword'
+  });
+  
+  const loginParams = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  
+  const loginRes = http.post('http://localhost:8080/api/login', loginPayload, loginParams);
+  
+  if (loginRes.status !== 200) {
+    console.error('Login failed:', loginRes.body);
+    return null;
+  }
+  
+  const loginData = loginRes.json();
+  const token = loginData.data.token;
+  
+  return {
+    token: token,
+    userId: loginData.data.user.uid
+  };
+}
+
+export default function (data) {
+  if (!data || !data.token) {
+    console.error('No authentication token available');
+    return;
+  }
+  
   const roomName = `TestRoom_${randomString(8)}`;
   const payload = JSON.stringify({
     name: roomName,
@@ -67,6 +131,7 @@ export default function () {
   const params = {
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${data.token}`,
     },
   };
   
@@ -116,7 +181,42 @@ export const options = {
 // Pre-create rooms (this would be done in setup)
 const roomIds = Array(500).fill().map((_, i) => `room_${i}`);
 
-export default function () {
+// Setup function to authenticate and get JWT token
+export function setup() {
+  // Login to get authentication token
+  const loginPayload = JSON.stringify({
+    name: `loadtest_user_${randomString(6)}`,
+    password: 'testpassword'
+  });
+  
+  const loginParams = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  
+  const loginRes = http.post('http://localhost:8080/api/login', loginPayload, loginParams);
+  
+  if (loginRes.status !== 200) {
+    console.error('Login failed:', loginRes.body);
+    return null;
+  }
+  
+  const loginData = loginRes.json();
+  const token = loginData.data.token;
+  
+  return {
+    token: token,
+    userId: loginData.data.user.uid
+  };
+}
+
+export default function (data) {
+  if (!data || !data.token) {
+    console.error('No authentication token available');
+    return;
+  }
+  
   const roomId = roomIds[randomIntBetween(0, 499)];
   const playerName = `Bot_${randomString(8)}`;
   
@@ -130,6 +230,7 @@ export default function () {
   const params = {
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${data.token}`,
     },
   };
   
@@ -144,66 +245,312 @@ export default function () {
 }
 ```
 
-### Scenario 3: Gameplay Simulation
-**Objective**: Test actual gameplay performance under load
+### Scenario 3: Complete Gameplay Simulation
+**Objective**: Test the full gameplay lifecycle from login to betting under load
 
 **Test Parameters**:
-- Active rooms: 200
-- Players per room: 8
-- Hands per room: 1000
+- Test users: 200
+- Rooms per user: 1
+- Players per room: 8 (including creator)
+- Hands per room: 50
 - Bot strategies:
   - 70%: Always call
-  - 20%: Random raise (2-5x)
-  - 10%: Random fold
+  - 20%: Random raise (2-5x current bet)
+  - 10%: Random fold based on hand strength
 
 **Success Criteria**:
-- All hands complete successfully
+- All users successfully authenticate
+- All rooms created successfully
+- All players join their respective rooms
+- Games start without errors
+- All betting actions complete successfully
 - No deadlocks or race conditions
-- Consistent game state
-- Acceptable response times (<500ms per action)
+- Consistent game state throughout
+- Acceptable response times (<500ms for actions, <800ms for room operations)
 
 **k6 Implementation**:
 ```javascript
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check, sleep, group } from 'k6';
 import { randomIntBetween, randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 
 export const options = {
   stages: [
-    { duration: '5m', target: 200 },  // Ramp-up to 200 RPS
-    { duration: '30m', target: 200 }, // Maintain 200 RPS
-    { duration: '5m', target: 0 },   // Ramp-down
+    { duration: '5m', target: 50 },   // Ramp-up to 50 VUs
+    { duration: '15m', target: 50 },  // Maintain 50 VUs for gameplay
+    { duration: '5m', target: 0 },    // Ramp-down
   ],
   thresholds: {
     http_req_failed: ['rate<0.01'],
-    http_req_duration: ['p(95)<500'],
+    http_req_duration: ['p(95)<1000'], // Slightly higher threshold for full workflow
   }
 };
 
-// Pre-create rooms with players (setup phase)
-const roomIds = Array(200).fill().map((_, i) => `room_${i}`);
-const playerIds = {};
+// Global state for the test
+const testState = {
+  users: [],
+  rooms: new Map(), // roomId -> { creatorId, players: [] }
+  currentHand: 0,
+  maxHands: 50
+};
 
-// Initialize phase - join players to rooms
-function setup() {
-  roomIds.forEach(roomId => {
-    playerIds[roomId] = [];
-    for (let i = 0; i < 8; i++) {
-      const playerName = `Bot_${roomId}_${i}`;
-      const payload = JSON.stringify({
-        roomId: roomId,
-        playerName: playerName,
-        startingChips: 1000,
-        botStrategy: getRandomStrategy()
+export function setup() {
+  console.log('Setting up complete gameplay simulation...');
+  
+  // Pre-create test users and their authentication tokens
+  for (let i = 0; i < 200; i++) {
+    const userId = i;
+    const username = `loadtest_user_${userId}`;
+    const password = 'testpassword';
+    
+    // Login to get authentication token
+    const loginPayload = JSON.stringify({
+      name: username,
+      password: password
+    });
+    
+    const loginParams = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    
+    const loginRes = http.post('http://localhost:8080/api/login', loginPayload, loginParams);
+    
+    if (loginRes.status === 200) {
+      const loginData = loginRes.json();
+      testState.users.push({
+        userId: userId,
+        username: username,
+        token: loginData.data.token,
+        playerId: loginData.data.user.uid
       });
-      
-      const res = http.post('http://localhost:8080/api/rooms/join', payload, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (res.status === 200) {
-        playerIds[roomId].push(res.json().playerId);
+    } else {
+      console.error(`Login failed for user ${username}:`, loginRes.body);
+    }
+  }
+  
+  console.log(`Successfully authenticated ${testState.users.length} users`);
+  return testState;
+}
+
+export default function (data) {
+  if (!data || data.users.length === 0) {
+    console.error('No authenticated users available');
+    return;
+  }
+  
+  // Select a random user for this iteration
+  const userIndex = randomIntBetween(0, data.users.length - 1);
+  const user = data.users[userIndex];
+  
+  // Execute the complete gameplay workflow
+  executeGameplayWorkflow(user, data);
+  
+  // Sleep to simulate realistic player behavior
+  sleep(randomIntBetween(1, 3));
+}
+
+function executeGameplayWorkflow(user, data) {
+  group('Complete Gameplay Workflow', function () {
+    
+    // Step 1: Create a room (if user doesn't have one yet)
+    const userRoom = Array.from(data.rooms.values()).find(room => room.creatorId === user.userId);
+    
+    if (!userRoom) {
+      const roomId = createRoom(user);
+      if (roomId) {
+        data.rooms.set(roomId, {
+          creatorId: user.userId,
+          players: [user.playerId],
+          status: 'LOBBY',
+          currentHand: 0
+        });
       }
+    }
+    
+    // Step 2: Find or join a room
+    const roomId = findUserRoom(user.userId, data);
+    if (!roomId) {
+      console.log(`User ${user.userId} could not find or create a room`);
+      return;
+    }
+    
+    const room = data.rooms.get(roomId);
+    
+    // Step 3: If room is in LOBBY state, try to start the game
+    if (room.status === 'LOBBY' && room.players.length >= 2) {
+      const success = startGame(user, roomId, data);
+      if (success) {
+        room.status = 'IN_PROGRESS';
+      }
+    }
+    
+    // Step 4: If game is in progress, perform betting actions
+    if (room.status === 'IN_PROGRESS') {
+      performBettingAction(user, roomId, data);
+      
+      // Increment hand counter and check if we've reached max hands
+      room.currentHand++;
+      if (room.currentHand >= data.maxHands) {
+        room.status = 'COMPLETED';
+      }
+    }
+    
+  });
+}
+
+function createRoom(user) {
+  group('Room Creation', function () {
+    const roomName = `LoadTestRoom_${user.userId}_${randomString(4)}`;
+    const payload = JSON.stringify({
+      name: roomName,
+      roomType: 'TEXAS_HOLDEM',
+      maxPlayers: 8
+    });
+    
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`,
+      },
+    };
+    
+    const res = http.post('http://localhost:8080/api/rooms', payload, params);
+    
+    const success = check(res, {
+      'Room created successfully': (r) => r.status === 201,
+      'Response time acceptable': (r) => r.timings.duration < 800,
+    });
+    
+    if (success && res.status === 201) {
+      const roomData = res.json().data;
+      console.log(`User ${user.userId} created room ${roomData.roomid}`);
+      return roomData.roomid;
+    } else {
+      console.error(`Room creation failed for user ${user.userId}:`, res.body);
+      return null;
+    }
+  });
+}
+
+function findUserRoom(userId, data) {
+  // Look for a room created by this user
+  for (const [roomId, room] of data.rooms) {
+    if (room.creatorId === userId) {
+      return roomId;
+    }
+  }
+  
+  // If no room found, look for any room with available slots
+  for (const [roomId, room] of data.rooms) {
+    if (room.players.length < 8 && room.status === 'LOBBY') {
+      return roomId;
+    }
+  }
+  
+  return null;
+}
+
+function joinRoom(user, roomId, data) {
+  group('Room Joining', function () {
+    const payload = JSON.stringify({
+      roomId: roomId,
+      playerName: user.username,
+      startingChips: 1000,
+      botStrategy: getRandomStrategy()
+    });
+    
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`,
+      },
+    };
+    
+    const res = http.post(`http://localhost:8080/api/rooms/${roomId}/join`, payload, params);
+    
+    const success = check(res, {
+      'Player joined successfully': (r) => r.status === 200,
+      'Response time acceptable': (r) => r.timings.duration < 800,
+    });
+    
+    if (success && res.status === 200) {
+      const room = data.rooms.get(roomId);
+      if (room && !room.players.includes(user.playerId)) {
+        room.players.push(user.playerId);
+        console.log(`User ${user.userId} joined room ${roomId}, now has ${room.players.length} players`);
+      }
+      return true;
+    } else {
+      console.error(`Join failed for user ${user.userId} to room ${roomId}:`, res.body);
+      return false;
+    }
+  });
+}
+
+function startGame(user, roomId, data) {
+  group('Game Start', function () {
+    // Use the game action endpoint with sbot command to start the game
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`,
+      },
+    };
+    
+    // The sbot command starts the game (deals initial cards)
+    const res = http.post(`http://localhost:8080/api/game?cmd=sbot`, JSON.stringify({}), params);
+    
+    const success = check(res, {
+      'Game started successfully': (r) => r.status === 200,
+      'Response time acceptable': (r) => r.timings.duration < 800,
+    });
+    
+    if (success) {
+      console.log(`User ${user.userId} started game in room ${roomId}`);
+      return true;
+    } else {
+      console.error(`Game start failed for user ${user.userId} in room ${roomId}:`, res.body);
+      return false;
+    }
+  });
+}
+
+function performBettingAction(user, roomId, data) {
+  group('Betting Action', function () {
+    const actionType = getRandomAction();
+    
+    // Map action types to game commands
+    const commandMap = {
+      'CALL': '3',      // CMD_FOLLOW_BET
+      'RAISE': '2',     // CMD_ADD_BET
+      'FOLD': '4'       // CMD_DROP_CARD
+    };
+    
+    const cmd = commandMap[actionType];
+    const amount = actionType === 'RAISE' ? randomIntBetween(20, 100) : 0;
+    
+    const params = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${user.token}`,
+      },
+    };
+    
+    // Use the game action endpoint with the appropriate command
+    const url = `http://localhost:8080/api/game?cmd=${cmd}`;
+    const payload = amount > 0 ? JSON.stringify({ amount: amount }) : JSON.stringify({});
+    
+    const res = http.post(url, payload, params);
+    
+    check(res, {
+      'Action processed successfully': (r) => r.status === 200,
+      'Response time acceptable': (r) => r.timings.duration < 500,
+    });
+    
+    if (res.status !== 200) {
+      console.error(`Action failed for user ${user.userId} in room ${roomId}:`, res.body);
     }
   });
 }
@@ -215,39 +562,34 @@ function getRandomStrategy() {
   return 'SELECTIVE_FOLD';
 }
 
-export default function () {
-  const roomId = roomIds[randomIntBetween(0, 199)];
-  const players = playerIds[roomId];
-  
-  if (players && players.length > 0) {
-    const playerId = players[randomIntBetween(0, players.length - 1)];
-    
-    // Simulate player action
-    const actionType = getRandomAction();
-    const payload = JSON.stringify({
-      playerId: playerId,
-      action: actionType,
-      amount: actionType === 'RAISE' ? randomIntBetween(20, 100) : 0
-    });
-    
-    const res = http.post(`http://localhost:8080/api/rooms/${roomId}/actions`, payload, {
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    check(res, {
-      'Action processed successfully': (r) => r.status === 200,
-      'Response time acceptable': (r) => r.timings.duration < 500,
-    });
-  }
-  
-  sleep(0.5); // Higher frequency for gameplay
-}
-
 function getRandomAction() {
   const rand = randomIntBetween(1, 10);
   if (rand <= 7) return 'CALL';
   if (rand <= 9) return 'RAISE';
   return 'FOLD';
+}
+
+export function teardown(data) {
+  console.log('Cleaning up test data...');
+  
+  // Cleanup: Remove test rooms
+  for (const roomId of data.rooms.keys()) {
+    try {
+      const user = data.users[0]; // Use first user for cleanup
+      if (user && user.token) {
+        const params = {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+          },
+        };
+        http.del(`http://localhost:8080/api/rooms/${roomId}`, params);
+      }
+    } catch (e) {
+      console.error(`Failed to cleanup room ${roomId}:`, e);
+    }
+  }
+  
+  console.log('Test completed successfully');
 }
 ```
 
