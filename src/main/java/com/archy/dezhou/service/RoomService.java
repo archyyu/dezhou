@@ -13,6 +13,7 @@ import com.archy.dezhou.dao.RoomDBMapper;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.entity.room.PukerGame;
 
 import jakarta.annotation.Resource;
 
@@ -22,7 +23,7 @@ public class RoomService{
     @Resource
     private RoomDBMapper roomDBMapper;
 
-    private Map<Integer,GameRoom> roomsMap = new HashMap<Integer,GameRoom>();
+    private Map<Integer,PukerGame> roomsMap = new HashMap<Integer,PukerGame>();
 	
 	private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
 
@@ -34,7 +35,7 @@ public class RoomService{
 		return this.roomDBMapper.selectAllRooms();
 	}
 	
-	public GameRoom getRoom(Integer id)
+	public PukerGame getRoom(Integer id)
 	{
 		if (id == null) {
 			return null;
@@ -56,7 +57,7 @@ public class RoomService{
 
 		RoomDB roomDB = this.roomDBMapper.selectByPrimaryKey(roomTypeId);
 
-		GameRoom gameRoom = new GameRoom(roomDB);
+		PukerGame gameRoom = new PukerGame(roomDB);
 		gameRoom.setCreator(userName);
 		gameRoom.setName(roomName);
 
@@ -65,17 +66,17 @@ public class RoomService{
 		return gameRoom;
 	}
 	
-	public void addRoom(GameRoom room)
+	public void addRoom(PukerGame room)
 	{
 		roomsMap.put(room.getRoomid(),room);
 	}
 	
-	public List<GameRoom> getRoomList()
+	public List<PukerGame> getRoomList()
 	{
-		return new ArrayList<GameRoom>(this.roomsMap.values());
+		return new ArrayList<PukerGame>(this.roomsMap.values());
 	}
 
-	public List<GameRoom> getRoomListByTypeId(int roomTypeId) {
+	public List<PukerGame> getRoomListByTypeId(int roomTypeId) {
 		return this.roomsMap.values().stream().filter(item -> item.getRoomTypeId() == roomTypeId).collect(Collectors.toList());
 	}
 	

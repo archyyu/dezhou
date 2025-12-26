@@ -1,6 +1,8 @@
 package com.archy.dezhou.entity.response;
 
 import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.entity.room.PukerGame;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +33,7 @@ public class RoomResponse {
     /**
      * Create RoomResponse from GameRoom
      */
-    public RoomResponse(GameRoom room) {
+    public RoomResponse(PukerGame room) {
         this.roomId = room.getRoomid();
         this.name = room.getName();
         this.creator = room.getCreator();
@@ -50,8 +52,8 @@ public class RoomResponse {
             .toList();
         
         // Add game state if game is active
-        if (room.isGame() && room.getPokerGame() != null) {
-            this.gameState = new GameStateResponse(room, room.getPokerGame());
+        if (room.isGame()) {
+            this.gameState = new GameStateResponse(room);
         }
     }
 

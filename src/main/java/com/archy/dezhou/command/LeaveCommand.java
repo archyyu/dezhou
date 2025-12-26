@@ -20,8 +20,8 @@ public class LeaveCommand implements GameCommand {
     @Override
     public JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String, String> params) {
 
-        gameRoom.getGameRoom().playerLeave(player);
-        return gameRoom.playerLeave(player);
+        gameRoom.playerLeave(player);
+        return new JsonObjectWrapper();
 
     }
     

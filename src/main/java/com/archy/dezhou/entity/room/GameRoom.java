@@ -7,15 +7,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.JSONObject;
 import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
+import com.archy.dezhou.GameCmdException;
 import com.archy.dezhou.container.JsonObjectWrapper;
-import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.RoomDB;
@@ -40,8 +39,7 @@ public class GameRoom
 	}
 
 	public String creator;
-	@JsonIgnore
-	private PukerGame pokerGame = null;
+
 	//进入房间，但是尚未坐下的玩家
 	@JsonIgnore
 	private Set<Player> spectatorList = Collections.synchronizedSet( new HashSet<Player>() );
@@ -64,14 +62,16 @@ public class GameRoom
 
 	private static AtomicInteger autoId = new AtomicInteger(0);
 
-	private volatile IRoomState roomState = new RoomStateReady();
-
 	@JsonIgnore
 	private Map<Integer,Player> playerMap = new Hashtable<Integer,Player>();
 
 	public boolean isPlayerInRoom(Player user)
 	{
 		return this.playerMap.containsValue(user);
+	}
+
+	public Player getPlayerBySeat(int seatId) {
+		return this.playerMap.get(seatId);
 	}
 
 	public GameRoom() {
@@ -94,36 +94,7 @@ public class GameRoom
 		this.maxbuy = roomDB.getMaxbuy();
 		this.showname = roomDB.getShowname();
 
-		this.pokerGame = new PukerGame(this);
 	}
-
-	public GameRoom(String name ,String zone,String creator)
-	{
-		setRoomID();
-
-		this.name = name;
-		this.zone = zone;
-		this.creator = creator;
-
-
-		this.pokerGame = new PukerGame(this);
-	}
-
-	public GameRoom(JSONObject obj)
-	{
-		setRoomID();
-
-		this.name = obj.getString("name");
-		this.creator = "admin";
-		this.bbet = obj.getIntValue("bbet");
-		this.sbet = obj.getIntValue("sbet");
-		this.minbuy = obj.getIntValue("mixbuy");
-		this.maxbuy = obj.getIntValue("maxbuy");
-		this.showname = obj.getString("showname");
-
-		this.pokerGame = new PukerGame(this);
-	}
-
 
 	public int getMaxSpectator()
 	{
@@ -140,31 +111,32 @@ public class GameRoom
 		this.playerMap.remove(seatId);
 	}
 
+	public boolean isSeatTaken(int seatId) {
+		return this.playerMap.containsKey(seatId);
+	}
+
 	public List<Player> getPlayers()
 	{
-		// List<Player> players = new ArrayList<Player>();
-		// players.addAll(this.playerMap.values());
-		// return players;
 		return this.playerMap.values().stream().collect(Collectors.toList());
 	}
 	
-	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws Exception
+	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws GameCmdException
 	{
 		JsonObjectWrapper response = new JsonObjectWrapper();
 		JsonObjectWrapper userAobj = new JsonObjectWrapper();
 		if(player == null)
 		{
-			throw new Exception("playerNotExist");
+			throw new GameCmdException("playerNotExist");
 		}
 
 		if(this.playerMap.containsKey(seatId))
 		{
-			throw new Exception("HaveAlreadySitDowned");
+			throw new GameCmdException("HaveAlreadySitDowned");
 		}
 
 		if(this.playerMap.values().contains(player))
 		{
-			throw new Exception("YouHaveSitedAtOtherPlace");
+			throw new GameCmdException("YouHaveSitedAtOtherPlace");
 		}
 
 
@@ -210,68 +182,26 @@ public class GameRoom
 		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		return response;
 	}
-	
-	public JsonObjectWrapper playerStandUp(Integer uid, boolean notifyMySelf)
-	{
 
-		log.info("roomName: " + this.getName() + " try standup users: "  + uid);
-
-		int seatId = 0;
-		Player player = null;
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			if(entry.getValue().getUid().intValue() == uid)
-			{
-				seatId = entry.getKey();
-				player = entry.getValue();
-				log.info("roomName: " + this.getName() + "  standup users: "  + uid + " ok! ");
-				break;
-			}
-		}
-
-		if(player == null)
-		{
-			return null;
-		}
-
-		this.spectatorList.add(player);
-
-		log.warn("roomName: " + this.getName() + "  " + uid + " standup at seatId: " + seatId);
-
-		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
-
-		this.playerMap.remove(seatId);
-		boolean isp = this.pokerGame.isUserPlaying(player.getUid());
-		this.pokerGame.playerStandup(player.getSeatId());
-
-
-		JsonObjectWrapper response = new JsonObjectWrapper();
-		response.put("_cmd",ConstList.CMD_STANDUP);
-
-		JsonObjectWrapper playerAs = new JsonObjectWrapper();
-		playerAs.putNumber("sid",seatId);
-		playerAs.put("un",player.getAccount());
-		playerAs.putNumber("yt",player.getYourTurn());
-		playerAs.put("uid",player.getUid());
-		playerAs.put("uid",player.getUid());
-		playerAs.putNumber("ps",player.getPlayerState().value());
-		playerAs.putNumber("gs",player.getGameState().value());
-		playerAs.putBool("isp",isp);
-		playerAs.putBool("ip",true);
-		playerAs.putNumber("tb",player.getTempBet());
-		response.put("user",playerAs);
-
-		if(notifyMySelf)
-		{
-			this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
-		}
-		else
-		{
-			this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE, player.getUid());
-		}
-		return response;
+	public Player findPlayerBySeat(int seatId) {
+		return this.playerMap.get(seatId);
 	}
 	
+	public boolean playerStandUp(Player player)
+	{
+
+		log.warn("roomName: " + this.getName() + "  " + player.getUid() + " standup at seatId: " + player.getSeatId());
+		this.removePlayer(player.getSeatId());
+		this.spectatorList.add(player);
+
+		return true;
+
+	}
+	
+
+	public void removePlayerBySeat(int seatId) {
+		this.playerMap.remove(seatId);
+	}
 	
 
 	public int getPlayerCount() {
@@ -280,9 +210,9 @@ public class GameRoom
 
 	public int userJoin(Player u)
 	{
-
 		if (!this.spectatorList.contains(u))
 		{
+			u.setRoomId(getRoomid());
 			log.info("roomName: " + this.getName() + "  " + u.getUid() + " enter room as spectator");
 			this.spectatorList.add(u);
 			return 0;
@@ -294,10 +224,8 @@ public class GameRoom
 		}
 	}
 
-	public int playerLeave(Player user)
-	{
-		this.forceRemoveUser(user);
-		return 0;
+	public void removePlayerFromSpectaclors(Player player) {
+		this.spectatorList.remove(player);
 	}
 
 	public boolean isTemp()
@@ -310,47 +238,25 @@ public class GameRoom
 		return ConstList.MAXNUMPLAYEROFROOM;
 	}
 
-	public void beatHeart(long now)
-	{
-		log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
-		now = System.currentTimeMillis();
-		List<Player> users = new ArrayList<Player>();
-		users.addAll(this.playerMap.values());
-		for(Player user : users)
-		{
-			if(user.isStandUpExpired(now))
-			{
-				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " standUp expired");
-				this.playerStandUp(user.getUid(),true);
-			}
-		}
-
-		users.clear();
-		users.addAll(this.spectatorList);
-		for(Player user : users)
-		{
-			if(user.isLeaveExpired(now))
-			{
-				if(this.isPlayerSitDown(user.getUid()))
-				{
-					continue;
-				}
-				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " leave room expired");
-				this.playerLeave(user);
-			}
-		}
-
-		this.roomState.beatHear(now);
-	}
-
+	
 	public int getSpectatorCount()
 	{
 		return this.spectatorList.size();
 	}
+
+	public boolean isPlayerSeatOn(int seatId, int uid) {
+		Player player = this.playerMap.get(seatId);
+		if (player == null) {
+			return false;
+		}
+		if (player.getUid() == uid) {
+			return true;
+		}
+		return false;
+	}
 	
 	public boolean isPlayerSitDown(Integer uId)
 	{
-
 		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
 		{
 			if(entry.getValue().getUid().equals(uId))
@@ -421,32 +327,6 @@ public class GameRoom
 		return true;
 	}
 
-	public boolean forceRemoveUser(User u)
-	{
-		if(this.isPlayerSitDown(u.getUid()))
-		{
-			this.playerStandUp(u.getUid(),true);
-		}
-
-		this.spectatorList.remove(u);
-		return true;
-	}
-
-	public void gameOverHandle()
-	{
-		this.roomState = new RoomStateReady(7);
-	}
-
-	public int getSecsPassByTurn()
-	{
-		if(this.pokerGame == null)
-		{
-			return 0;
-		}
-		return this.pokerGame.getSecsPassByTurn();
-	}
-	
-
 	public int howManyUsers()
 	{
 		return this.playerMap.size();
@@ -483,11 +363,6 @@ public class GameRoom
 		map.putAll(this.playerMap);
 		return map;
 	}
-	
-	public PukerGame getPokerGame()
-	{
-		return this.pokerGame;
-	}
 
 	public void notifyRoomPlayerButOne(JsonObjectWrapper aObj, ConstList.MessageType msgType, Integer uId)
 	{
@@ -514,6 +389,17 @@ public class GameRoom
 		}
 	}
 
+	public boolean isUserPlaying(int uid) {
+		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		{
+			if(entry.getValue().getUid().equals(uid))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void notifyRoomPlayer(JsonObjectWrapper aObj, ConstList.MessageType msgType)
 	{
 		long timeStamp = System.currentTimeMillis();
@@ -531,36 +417,7 @@ public class GameRoom
 		//notify all the uers, game start
 	}
 
-	public JsonObjectWrapper toAsObj()
-	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
-
-		response.put("_cmd",ConstList.CMD_ROOMINFO);
-		response.put("ig", this.isGame()?"yes":"no");
-		response.putNumber("turn",this.pokerGame.getTurn());
-		response.putNumber("round",this.pokerGame.getRound());
-
-		response.putNumber("mbet",this.getBbet());
-		response.putNumber("sbet",this.getSbet());
-		response.putNumber("msid",this.pokerGame.maxSeatId());
-		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
-		response.putNumber("wt",this.pokerGame.getNextSeatId());
-
-		response.putNumber("minbuy",this.getMinbuy());
-		response.putNumber("maxbuy",this.getMaxbuy());
-
-		response.put("chname",this.getShowname());
-		response.put("roomName",this.getName());
-		response.putNumber("fpb",this.pokerGame.getPoolBet(1));
-		response.putNumber("spb",this.pokerGame.getPoolBet(2));
-		response.putNumber("tpb",this.pokerGame.getPoolBet(3));
-		response.putNumber("fopb",this.pokerGame.getPoolBet(4));
-
-		if(this.isGame())
-		{
-			response.put("fpk",this.pokerGame.fiveSharePkToAsob());
-		}
-
+	public JsonObjectWrapper playersToList() {
 		JsonObjectWrapper as_plist = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
@@ -604,11 +461,7 @@ public class GameRoom
 			}
 			as_plist.put("sid" + entry.getKey(),as_player);
 		}
-
-		response.putNumber("bsid",this.pokerGame.getBankerSeatId());
-		response.put("plist",as_plist);
-
-		return response;
+		return as_plist;
 	}
 	
 	public Integer getBbet() {
@@ -634,86 +487,5 @@ public class GameRoom
 	public void setShowname(String showname) {
 		this.showname = showname;
 	}
-
-	// two game states
-	private class RoomStateFight implements IRoomState
-	{
-		
-		public RoomStateFight()
-		{
-			timer = new HeartTimer(1*1000);
-		}
-		
-		@Override
-		public void beatHear(long now)
-		{
-			if( this.timer != null && this.timer.Check(now))
-			{
-				pokerGame.beatHeart(now);
-				this.timer.setNextTick();
-			}
-		}
-
-		@Override
-		public boolean isGame()
-		{
-			return true;
-		}
-		
-		private HeartTimer timer = null;
-		
-	}
-
-	private class RoomStateReady implements IRoomState
-	{
-
-		private HeartTimer timer = null;
-
-		public RoomStateReady()
-		{
-			timer = new HeartTimer(5*1000);
-		}
-
-		public RoomStateReady(int secs)
-		{
-			timer = new HeartTimer( secs * 1000 );
-		}
-
-		@Override
-		public void beatHear(long now)
-		{
-			if( this.timer != null && this.timer.Check(now))
-			{
-				if(playerMap.size() >= 2)
-				{
-					this.timer = null;
-					roomState = new RoomStateFight();
-					try
-					{
-						pokerGame.gameStartHandle();
-					}
-					catch (Exception e)
-					{
-						timer = new HeartTimer(3*1000);
-						this.timer.setNextTick();
-						log.error("roomName: " +  getName() + " start game error",e);
-					}
-				}
-				else
-				{
-					this.timer.setNextTick();
-				}
-			}
-		}
-
-		@Override
-		public boolean isGame()
-		{
-			return false;
-		}
-
-	}
-
-
 	
 }

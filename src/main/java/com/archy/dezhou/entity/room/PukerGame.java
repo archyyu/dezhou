@@ -7,33 +7,31 @@ import java.util.List;
 import java.util.Queue;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.archy.dezhou.entity.User;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.service.RoomService;
 
 import jakarta.annotation.Resource;
 
 import com.archy.dezhou.container.JsonObjectWrapper;
+import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
+import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.puker.PukerKit;
 
 
-public class PukerGame
+public class PukerGame extends GameRoom
 {
 	
 	@Resource
 	private RoomService	roomService;
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-
-	private GameRoom room = null;
 
 	//当前的庄家座位号
 	private int bankSeatId = 0;
@@ -59,9 +57,6 @@ public class PukerGame
 	//当前出手玩家
 	private volatile Player currentPlayer = null;
 	
-	//玩家map key:seatid value:Player
-	private Map<Integer,Player> playerMap = new TreeMap<Integer, Player>();
-	
 	private Map<Integer,Integer> winMap = new HashMap<Integer,Integer>();
 	
 	//玩家list
@@ -73,10 +68,12 @@ public class PukerGame
 	List<Puke> fiveSharePk = new ArrayList<Puke>();
 	
 	Map<Integer,Integer> roundPoolBet = new HashMap<Integer,Integer>();
+
+	private volatile IRoomState roomState = new RoomStateReady();
 	
-	public PukerGame(GameRoom room)
+	public PukerGame(RoomDB roomDB)
 	{
-		this.room = room;
+		super(roomDB);
 	}
 
 	public void initGame() {
@@ -92,11 +89,41 @@ public class PukerGame
 		return this.currentPlayer.getUid() + "";
 	}
 
-	public GameRoom getGameRoom() {
-		return this.room;
+	public void beatHeart(long now)
+	{
+		log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
+		now = System.currentTimeMillis();
+		List<Player> users = this.getPlayers();
+		for(Player user : users)
+		{
+			if(user.isStandUpExpired(now))
+			{
+				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " standUp expired");
+				this.playerStandUp(user);
+			}
+		}
+
+		users.clear();
+		users.addAll(this.getSpectatorList());
+		for(Player user : users)
+		{
+			if(user.isLeaveExpired(now))
+			{
+				if(this.isPlayerSitDown(user.getUid()))
+				{
+					continue;
+				}
+				log.warn("roomName: " + this.getName() + " at time: " + System.currentTimeMillis() + " user " + user.getUid() + " leave room expired");
+				this.playerLeave(user);
+			}
+		}
+
+		this.checkTheCurrentPlayer(now);
+
+		this.roomState.beatHear(now);
 	}
 
-	public void beatHeart( long now )
+	public void checkTheCurrentPlayer( long now )
 	{
 		if(this.currentPlayer == null)
 		{
@@ -105,7 +132,7 @@ public class PukerGame
 		if(this.currentPlayer.isDropCardExpired(now))
 		{
 			Player tempPlayer = this.currentPlayer;
-			log.info("roomName: " + this.room.getName() + " seat: " + this.currentPlayer.getSeatId() + " Id: " + this.currentPlayer.getUid() + " drop card time expired");
+			log.info("roomName: " + this.getName() + " seat: " + this.currentPlayer.getSeatId() + " Id: " + this.currentPlayer.getUid() + " drop card time expired");
 			this.currentPlayer.addDropCardNum();
 			this.playerDropCard(this.currentPlayer);
 			
@@ -117,9 +144,9 @@ public class PukerGame
                     GameRoom room = this.roomService.getRoom(tempPlayer.getRoomid());
                     if(room != null)
                     {
-                        log.warn("roomName: " + this.room.getName() + " seat: " + tempPlayer.getSeatId()
+                        log.warn("roomName: " + this.getName() + " seat: " + tempPlayer.getSeatId()
                                 + " userId: " + tempPlayer.getUid() + " 两次弃牌，导致被站起 ");
-                        room.playerStandUp(tempPlayer.getUid(),true);
+                        room.playerStandUp(tempPlayer);
                     }
 				}
 			}
@@ -131,7 +158,7 @@ public class PukerGame
 	
 	public void gameStartHandle()
 	{
-		log.info("roomName: " + this.room.getName() + "第" + (this.roundNum + 1) + "轮扑克比赛开始");
+		log.info("roomName: " + this.getName() + "第" + (this.roundNum + 1) + "轮扑克比赛开始");
 		for(int i=1;i<5;i++) 
 		{
 			roundPoolBet.put(i,0);
@@ -142,13 +169,13 @@ public class PukerGame
 		this.roundNum ++;
 		this.round = 1;
 		this.fiveSharePk.clear();
-		this.maxBet = this.room.getBbet();
+		this.maxBet = this.getBbet();
 		this.resetAllPlayer();
 		this.autoSetNextBankerSeat();
 		this.autoSetPlayerState();
 		this.dispatchPukers();
 		
-		log.info("roomName: " + this.room.getName() + " 第 " + this.round + " 回合开始");
+		log.info("roomName: " + this.getName() + " 第 " + this.round + " 回合开始");
 		this.settleRoundPlayersOnStart();
 		this.settleNextTurnPlayer();
 		this.notifyRoomPlayerPokeGameStart();
@@ -160,45 +187,37 @@ public class PukerGame
 	public void clearLessMoneyPlayer()
 	{
 		
-		Map<Integer, Player> tempPlayerMap = new HashMap<Integer,Player>();
-		tempPlayerMap.putAll(this.playerMap);
-		
-		for(Map.Entry<Integer, Player> entry : tempPlayerMap.entrySet())
+		List<Player> tempPlayerMap = this.getPlayers();
+		for(Player entry : tempPlayerMap)
 		{
-			if(entry.getValue().getRmoney() < this.room.getBbet())
+			if(entry.getRmoney() < this.getBbet())
 			{
-				this.room.playerStandUp(entry.getValue().getUid(),true);
+				this.playerStandUp(entry);
 			}
 		}
+
 	}
 	
 	
 	public void resetAllPlayer()
 	{
-		this.playerMap.clear();
-		this.playerMap.putAll( this.room.userListToPlayerMap() );
-
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-		    entry.getValue().setPlaying(true);
-			entry.getValue().clearTempBet();
-			entry.getValue().clearTotalGambleBet();
-			entry.getValue().setYourTurn(0);
-			entry.getValue().clearPukeInfo();
-			entry.getValue().setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
-			entry.getValue().setGameState(ConstList.PlayerGameState.PLAYER_STATE_PLAYER);
-			log.info("roomName: " + this.room.getName() + " 参与玩家: seat: " + entry.getValue().getSeatId() + " Id: " + entry.getValue().getUid());
+		    entry.setPlaying(true);
+			entry.clearTempBet();
+			entry.clearTotalGambleBet();
+			entry.setYourTurn(0);
+			entry.clearPukeInfo();
+			entry.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
+			entry.setGameState(ConstList.PlayerGameState.PLAYER_STATE_PLAYER);
+			log.info("roomName: " + this.getName() + " 参与玩家: seat: " + entry.getSeatId() + " Id: " + entry.getUid());
 		}
 	}
 	
 	
 	public void autoSetPlayerState()
 	{
-		List<Player> playerList = new ArrayList<Player>();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			playerList.add(entry.getValue());
-		}
+		List<Player> playerList = getPlayers();
 		
 		Player player = playerList.get(0);
 		while(player.getSeatId() != this.bankSeatId)
@@ -238,15 +257,15 @@ public class PukerGame
 		smallBlind.addTotalGambleBet(this.maxBet/2);
 		smallBlind.deductRmoney(this.maxBet/2);
 		
-		log.info("roomName: " + this.room.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUid() + " deduct Bet " + this.maxBet/2);
-		log.info("roomName: " + this.room.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
+		log.info("roomName: " + this.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUid() + " deduct Bet " + this.maxBet/2);
+		log.info("roomName: " + this.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
 		
 	}
 	
 	public void autoSetNextBankerSeat()
 	{
 		this.bankSeatId ++;
-		while(this.playerMap.containsKey(this.bankSeatId) == false)
+		while(this.isSeatTaken(this.bankSeatId) == false)
 		{
 			this.bankSeatId ++;
 			if(this.bankSeatId > ConstList.MAXNUMPLAYEROFROOM)
@@ -255,8 +274,8 @@ public class PukerGame
 			}
 		}
 		
-		log.info("roomName: " + this.room.getName() + " banker : seat: " + this.bankSeatId 
-				+ " Id: " + this.playerMap.get(this.bankSeatId).getUid());
+		log.info("roomName: " + this.getName() + " banker : seat: " + this.bankSeatId 
+				+ " Id: " + this.getPlayerBySeat(this.bankSeatId).getUid());
 	}
 	
 	public Player popNextPlayer()
@@ -274,7 +293,7 @@ public class PukerGame
 	
 	public void dispatchPukers()
 	{
-		int totalPuke = 2 * playerMap.size() + 5;
+		int totalPuke = 2 * this.getPlayerCount() + 5;
 		Integer[] pukeArray = PukerKit.generateRandomNumArray(totalPuke);
 		
 		for (int j = pukeArray.length - 5; j < pukeArray.length; j++)
@@ -287,20 +306,21 @@ public class PukerGame
 		{
 			sb.append(puke.toString());
 		}
-		// log.info("roomName: " + this.room.getName() + " 公共五张牌: " + sb.toString());
+		// log.info("roomName: " + this.getName() + " 公共五张牌: " + sb.toString());
 		
+		int playerCount = this.getPlayerCount();
 		int n = 1;
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
 			// entry.getValue().addPukes(fiveSharePk);
-			entry.getValue().addPuke(PukerKit.getPuke(pukeArray[n-1]));
-			entry.getValue().addPuke(PukerKit.getPuke(pukeArray[n-1 + playerMap.size()]));
+			entry.addPuke(PukerKit.getPuke(pukeArray[n-1]));
+			entry.addPuke(PukerKit.getPuke(pukeArray[n-1 + playerCount]));
 			
-			log.info("roomName: " + this.room.getName() +
-					" seat: " + entry.getValue().getSeatId() +
-					" Id: " + entry.getValue().getUid() +
+			log.info("roomName: " + this.getName() +
+					" seat: " + entry.getSeatId() +
+					" Id: " + entry.getUid() +
 					" puke1: " + PukerKit.getPuke(pukeArray[n-1]).toString() +
-					" puke2: " + PukerKit.getPuke(pukeArray[n-1 + playerMap.size()]).toString());
+					" puke2: " + PukerKit.getPuke(pukeArray[n-1 + playerCount]).toString());
 			
 			n++;
 		}
@@ -320,13 +340,13 @@ public class PukerGame
 	public void balanceBet()
 	{
 		this.winMap.clear();
-		List<Player> players = PukerKit.sortPlayerByPukeMap(new ArrayList<Player>(this.playerMap.values()));
+		List<Player> players = PukerKit.sortPlayerByPukeMap(this.getPlayers());
 		
-		log.info("roomName: " + this.room.getName() + " 开始结算");
+		log.info("roomName: " + this.getName() + " 开始结算");
 		
 		for(Player player : players)
 		{
-			log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid()
+			log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid()
 					+ " handleValue: " + player.getPkValue()
 					+ " gambleValue: " + player.getTotalGambleBet());
 		}
@@ -388,7 +408,7 @@ public class PukerGame
 			{
                 player.addRmoney(totalBet/sameCardPlayers.size());
 			
-				log.info("roomName: " + this.room.getName() 
+				log.info("roomName: " + this.getName() 
 						+ " 奖励   seat : " + player.getSeatId() 
 						+ " Id: " + player.getUid()
 						+ " add : " + totalBet/sameCardPlayers.size() );
@@ -431,9 +451,9 @@ public class PukerGame
 	public void settleRoundPlayersOnStart()
 	{
 		this.playerList.clear();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			this.playerList.add(entry.getValue());
+			this.playerList.add(entry);
 		}
 		
 		Player player = this.playerList.peek();
@@ -449,9 +469,9 @@ public class PukerGame
 	public void settleRoundPlayersOnAddBet(Player player)
 	{
 		this.playerList.clear();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			this.playerList.add(entry.getValue());
+			this.playerList.add(entry);
 		}
 		
 		Player tempPlayer = this.playerList.peek();
@@ -462,26 +482,64 @@ public class PukerGame
 		}
 		this.playerList.poll();
 	}
-	
+
+	public JsonObjectWrapper toAsObj()
+	{
+		JsonObjectWrapper response = new JsonObjectWrapper();
+
+		response.put("_cmd",ConstList.CMD_ROOMINFO);
+		response.put("ig", this.isGame()?"yes":"no");
+		response.putNumber("turn",this.getTurn());
+		response.putNumber("round",this.getRound());
+
+		response.putNumber("mbet",this.getBbet());
+		response.putNumber("sbet",this.getSbet());
+		response.putNumber("msid",this.maxSeatId());
+		response.putNumber("bsid",this.getBankerSeatId());
+		response.putNumber("wt",this.getNextSeatId());
+
+		response.putNumber("minbuy",this.getMinbuy());
+		response.putNumber("maxbuy",this.getMaxbuy());
+
+		response.put("chname",this.getShowname());
+		response.put("roomName",this.getName());
+		response.putNumber("fpb",this.getPoolBet(1));
+		response.putNumber("spb",this.getPoolBet(2));
+		response.putNumber("tpb",this.getPoolBet(3));
+		response.putNumber("fopb",this.getPoolBet(4));
+
+		if(this.isGame())
+		{
+			response.put("fpk",this.fiveSharePkToAsob());
+		}
+
+		JsonObjectWrapper as_plist = this.playersToList();
+		
+
+		response.putNumber("bsid",this.getBankerSeatId());
+		response.put("plist",as_plist);
+
+		return response;
+	}
 	
 	public void settleRoundPlayerOnRoundOver()
 	{
 		this.playerList.clear();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			if(entry.getValue() == null)
+			if(entry == null)
 			{
 				continue;
 			}
 			
-			this.playerList.add(entry.getValue());
+			this.playerList.add(entry);
 		}
 		int seatId = 1;
 		int i = this.firstSeatIdOnRound;
 		int k = 0;
 		while(k < 8)
 		{
-			if(this.playerMap.containsKey(i))
+			if(this.isSeatTaken(i))
 			{
 				seatId = i ;
 				break;
@@ -506,31 +564,28 @@ public class PukerGame
 	
 	public void gameOverHandle()
 	{
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			entry.getValue().setPlaying(false);
-			//entry.getValue().addCompletePkNum();
-		}
-
-		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
-		{
-			entry.getValue().setPkLevelByPkType();
+			entry.setPlaying(false);
+			entry.setPkLevelByPkType();
 		}
 		
 		this.currentPlayer = null;
 		this.getPlayerMaxHandPuke();
 		this.round = 0;
 		this.balanceBet();
-		this.room.gameOverHandle();
+		// this.gameOverHandle();
 		this.notifyRoomPlayerRoundOver();
 		this.notifyRoomPlayerPokeGameOver();
 
 		this.clearLessMoneyPlayer();
+
+		this.roomState = new RoomStateReady(7);
 	}
 	
 	public void getPlayerMaxHandPuke() 
 	{
-		List<Player> players = new ArrayList<Player>(this.playerMap.values());
+		List<Player> players = this.getPlayers();
 		int j = players.size();
 		for(int i = 0; i < j; i++)
 		{
@@ -556,70 +611,6 @@ public class PukerGame
 	}
 	
 	
-	public JsonObjectWrapper toAsObj()
-	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
-		
-		response.put("ig","yes");
-		response.putNumber("turn",this.roundNum);
-		response.putNumber("round",this.round);
-		
-		response.putNumber("fpb",this.roundPoolBet.get(1));
-		response.putNumber("spb",this.roundPoolBet.get(2));
-		response.putNumber("tpb",this.roundPoolBet.get(3));
-		response.putNumber("fopb",this.roundPoolBet.get(4));
-		
-		response.put("fpk",this.fiveSharePkToAsob());
-		
-		response.putNumber("mbet",this.maxBet());
-		response.putNumber("wt_sid",this.currentPlayer.getSeatId());
-		response.put("wt_uid",this.currentPlayer.getUid());
-		
-		JsonObjectWrapper as_plist = new JsonObjectWrapper();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			JsonObjectWrapper as_player = new JsonObjectWrapper();
-			Player player = entry.getValue();
-
-
-
-			
-			as_player.put("un",player.getAccount());
-			as_player.putNumber("sid",entry.getKey());
-			as_player.put("uid",player.getUid());
-			
-			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.putBool("isp",true);
-			as_player.putNumber("tb",player.getTempBet());
-			as_player.putNumber("yt",player.getYourTurn());
-			
-			as_player.putNumber("cm",player.getRmoney());
-			as_player.putNumber("tm",player.getAMoney());
-			as_player.putNumber("gs",player.getGameState().value());
-			as_player.putNumber("ps",player.getPlayerState().value());
-
-			
-			Puke p = player.getPuke(5);
-			if(p != null)
-			{
-				as_player.put("pk1",p.toAobj());
-			}
-			
-			Puke p2 = player.getPuke(6);
-			if(p2 != null)
-			{
-				as_player.put("pk2",p2.toAobj());
-			}
-			
-			as_plist.put("sid" + entry.getKey(),as_player);
-		}
-		
-		response.putNumber("bsid",this.bankSeatId);
-		response.put("plist",as_plist);
-		return response;
-	}
-	
-	
 	public void notifyRoomPlayerPokeGameOver()
 	{
 		JsonObjectWrapper asObj = new JsonObjectWrapper();
@@ -627,7 +618,7 @@ public class PukerGame
 		JsonObjectWrapper winList = new JsonObjectWrapper();
 		for(Map.Entry<Integer, Integer> entry : this.winMap.entrySet())
 		{
-			Player player = this.playerMap.get(entry.getKey());
+			Player player = this.getPlayerBySeat(entry.getKey());
 			if(player == null)
 			{
 				continue;
@@ -647,18 +638,18 @@ public class PukerGame
 		asObj.put("blist",new JsonObjectWrapper());
 		
 		JsonObjectWrapper cmList = new JsonObjectWrapper();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			if(entry.getValue().getPlayerState() == ConstList.PlayerCareerState.PLAYER_STATE_LEAVE)
+			if(entry.getPlayerState() == ConstList.PlayerCareerState.PLAYER_STATE_LEAVE)
 			{
 				continue;
 			}
-			cmList.put(entry.getValue().getSeatId(),entry.getValue().getRmoney() + "");
+			cmList.put(entry.getSeatId(),entry.getRmoney() + "");
 		}
 		asObj.put("cmList",cmList);
 		asObj.put("_cmd",ConstList.CMD_DBT); 
 		asObj.putBool("normal", isGameNormalOver());
-		this.room.notifyRoomPlayer(asObj, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoomPlayer(asObj, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
 	
@@ -666,7 +657,7 @@ public class PukerGame
 	{
 		JsonObjectWrapper response = this.toAsObj();
 		response.put("_cmd",ConstList.CMD_SBOT);
-		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
 	public void notifyRoomWhoTurn()
@@ -678,13 +669,13 @@ public class PukerGame
 		response.putNumber("wt_sid",currentPlayer.getSeatId());
 		response.put("wt_uid",currentPlayer.getUid());
 		
-		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
 	
 	public void turnOverHandle()
 	{
-		if(this.room.isGame() == false )
+		if(this.isGame() == false )
 		{
 			return ;
 		}
@@ -714,13 +705,13 @@ public class PukerGame
 	public boolean isGameOverWhenDropCard()
 	{
 		int size = 0;
-		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
+			if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
 			{
 				continue;
 			}
-			if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
+			if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
 			{
 				continue;
 			}
@@ -734,13 +725,13 @@ public class PukerGame
 	public boolean isGameNormalOver()
 	{
 		int size = 0;
-		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
+			if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
 			{
 				continue;
 			}
-			else if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
+			else if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
 			{
 				continue;
 			}
@@ -759,17 +750,17 @@ public class PukerGame
 		}
 		
 		int size = 0;
-		for(Map.Entry<Integer,Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
+			if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_DROP_CARD)
 			{
 				continue;
 			}
-			else if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_ALL_END)
+			else if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_ALL_END)
 			{
 				continue;
 			}
-			else if(entry.getValue().getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
+			else if(entry.getGameState() == ConstList.PlayerGameState.GAME_STATE_STANDUP)
 			{
 				continue;
 			}
@@ -798,7 +789,7 @@ public class PukerGame
 		{
 			return false;
 		}
-        return this.playerMap.containsKey(player.getSeatId()) != false;
+        return this.isSeatTaken(player.getSeatId()) != false;
     }
 	
 	
@@ -813,20 +804,20 @@ public class PukerGame
 		this.roundPoolBet.put(this.round,this.currentRoundBet);
 		this.currentRoundBet = 0;
 		
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
-			entry.getValue().clearTempBet();
+			entry.clearTempBet();
 		}
 		
 		this.round ++;
 		this.currentRoundBet = 0;
-		this.maxBet = this.room.getBbet();
-		log.info("roomName: " + this.room.getName() + " round " + this.round + " started");
+		this.maxBet = this.getBbet();
+		log.info("roomName: " + this.getName() + " round " + this.round + " started");
 
 		if (this.round == 2) {
 			IntStream.range(0, 3).forEach(i -> {
 				log.info("public cards: " + fiveSharePk.get(i).toString());
-				this.playerMap.values().forEach(player -> {
+				this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(i));
 			});
 			});
@@ -834,13 +825,13 @@ public class PukerGame
 		}
 		else if (this.round == 3) {
 			log.info("public cards: " + fiveSharePk.get(3).toString());
-			this.playerMap.values().forEach(player -> {
+			this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(3));
 				});
 		}
 		else if (this.round == 4) {
 			log.info("public cards: " + fiveSharePk.get(4).toString());
-			this.playerMap.values().forEach(player -> {
+			this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(4));
 				});
 		}
@@ -862,21 +853,21 @@ public class PukerGame
 		JsonObjectWrapper response = new JsonObjectWrapper();
 		JsonObjectWrapper uList = new JsonObjectWrapper();
 		
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
+		for(Player entry : this.getPlayers())
 		{
 			JsonObjectWrapper pl = new JsonObjectWrapper();
-			pl.putNumber("sid",entry.getKey());
-			pl.putNumber("pkl",entry.getValue().getPkLevel());
-			uList.put("sid" + entry.getKey(),pl);
+			pl.putNumber("sid",entry.getSeatId());
+			pl.putNumber("pkl",entry.getPkLevel());
+			uList.put("sid" + entry.getSeatId(),pl);
 		}
 		
 		response.put("ulist",uList);
 		response.put("_cmd",ConstList.CMD_ROUND_OVER);
 		response.putNumber("round",this.round);
 		response.putNumber("rbet",this.currentRoundBet);
-		response.put("gover", this.room.isGame() ? "no" : "yes");
+		response.put("gover", this.isGame() ? "no" : "yes");
 		
-		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 	}
 	
 	
@@ -886,7 +877,7 @@ public class PukerGame
 		if(this.isYouTurn(player) == false)
 		{
 			response.put("error","notYourTurn");
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
@@ -901,8 +892,8 @@ public class PukerGame
 		response.put("_cmd", ConstList.CMD_LOOK_CARD);
 		response.put("user", as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " look card " );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " look card " );
+		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
@@ -921,7 +912,7 @@ public class PukerGame
 		{
 			response.put("error","notYourTurn");
 			
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
@@ -939,7 +930,7 @@ public class PukerGame
 		{
 			response.put("error","YouParmsisNotValid");
 			
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " add bet error bet: " + bet);
 			
@@ -962,8 +953,8 @@ public class PukerGame
 		response.put("_cmd",ConstList.CMD_ADD_BET);
 		response.put("user",as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " add " + bet  );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " add " + bet  );
+		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.settleRoundPlayersOnAddBet(player);
 		this.turnOverHandle();
 		return response;
@@ -985,7 +976,7 @@ public class PukerGame
 		{
 			response.put("error","notYourTurn");
 			
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
@@ -1002,7 +993,7 @@ public class PukerGame
 		if(player.getTempBet() + bet < this.maxBet)
 		{
 			response.put("error","YouParmsisNotValid");
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " call error,bet: " + bet);
 			
@@ -1026,8 +1017,8 @@ public class PukerGame
 		JsonObjectWrapper as_player = player.toAsObj();
 		response.put("user",as_player);
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet + " on round:" + this.round);
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet + " on round:" + this.round);
+		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
@@ -1041,7 +1032,7 @@ public class PukerGame
 		{
 			response.put("error","notYourTurn");
 			
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
@@ -1056,10 +1047,10 @@ public class PukerGame
 		
 		this.publicPoolBet += player.getTotalGambleBet();
 		
-		log.info("roomName: " + this.room.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " drop card " );
-		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " drop card " );
+		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 		this.turnOverHandle();
-		if(this.room.isGame() && this.isGameOverWhenDropCard())
+		if(this.isGame() && this.isGameOverWhenDropCard())
 		{
 			this.gameOverHandle();
 		}
@@ -1075,7 +1066,7 @@ public class PukerGame
 		{
 			response.put("error","notYourTurn");
 			
-			log.error("roomName: " + this.room.getName() 
+			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
@@ -1105,48 +1096,39 @@ public class PukerGame
 		response.put("_cmd",ConstList.CMD_ALL_IN);
 		response.put("user",player.toAsObj());
 		
-		log.info("roomName: " + this.room.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " all in " + bet );
-		this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " all in " + bet );
+		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
 		return response;
 	}
 	
-	
-	public JsonObjectWrapper playerStandUp(Player player)
+	@Override
+	public boolean playerStandUp(Player player)
 	{
 		if(player == null)
 		{
-			return null;
+			return false;
 		}
 		
-		if(this.playerMap.containsKey(player.getSeatId()) == false)
-		{
-			return null;
+		if (this.isPlayerSeatOn(player.getUid(), player.getSeatId()) == false) {
+			return false;
 		}
-		
-		JsonObjectWrapper response = new JsonObjectWrapper();
 
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
 		player.addAmoney(player.getRmoney());
 		player.clearRoomMoney();
-		
-		JsonObjectWrapper as_player = player.toAsObj();
-		as_player.putBool("isp",false);
-		as_player.putBool("ip",true);
-		
-		response.put("_cmd",ConstList.CMD_STANDUP);
-		response.put("user",as_player);
-		
-		this.room.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
-		
+
+		super.playerStandUp(player);
+		player.setSeatId(-1);
+
 		if(this.isGameOver())
 		{
 			this.gameOverHandle();
 		}
 		
-		return response;
+		return true;
 	}
 	
 	
@@ -1161,11 +1143,14 @@ public class PukerGame
 
     }
 	
-	
-	public JsonObjectWrapper playerLeave(Player player)
+	public boolean playerLeave(Player player)
 	{
-		this.playerMap.remove(player.getSeatId());
-		JsonObjectWrapper response = new JsonObjectWrapper();
+
+		if (this.isPlayerSitDown(player.getUid())) {
+			super.playerStandUp(player);
+		} else {
+			this.removePlayerFromSpectaclors(player);
+		}
 
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
@@ -1173,54 +1158,30 @@ public class PukerGame
 		player.addAmoney(player.getRmoney());
 
 		player.setRoomId(-1);
-
-		JsonObjectWrapper as_player = player.toAsObj();
-		
-		response.put("_cmd",ConstList.CMD_LEAVE);
-		response.put("_user",as_player);
-
-		if(this.room.isPlayerSitDown(player.getUid()))
-		{
-			response.put("flag","sit");
-			response.put("user",as_player);
-			this.room.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
-		}
-		else
-		{
-			response.put("flag","nosit");
-		}
+		player.setSeatId(-1);
 		
 		if(this.isGameOver())
 		{
-//			this.gameOverHandle();
+			// this.gameOverHandle();
 		}
 		
-		return response;
+		return true;
 	}
 	
 	public boolean isUserPlaying(Integer uid)
 	{	
-		if(this.room.isGame() == false)
+		if(this.isGame() == false)
 		{
 			return false;
 		}
 		
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			if(entry.getValue().getUid().equals(uid))
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		return super.isUserPlaying(uid);
 	}
 	
 	
-	public void playerStandup(int seatId)
+	public void playerStandup(Player player)
 	{
-		Player player = playerMap.get(seatId);
-		if(player != null)
+		super.playerStandUp(player);
 		{
 			this.publicPoolBet += player.getTotalGambleBet();
 			if(this.currentPlayer != null && player.getUid().equals(this.currentPlayer.getUid()))
@@ -1229,23 +1190,8 @@ public class PukerGame
 			}
 		}
 		
-		this.playerMap.remove(seatId);
 		return ;
 	}
-	
-	
-	public Player findPlayerByUser(User u)
-	{
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			if(entry.getValue().getUid().equals(u.getUid()))
-			{
-				return entry.getValue();
-			}
-		}
-		return null;
-	}
-	
 	
 	public int getTurn()
 	{
@@ -1315,6 +1261,85 @@ public class PukerGame
 			}
 			this.popNextPlayer();
 		}
+	}
+
+		// two game states
+	private class RoomStateFight implements IRoomState
+	{
+		
+		public RoomStateFight()
+		{
+			timer = new HeartTimer(1*1000);
+		}
+		
+		@Override
+		public void beatHear(long now)
+		{
+			if( this.timer != null && this.timer.Check(now))
+			{
+				beatHeart(now);
+				this.timer.setNextTick();
+			}
+		}
+
+		@Override
+		public boolean isGame()
+		{
+			return true;
+		}
+		
+		private HeartTimer timer = null;
+		
+	}
+
+	private class RoomStateReady implements IRoomState
+	{
+
+		private HeartTimer timer = null;
+
+		public RoomStateReady()
+		{
+			timer = new HeartTimer(5*1000);
+		}
+
+		public RoomStateReady(int secs)
+		{
+			timer = new HeartTimer( secs * 1000 );
+		}
+
+		@Override
+		public void beatHear(long now)
+		{
+			if( this.timer != null && this.timer.Check(now))
+			{
+				if(getPlayerCount() >= 2)
+				{
+					this.timer = null;
+					roomState = new RoomStateFight();
+					try
+					{
+						gameStartHandle();
+					}
+					catch (Exception e)
+					{
+						timer = new HeartTimer(3*1000);
+						this.timer.setNextTick();
+						log.error("roomName: " +  getName() + " start game error",e);
+					}
+				}
+				else
+				{
+					this.timer.setNextTick();
+				}
+			}
+		}
+
+		@Override
+		public boolean isGame()
+		{
+			return false;
+		}
+
 	}
 	
 }

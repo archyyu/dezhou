@@ -5,6 +5,7 @@ import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.room.GameRoom;
+import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.PlayerService;
 import com.archy.dezhou.service.RoomService;
@@ -75,7 +76,7 @@ public class RoomApiController extends BaseApiController {
     @GetMapping("/{roomTypeId}/list")
     public ResponseEntity<ApiResponse<?>> getMethodName(@PathVariable Integer roomTypeId) {
 
-        List<GameRoom> list = this.roomService.getRoomListByTypeId(roomTypeId);
+        List<PukerGame> list = this.roomService.getRoomListByTypeId(roomTypeId);
         // List<JsonObjectWrapper> result = list.stream().map(item -> item.toAsObj()).collect(Collectors.toList());
         return successResponse(list);
     }
@@ -115,7 +116,7 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Leave old room if user is already in one
-            GameRoom oldRoom = this.roomService.getRoom(user.getRoomid());
+            PukerGame oldRoom = this.roomService.getRoom(user.getRoomid());
             if (oldRoom != null) {
                 oldRoom.playerLeave(user);
             }
@@ -152,14 +153,14 @@ public class RoomApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
 
-            GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
+            PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
             if (room == null) {
                 return errorResponse("YourParmsIsInValid");
             }
             
-            int lea = room.playerLeave(user);
+            boolean lea = room.playerLeave(user);
             
-            if (lea == 0) {
+            if (lea) {
                 return successResponse("UserLeaveRoomOk");
             } else {
                 return successResponse("haveBeenLeaved");
@@ -171,7 +172,7 @@ public class RoomApiController extends BaseApiController {
 
     // Helper method to generate room list using modern entities
     private List<RoomResponse.RoomListItem> getRoomListFromMemory(String roomtype, String bb, String sb) {
-        List<GameRoom> roomlist = this.roomService.getRoomList();
+        List<PukerGame> roomlist = this.roomService.getRoomList();
         List<RoomResponse.RoomListItem> result = new ArrayList<>();
         
         if (StringUtils.isNumeric(bb) && StringUtils.isNumeric(sb)) {
@@ -194,7 +195,7 @@ public class RoomApiController extends BaseApiController {
     // Get room details endpoint
     @GetMapping("/{roomId}")
     public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomId) {
-        GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
+        PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
         if (room != null) {
             RoomResponse response = new RoomResponse(room);
             return successResponse(response);
