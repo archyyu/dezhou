@@ -15,6 +15,8 @@ import com.archy.dezhou.service.UserService;
 
 import jakarta.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +45,8 @@ public class GameApiController extends BaseApiController {
     @Resource
     private GameCommandFactory gameCommandFactory;
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * Protected getter for roomService - used for testing
      */
@@ -64,7 +68,6 @@ public class GameApiController extends BaseApiController {
     @PostMapping("/{roomId}/actions")
     public ResponseEntity<ApiResponse<?>> handleGameAction(
             @PathVariable String roomId,
-            @RequestParam String uid,
             @RequestParam String cmd,
             @RequestBody(required = false) Map<String, String> additionalParams) {
         
@@ -81,7 +84,7 @@ public class GameApiController extends BaseApiController {
             }
             
             PukerGame game = room.getPokerGame();
-            Player player = game.findPlayerByUser(user);
+            Player player = this.userService.getUserByUserId(user.getUid());
             
             if (player != null) {
                 player.clearDropCardNum();
@@ -90,11 +93,13 @@ public class GameApiController extends BaseApiController {
             JsonObjectWrapper result = null;
 
             GameCommand gameCommand = this.gameCommandFactory.getCommand(cmd);
+
             result = gameCommand.execute(game, player, additionalParams);
             
-            return successResponse(result);
+            return successResponse(result.toJSONString());
             
         } catch (Exception e) {
+            logger.error("err", e);
             return errorResponse("GameActionProcessingFailed: " + e.getMessage());
         }
     }
@@ -171,7 +176,7 @@ public class GameApiController extends BaseApiController {
     @GetMapping("/{roomId}/state")
     public ResponseEntity<ApiResponse<?>> getGameState(@PathVariable String roomId) {
         try {
-            GameRoom room = this.roomService.getRoomByName(roomId);
+            GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
@@ -186,6 +191,7 @@ public class GameApiController extends BaseApiController {
             
             return successResponse(gameState);
         } catch (Exception e) {
+            
             return errorResponse("FailedToGetGameState: " + e.getMessage());
         }
     }

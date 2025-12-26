@@ -36,10 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         
         // Skip JWT validation for public endpoints
         String requestPath = request.getRequestURI();
-        if (isPublicEndpoint(requestPath)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        // if (isPublicEndpoint(requestPath)) {
+        //     filterChain.doFilter(request, response);
+        //     return;
+        // }
         
         try {
             String token = getJwtFromRequest(request);

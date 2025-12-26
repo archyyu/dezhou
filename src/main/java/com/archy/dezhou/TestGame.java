@@ -18,6 +18,15 @@ public class TestGame {
 
         testGame.setUp();
         // testGame.detectNextPlayer();
+        normalFollowBet(testGame);
+        normalFollowBet(testGame);
+        normalFollowBet(testGame);
+
+    }
+
+    private static void normalFollowBet(TestGame testGame) {
+
+        testGame.startGame();
         testGame.followBet();
         testGame.followBet();
         testGame.followBet();
@@ -40,6 +49,8 @@ public class TestGame {
 
     }
 
+
+
     private List<Player> testPlayers;
     private GameRoom testRoom;
     private PukerGame texasHoldemGame;
@@ -57,9 +68,6 @@ public class TestGame {
         
         // Initialize the game
         initializeGame();
-
-        // start the game
-        startGame();
 
     }
 

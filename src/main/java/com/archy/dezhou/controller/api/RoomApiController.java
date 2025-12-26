@@ -1,5 +1,6 @@
 package com.archy.dezhou.controller.api;
 
+import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
@@ -23,9 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import java.util.stream.Collectors;
 
 
 
@@ -77,17 +76,18 @@ public class RoomApiController extends BaseApiController {
     public ResponseEntity<ApiResponse<?>> getMethodName(@PathVariable Integer roomTypeId) {
 
         List<GameRoom> list = this.roomService.getRoomListByTypeId(roomTypeId);
+        // List<JsonObjectWrapper> result = list.stream().map(item -> item.toAsObj()).collect(Collectors.toList());
         return successResponse(list);
     }
     
 
     // user create a room
-    @PostMapping("/create/{roomTypeId}")
-    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId) {
+    @PostMapping("/create/{roomTypeId}/{roomName}")
+    public ResponseEntity<ApiResponse<?>> postMethodName(@PathVariable String roomTypeId, @PathVariable String roomName) {
 
         Player player = getAuthentificatedPlayer();
 
-        GameRoom gameRoom = this.roomService.createGameRoom(player.getUid() + "", player.getAccount(), Integer.parseInt(roomTypeId));
+        GameRoom gameRoom = this.roomService.createGameRoom(player.getUid() + "", player.getAccount(), Integer.parseInt(roomTypeId), roomName);
         return successResponse(gameRoom);
 
     }
@@ -96,8 +96,7 @@ public class RoomApiController extends BaseApiController {
     // Join room endpoint - replaces JOIN command
     @PostMapping("/{roomId}/join")
     public ResponseEntity<ApiResponse<?>> joinRoom(
-            @PathVariable String roomId,
-            @RequestParam String uid) {
+            @PathVariable String roomId) {
         
         try {
             // Get user from JWT authentication or fallback to legacy
@@ -106,8 +105,10 @@ public class RoomApiController extends BaseApiController {
             if (user == null) {
                 return errorResponse("UserNotLogined");
             }
+
+            Player player = this.userService.getUserByUserId(user.getUid());
             
-            GameRoom room = this.roomService.getRoomByName(roomId);
+            GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
             
             if (room == null) {
                 return errorResponse("RoomNotFound");
@@ -125,8 +126,8 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Join the new room
-            int ret = room.userJoin(user);
-            user.setRoomId(room.getRoomid());
+            int ret = room.userJoin(player);
+            player.setRoomId(room.getRoomid());
             
             if (ret == 0) {
                 return successResponse("UserEnterRoomOk");
@@ -134,6 +135,7 @@ public class RoomApiController extends BaseApiController {
                 return successResponse("haveBeenEntered");
             }
         } catch (Exception e) {
+            log.error("RoomJoinFailed", e);
             return errorResponse("RoomJoinFailed: " + e.getMessage());
         }
     }
