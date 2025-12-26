@@ -33,12 +33,12 @@ public class GameStateResponse {
     /**
      * Create GameStateResponse from Room and Game
      */
-    public GameStateResponse(GameRoom room, PukerGame game) {
-        this.roomId = room.getRoomid();
-        this.roomName = room.getName();
-        this.currentPlayers = room.getPlayerCount();
-        this.maxPlayers = room.getMaxUsers();
-        this.gameStatus = room.isGame() ? "active" : "waiting";
+    public GameStateResponse(PukerGame game) {
+        this.roomId = game.getRoomid();
+        this.roomName = game.getName();
+        this.currentPlayers = game.getPlayerCount();
+        this.maxPlayers = game.getMaxUsers();
+        this.gameStatus = game.isGame() ? "active" : "waiting";
         
         if (game != null) {
             // Add game-specific information
@@ -49,11 +49,11 @@ public class GameStateResponse {
             this.communityCards = new ArrayList<>(); // game.getCommunityCards();
             
             // Convert players to PlayerState objects
-            this.players = room.getPlayers().stream()
+            this.players = game.getPlayers().stream()
                 .map(player -> new PlayerState(player, game))
                 .toList();
 
-            this.spectaclors = room.getSpectatorList().stream().map(player -> new PlayerState(player, game)).toList();
+            this.spectaclors = game.getSpectatorList().stream().map(player -> new PlayerState(player, game)).toList();
             
             // Add game settings
             // this.settings = new GameSettings(room, game);

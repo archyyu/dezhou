@@ -19,7 +19,7 @@ public class RoomInfoCommand implements GameCommand{
 
     @Override
     public JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String, String> params) {
-        return gameRoom.getGameRoom().toAsObj();
+        return gameRoom.toAsObj();
     }
 
 

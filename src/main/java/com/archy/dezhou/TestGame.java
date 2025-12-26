@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.User;
-import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
 
@@ -19,8 +19,8 @@ public class TestGame {
         testGame.setUp();
         // testGame.detectNextPlayer();
         normalFollowBet(testGame);
-        normalFollowBet(testGame);
-        normalFollowBet(testGame);
+        // normalFollowBet(testGame);
+        // normalFollowBet(testGame);
 
     }
 
@@ -52,8 +52,7 @@ public class TestGame {
 
 
     private List<Player> testPlayers;
-    private GameRoom testRoom;
-    private PukerGame texasHoldemGame;
+    private PukerGame testRoom;
 
 
     void setUp() {
@@ -98,7 +97,16 @@ public class TestGame {
 
      private void createTestRoom() {
         // Create a Texas Hold'em room
-        testRoom = new GameRoom();
+        RoomDB roomDB = new RoomDB();
+        roomDB.setId(1);
+        roomDB.setBbet(10);
+        roomDB.setName("beginner");
+        roomDB.setMinbuy(1000);
+        roomDB.setMaxbuy(2000);
+        roomDB.setRoomtype("public");
+        roomDB.setShowname("beginner");
+
+        testRoom = new PukerGame(roomDB);
         testRoom.setName("TexasHoldemTestRoom");
         testRoom.setRoomtype("rg"); // Regular game
         testRoom.setBbet(10); // Big blind
@@ -110,7 +118,13 @@ public class TestGame {
         // Add players to the room
         for (Player player : testPlayers) {
             testRoom.userJoin(player);
-            testRoom.playerSitDown(player.getSeatId(), player, player.getRoommoney());
+            try {
+                testRoom.playerSitDown(player.getSeatId(), player, player.getRoommoney());
+            } catch (GameCmdException e) {
+                System.err.print("sitDown err:" + e.getMessage());
+            }
+
+
             player.setRoomId(testRoom.getRoomid());
         }
         
@@ -120,16 +134,15 @@ public class TestGame {
 
     private void initializeGame() {
         // Create a new Texas Hold'em game
-        texasHoldemGame = new PukerGame(testRoom);
-        testRoom.setPokerGame(texasHoldemGame);
+        // testRoom.setPokerGame(texasHoldemGame);
         
         // Initialize the game with players
-        texasHoldemGame.initGame();
+        testRoom.initGame();
     
     }
 
     private void startGame() {
-        texasHoldemGame.gameStartHandle();
+        testRoom.gameStartHandle();
     }
 
     private void hearBeat() {
@@ -138,7 +151,7 @@ public class TestGame {
 
         for (int i=0;i<3;i++){
 
-            texasHoldemGame.beatHeart(System.currentTimeMillis() / 1000);
+            testRoom.beatHeart(System.currentTimeMillis() / 1000);
             
             try {
                 Thread.sleep(1000);
@@ -151,22 +164,22 @@ public class TestGame {
     }
 
     private void detectNextPlayer() {
-        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+        Player currentPlayer = this.testRoom.getCurrentPlayer();
         System.err.println("current player seat id:" + currentPlayer.getSeatId());
     }
 
     private void followBet() {
-        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+        Player currentPlayer = this.testRoom.getCurrentPlayer();
 
-        texasHoldemGame.playerFollow(currentPlayer);
+        testRoom.playerFollow(currentPlayer);
     }
 
 
 
     private void followBet(int bet) {
-        Player currentPlayer = this.texasHoldemGame.getCurrentPlayer();
+        Player currentPlayer = this.testRoom.getCurrentPlayer();
 
-        texasHoldemGame.playerAddBet(currentPlayer, bet);
+        testRoom.playerAddBet(currentPlayer, bet);
     }
 
     // private void followbet() {

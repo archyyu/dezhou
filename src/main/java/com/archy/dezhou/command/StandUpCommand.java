@@ -19,7 +19,8 @@ public class StandUpCommand implements GameCommand{
 
     @Override
     public JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String, String> params) {
-        return gameRoom.playerStandUp(player);
+        gameRoom.playerStandUp(player);
+        return new JsonObjectWrapper();
     }
     
 }

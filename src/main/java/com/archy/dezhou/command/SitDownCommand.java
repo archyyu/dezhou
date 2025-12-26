@@ -22,7 +22,7 @@ public class SitDownCommand implements GameCommand{
         int seatId = Integer.parseInt(params.get("sid"));
         int bet = Integer.parseInt(params.get("cb"));
         System.err.println("sitdown seatId" + seatId);
-        return gameRoom.getGameRoom().playerSitDown(seatId, player, bet);
+        return gameRoom.playerSitDown(seatId, player, bet);
     }
     
 }

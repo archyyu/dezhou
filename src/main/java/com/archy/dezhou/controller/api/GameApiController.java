@@ -78,12 +78,11 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
 
-            GameRoom room = this.roomService.getRoom(user.getRoomid());
+            PukerGame room = this.roomService.getRoom(user.getRoomid());
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
-            
-            PukerGame game = room.getPokerGame();
+
             Player player = this.userService.getUserByUserId(user.getUid());
             
             if (player != null) {
@@ -94,7 +93,7 @@ public class GameApiController extends BaseApiController {
 
             GameCommand gameCommand = this.gameCommandFactory.getCommand(cmd);
 
-            result = gameCommand.execute(game, player, additionalParams);
+            result = gameCommand.execute(room, player, additionalParams);
             
             return successResponse(result.toJSONString());
             
@@ -176,18 +175,13 @@ public class GameApiController extends BaseApiController {
     @GetMapping("/{roomId}/state")
     public ResponseEntity<ApiResponse<?>> getGameState(@PathVariable String roomId) {
         try {
-            GameRoom room = this.roomService.getRoom(Integer.parseInt(roomId));
+            PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
-            
-            PukerGame game = room.getPokerGame();
-            if (game == null) {
-                return errorResponse("NoActiveGameInRoom");
-            }
-            
+
             // Use the new GameStateResponse entity instead of JsonObjectWrapper
-            GameStateResponse gameState = new GameStateResponse(room, game);
+            GameStateResponse gameState = new GameStateResponse(room);
             
             return successResponse(gameState);
         } catch (Exception e) {
@@ -213,13 +207,8 @@ public class GameApiController extends BaseApiController {
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }
-            
-            PukerGame game = room.getPokerGame();
-            if (game == null) {
-                return errorResponse("NoActiveGameInRoom");
-            }
-            
-            Player player = game.findPlayerByUser(user);
+                        
+            Player player = room.findPlayerByUser(user);
             if (player == null) {
                 return errorResponse("PlayerNotInGame");
             }
