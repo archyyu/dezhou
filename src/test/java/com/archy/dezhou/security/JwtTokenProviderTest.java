@@ -5,27 +5,22 @@ import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class JwtTokenProviderTest {
 
-    @Mock
     private JwtConfig jwtConfig;
-
-    @InjectMocks
     private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {
-        when(jwtConfig.getSecret()).thenReturn("test-secret-key-1234567890");
-        when(jwtConfig.getExpiration()).thenReturn(3600000L); // 1 hour
+        // Create real JwtConfig instance instead of mocking
+        jwtConfig = new JwtConfig();
+        // Set a proper secret key for testing (256 bits minimum)
+        jwtConfig.setSecret("test-secret-key-1234567890-abcdefghijklmnop");
+        jwtConfig.setExpiration(3600000L); // 1 hour
+        jwtTokenProvider = new JwtTokenProvider(jwtConfig);
     }
 
     @Test

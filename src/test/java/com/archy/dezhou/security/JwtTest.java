@@ -20,7 +20,8 @@ public class JwtTest {
         JwtConfig jwtConfig = new JwtConfig();
         
         // Manually set the values (since we added manual getters)
-        String secret = "test-secret-key-1234567890";
+        // Use a longer secret key (256 bits minimum required for JWT)
+        String secret = "test-secret-key-1234567890-abcdefghijklmnop";
         long expiration = 3600000L; // 1 hour
         
         // Create secret key

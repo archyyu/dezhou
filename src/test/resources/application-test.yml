@@ -1,0 +1,10 @@
+# Test-specific configuration
+spring:
+  config:
+    activate:
+      on-profile: test
+
+# Enable test room initialization
+room:
+  test:
+    initialize: true
