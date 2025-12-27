@@ -16,6 +16,7 @@ import com.archy.dezhou.global.ConstList;
 
 import jakarta.annotation.Resource;
 
+import com.archy.dezhou.GameCmdException;
 import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
@@ -74,6 +75,10 @@ public class PukerGame extends GameRoom
 
 	public void initGame() {
 
+	}
+
+	public int getWinBySeat(int seatId) {
+		return this.winMap.get(seatId);
 	}
 	
 	public String getCurrentTurnPlayerId()
@@ -485,7 +490,7 @@ public class PukerGame extends GameRoom
 
 		response.put("_cmd",ConstList.CMD_ROOMINFO);
 		response.put("ig", this.isGame()?"yes":"no");
-		response.putNumber("turn",this.getTurn());
+		response.putNumber("turn",this.getRoundNum());
 		response.putNumber("round",this.getRound());
 
 		response.putNumber("mbet",this.getBbet());
@@ -1138,6 +1143,11 @@ public class PukerGame extends GameRoom
         return player.getUid().equals(this.currentPlayer.getUid());
 
     }
+
+	@Override
+	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws GameCmdException {
+		return super.playerSitDown(seatId, player, cb);
+	}
 	
 	public boolean playerLeave(Player player)
 	{
@@ -1189,7 +1199,7 @@ public class PukerGame extends GameRoom
 		return ;
 	}
 	
-	public int getTurn()
+	public int getRoundNum()
 	{
 		return this.roundNum;
 	}
