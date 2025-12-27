@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.archy.dezhou.global.ConstList;
-import com.archy.dezhou.service.RoomService;
 
 import jakarta.annotation.Resource;
 
@@ -27,9 +26,6 @@ import com.archy.dezhou.entity.puker.PukerKit;
 
 public class PukerGame extends GameRoom
 {
-	
-	@Resource
-	private RoomService	roomService;
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
@@ -140,14 +136,14 @@ public class PukerGame extends GameRoom
 			{
 				if(tempPlayer.getDropCardNum() >= 2)
 				{
-
-                    GameRoom room = this.roomService.getRoom(tempPlayer.getRoomid());
-                    if(room != null)
-                    {
-                        log.warn("roomName: " + this.getName() + " seat: " + tempPlayer.getSeatId()
-                                + " userId: " + tempPlayer.getUid() + " 两次弃牌，导致被站起 ");
-                        room.playerStandUp(tempPlayer);
-                    }
+					this.playerStandUp(tempPlayer);
+                    // GameRoom room = this.roomService.getRoom(tempPlayer.getRoomid());
+                    // if(room != null)
+                    // {
+                    //     log.warn("roomName: " + this.getName() + " seat: " + tempPlayer.getSeatId()
+                    //             + " userId: " + tempPlayer.getUid() + " 两次弃牌，导致被站起 ");
+                    //     room.playerStandUp(tempPlayer);
+                    // }
 				}
 			}
 			
