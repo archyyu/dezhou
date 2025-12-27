@@ -394,10 +394,11 @@ const isGameInProgress = computed(() => {
 })
 
 const canSitDown = computed(() => {
-  if (playerStatus === 'spectator' && !isGameInProgress) {
-    return true
-  }
-  return false
+  // if (playerStatus === 'spectator' && !isGameInProgress) {
+  //   return true
+  // }
+  // return false
+  return true
 })
 
 const canStandUp = computed(() => {
@@ -449,7 +450,7 @@ const loadGameState = async () => {
       }
     }
     
-    const stateResponse = await useApi().get(`/api/v1/game/${route.params.roomId}/state`)
+    const stateResponse = await get(`/api/v1/game/${route.params.roomId}/state`)
     
     if (stateResponse.data && stateResponse.data.success) {
       gameState.value = stateResponse.data.data
@@ -607,6 +608,9 @@ const confirmSeatSelection = () => {
   if (playerSeatId.value && playerSeatId.value > 0) {
     showSeatSelection.value = false
     showBuyInModal.value = true
+
+    
+
   }
 }
 
