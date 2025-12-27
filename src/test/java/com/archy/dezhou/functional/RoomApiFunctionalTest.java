@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("room-api")
 @Tag("functional")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 class RoomApiFunctionalTest {
 
     @Autowired
@@ -55,9 +57,9 @@ class RoomApiFunctionalTest {
 
     @Test
     void testGetSpecificRoom() {
-        // Test with beginner room
+        // Test with beginner room (ID 1)
         ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/beginner", 
+                "/api/v1/room/1", 
                 ApiResponse.class);
 
         assertNotNull(response);
