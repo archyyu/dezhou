@@ -123,7 +123,6 @@ public class GameRoom
 	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws GameCmdException
 	{
 		JsonObjectWrapper response = new JsonObjectWrapper();
-		JsonObjectWrapper userAobj = new JsonObjectWrapper();
 		if(player == null)
 		{
 			throw new GameCmdException("playerNotExist");
@@ -161,34 +160,17 @@ public class GameRoom
 			player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
 		}
 
-
-		userAobj.put("uid",player.getUid());
-		userAobj.putNumber("sid", seatId);
-		userAobj.putNumber("cm", player.getRmoney());
-		userAobj.put("tm", String.valueOf(player.getAMoney()));
-		userAobj.put("un", player.getAccount());
-		userAobj.putNumber("ps", player.getPlayerState().value());
-		userAobj.putNumber("gs", player.getGameState().value());
-		userAobj.putNumber("lev", 0);
-		userAobj.putNumber("yt", 0);
-		userAobj.put("big", "");
-		userAobj.put("spr", "");
-
-		response.put("_cmd",ConstList.CMD_SITDOWN);
-		response.put("user", userAobj.toJSONString());
-		response.put("issit", "no");
-
 		this.addPlayer(seatId,player);
 		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		return response;
 	}
-
-	public Player findPlayerBySeat(int seatId) {
-		return this.playerMap.get(seatId);
-	}
 	
 	public boolean playerStandUp(Player player)
 	{
+
+		if (this.playerMap.containsKey(player.getSeatId()) == false) {
+			return false;
+		}
 
 		log.warn("roomName: " + this.getName() + "  " + player.getUid() + " standup at seatId: " + player.getSeatId());
 		this.removePlayer(player.getSeatId());
