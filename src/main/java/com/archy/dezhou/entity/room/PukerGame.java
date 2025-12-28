@@ -78,6 +78,9 @@ public class PukerGame extends GameRoom
 	}
 
 	public int getWinBySeat(int seatId) {
+		if (this.winMap.containsKey(seatId) == false) {
+			return 0;
+		}
 		return this.winMap.get(seatId);
 	}
 	
@@ -812,7 +815,7 @@ public class PukerGame extends GameRoom
 		
 		this.round ++;
 		this.currentRoundBet = 0;
-		this.maxBet = this.getBbet();
+		this.maxBet = 0;//this.getBbet();
 		log.info("roomName: " + this.getName() + " round " + this.round + " started");
 
 		if (this.round == 2) {
@@ -964,6 +967,10 @@ public class PukerGame extends GameRoom
 	public JsonObjectWrapper playerFollow(Player player) {
 		int bet = this.maxBet - player.getTempBet();
 		return this.playerFollowBet(player, bet);
+	}
+
+	public JsonObjectWrapper playerCheck(Player player) {
+		return this.playerFollowBet(player, 0);
 	}
 
 	public JsonObjectWrapper playerRaise(Player player, int bet) {
