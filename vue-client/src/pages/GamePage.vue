@@ -450,7 +450,8 @@ const loadGameState = async () => {
       }
     }
     
-    const stateResponse = await get(`/api/v1/game/${route.params.roomId}/state`)
+    // const stateResponse = await get(`/api/v1/game/${route.params.roomId}/state`)
+    const stateResponse = await getRoomInfo(route.params.roomId)
     
     if (stateResponse.data && stateResponse.data.success) {
       gameState.value = stateResponse.data.data
@@ -660,7 +661,7 @@ const confirmRaise = async () => {
     const response = await gameAction(route.params.roomId, 'RAISE', { amount })
     gameLog.value.push(`You raised to ${amount} chips`)
     showRaiseInput.value = false
-    raiseAmount = 0
+    // raiseAmount = 0
     
     await nextTick()
     if (logContainer.value) {

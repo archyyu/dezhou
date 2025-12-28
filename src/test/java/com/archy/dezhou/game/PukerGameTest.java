@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,9 @@ public class PukerGameTest {
     
     private List<Player> testPlayers;
     private PukerGame testRoom;
+
+    private final int Bbet = 10;
+    private final int cd = 1000;
 
     @BeforeEach
     public void setUp() {
@@ -38,7 +43,7 @@ public class PukerGameTest {
         String[] names = {"Alice", "Bob", "Charlie", "Diana"};
         int[] chips = {1000, 1000, 1000, 1000};
         
-        for (int i = 0; i < 4; i++) {
+        IntStream.range(0, 4).forEach( i->{
             User user = new User();
             user.setUid(i + 1);
             user.setAccount(names[i]);
@@ -53,14 +58,14 @@ public class PukerGameTest {
             
             testPlayers.add(player);
             
-        }
+        });
     }
 
     private void setUpTestRoom() {
         // Create a Texas Hold'em room
         RoomDB roomDB = new RoomDB();
         roomDB.setId(1);
-        roomDB.setBbet(10);
+        roomDB.setBbet(Bbet);
         roomDB.setName("beginner");
         roomDB.setMinbuy(1000);
         roomDB.setMaxbuy(2000);
@@ -81,7 +86,6 @@ public class PukerGameTest {
     public void testPlayerSitdown() throws GameCmdException {
         int playerIndex = 0;
         int seatId = 2;
-        int cd = 1000;
         Player player = testPlayers.get(playerIndex);
         testRoom.userJoin(player);
         testRoom.playerSitDown(seatId, player, cd);
@@ -93,10 +97,7 @@ public class PukerGameTest {
     }
 
 
-    @Test
-    public void testPukerGame() {
-
-        int cd = 100;
+    private void playersSitdown() {
         // Add players to the room
         for (Player player : testPlayers) {
             testRoom.userJoin(player);
@@ -109,7 +110,11 @@ public class PukerGameTest {
 
             player.setRoomId(testRoom.getRoomid());
         }
+    }
 
+    @Test
+    public void testPukerGameFollowBet() {
+        this.playersSitdown();
         testRoom.initGame();
         testRoom.gameStartHandle();
 
@@ -120,23 +125,80 @@ public class PukerGameTest {
         followBet();
         followBet();
 
+        this.testPlayers.forEach(player -> {
+            assertEquals(player.getRoommoney() + Bbet, cd);
+        });
+
         assertEquals(2, testRoom.getRound());
+        this.check();
+        this.check();
+        this.check();
+        this.check();
+
+        assertEquals(3, testRoom.getRound());
+        this.check();
+        this.check();
+        this.check();
+        this.check();
+
+        assertEquals(4, testRoom.getRound());
+        this.check();
+        this.check();
+        this.check();
+        this.check();
+
+        int allmoney = 0;
+        for(Player player : testPlayers) {
+            allmoney += player.getRmoney();
+        }
+        assertEquals(cd * testPlayers.size() ,allmoney);
+
+        testRoom.gameStartHandle();
+        assertEquals(2, testRoom.getRoundNum());
+
+    }
+
+
+    @Test
+    public void testPukerGameRaiseBet() {
+        this.playersSitdown();
+        testRoom.initGame();
+        testRoom.gameStartHandle();
+
+        assertEquals(1, testRoom.getRoundNum());
+        assertEquals(1, testRoom.getRound());
         followBet();
+        followBet();
+        followBet();
+        followBet();
+
+        this.testPlayers.forEach(player -> {
+            assertEquals(player.getRoommoney() + Bbet, cd);
+        });
+
+        assertEquals(2, testRoom.getRound());
+        raiseBet(Bbet);
         followBet();
         followBet();
         followBet();
 
         assertEquals(3, testRoom.getRound());
-        followBet();
+        raiseBet(Bbet);
         followBet();
         followBet();
         followBet();
 
         assertEquals(4, testRoom.getRound());
+        raiseBet(Bbet);
         followBet();
         followBet();
         followBet();
-        followBet();
+
+        int allmoney = 0;
+        for(Player player : testPlayers) {
+            allmoney += player.getRmoney();
+        }
+        assertEquals(cd * testPlayers.size() ,allmoney);
 
         testRoom.gameStartHandle();
         assertEquals(2, testRoom.getRoundNum());
@@ -145,6 +207,16 @@ public class PukerGameTest {
     private void followBet() {
         Player currentPlayer = this.testRoom.getCurrentPlayer();
         testRoom.playerFollow(currentPlayer);
+    }
+
+    private void raiseBet(int bet) {
+        Player currentPlayer = this.testRoom.getCurrentPlayer();
+        testRoom.playerAddBet(currentPlayer, bet);
+    }
+
+    private void check() {
+        Player currentPlayer = this.testRoom.getCurrentPlayer();
+        testRoom.playerCheck(currentPlayer);
     }
 
 }
