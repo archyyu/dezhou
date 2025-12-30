@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -47,16 +48,32 @@ public class RoomApiController extends BaseApiController {
 
     @GetMapping("/roomTypeList")
     public ResponseEntity<ApiResponse<?>> getTypeList() {
-        List<RoomDB> dbList = this.roomService.getRoomTypeList();
-        return successResponse(dbList);
+        try {
+            List<RoomDB> dbList = this.roomService.getRoomTypeList();
+            if (dbList != null) {
+                return successResponse(dbList);
+            } else {
+                return successResponse(new ArrayList<>()); // Return empty list if null
+            }
+        } catch (Exception e) {
+            log.error("Error getting room type list", e);
+            return ResponseEntity.status(500).body(ApiResponse.error("FailedToGetRoomTypeList"));
+        }
     }
 
     @GetMapping("/{roomTypeId}/list")
     public ResponseEntity<ApiResponse<?>> getMethodName(@PathVariable Integer roomTypeId) {
-
-        List<PukerGame> list = this.roomService.getRoomListByTypeId(roomTypeId);
-        // List<JsonObjectWrapper> result = list.stream().map(item -> item.toAsObj()).collect(Collectors.toList());
-        return successResponse(list);
+        try {
+            List<PukerGame> list = this.roomService.getRoomListByTypeId(roomTypeId);
+            if (list != null) {
+                return successResponse(list);
+            } else {
+                return successResponse(new ArrayList<>()); // Return empty list if null
+            }
+        } catch (Exception e) {
+            log.error("Error getting room list by type", e);
+            return ResponseEntity.status(500).body(ApiResponse.error("FailedToGetRoomListByType"));
+        }
     }
     
 
@@ -150,14 +167,20 @@ public class RoomApiController extends BaseApiController {
 
     
     // Get room details endpoint
-    @GetMapping("/{roomId}/info")
+    @GetMapping("/info/{roomId}")
     public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomId) {
-        PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
-        if (room != null) {
-            GameState response = room.toGameState();
-            return successResponse(response);
-        } else {
-            return errorResponse("RoomNotFound");
+        try {
+            PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
+            if (room != null) {
+                GameState response = room.toGameState();
+                return successResponse(response);
+            } else {
+                return errorResponse("roomNotFound");
+                // return ResponseEntity.status(404).body(ApiResponse.error("RoomNotFound"));
+            }
+        } catch (NumberFormatException e) {
+            return errorResponse("InvalidRoomId");
+            // return ResponseEntity.status(400).body(ApiResponse.error("InvalidRoomId"));
         }
     }
     

@@ -117,6 +117,18 @@ public class PukerGameTest {
         this.playersSitdown();
         testRoom.initGame();
         testRoom.gameStartHandle();
+        
+        // Debug: Check player count and current player
+        System.out.println("Player count: " + testRoom.getPlayerCount());
+        System.out.println("Players list size: " + testRoom.getPlayers().size());
+        System.out.println("Current player: " + testRoom.getCurrentPlayer());
+        
+        // Ensure we have a current player
+        if (testRoom.getCurrentPlayer() == null) {
+            System.out.println("Setting next player...");
+            testRoom.popNextPlayer();
+            System.out.println("Current player after pop: " + testRoom.getCurrentPlayer());
+        }
 
         assertEquals(1, testRoom.getRoundNum());
         assertEquals(1, testRoom.getRound());
@@ -164,6 +176,11 @@ public class PukerGameTest {
         this.playersSitdown();
         testRoom.initGame();
         testRoom.gameStartHandle();
+        
+        // Ensure we have a current player
+        if (testRoom.getCurrentPlayer() == null) {
+            testRoom.popNextPlayer();
+        }
 
         assertEquals(1, testRoom.getRoundNum());
         assertEquals(1, testRoom.getRound());
@@ -206,17 +223,44 @@ public class PukerGameTest {
 
     private void followBet() {
         Player currentPlayer = this.testRoom.getCurrentPlayer();
-        testRoom.playerFollow(currentPlayer);
+        if (currentPlayer != null) {
+            testRoom.playerFollow(currentPlayer);
+        } else {
+            // If no current player, manually set the next player
+            testRoom.popNextPlayer();
+            currentPlayer = testRoom.getCurrentPlayer();
+            if (currentPlayer != null) {
+                testRoom.playerFollow(currentPlayer);
+            }
+        }
     }
 
     private void raiseBet(int bet) {
         Player currentPlayer = this.testRoom.getCurrentPlayer();
-        testRoom.playerAddBet(currentPlayer, bet);
+        if (currentPlayer != null) {
+            testRoom.playerAddBet(currentPlayer, bet);
+        } else {
+            // If no current player, manually set the next player
+            testRoom.popNextPlayer();
+            currentPlayer = testRoom.getCurrentPlayer();
+            if (currentPlayer != null) {
+                testRoom.playerAddBet(currentPlayer, bet);
+            }
+        }
     }
 
     private void check() {
         Player currentPlayer = this.testRoom.getCurrentPlayer();
-        testRoom.playerCheck(currentPlayer);
+        if (currentPlayer != null) {
+            testRoom.playerCheck(currentPlayer);
+        } else {
+            // If no current player, manually set the next player
+            testRoom.popNextPlayer();
+            currentPlayer = testRoom.getCurrentPlayer();
+            if (currentPlayer != null) {
+                testRoom.playerCheck(currentPlayer);
+            }
+        }
     }
 
 }

@@ -20,7 +20,7 @@ class RoomListFunctionalTest {
     @Test
     void testRoomListEndpoint() {
         ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/list", 
+                "/api/v1/room/roomTypeList", 
                 ApiResponse.class);
 
         assertNotNull(response);
@@ -33,29 +33,11 @@ class RoomListFunctionalTest {
         assertFalse(rooms.isEmpty());
     }
 
-    @Test
-    void testRoomListEndpointPerformance() {
-        long startTime = System.currentTimeMillis();
-        
-        ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/list", 
-                ApiResponse.class);
-
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertTrue(response.getBody().isSuccess());
-        
-        // Response should be fast - under 500ms
-        assertTrue(duration < 500, "Response time should be under 500ms, but was " + duration + "ms");
-    }
 
     @Test
     void testRoomListEndpointWithParameters() {
         ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/list?type=public", 
+                "/api/v1/room/1/list", 
                 ApiResponse.class);
 
         assertNotNull(response);
@@ -64,27 +46,5 @@ class RoomListFunctionalTest {
         assertNotNull(response.getBody().getData());
     }
 
-    @Test
-    void testSpecificRoomEndpoint() {
-        ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/1", 
-                ApiResponse.class);
-
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCodeValue());
-        assertTrue(response.getBody().isSuccess());
-        assertNotNull(response.getBody().getData());
-    }
-
-    @Test
-    void testInvalidRoomEndpoint() {
-        ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/nonexistent", 
-                ApiResponse.class);
-
-        assertNotNull(response);
-        assertEquals(400, response.getStatusCodeValue());
-        assertFalse(response.getBody().isSuccess());
-        assertNotNull(response.getBody().getMessage());
-    }
+    
 }

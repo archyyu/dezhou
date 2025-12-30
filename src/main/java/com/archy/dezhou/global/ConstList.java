@@ -15,6 +15,7 @@ public class ConstList
 	public static final String CMD_ALL_IN = "5"; // 全下
 	public static final String CMD_SITDOWN = "6"; // 坐下
 	public static final String CMD_STANDUP = "7"; // 站起
+	public static final String CMD_CHECK = "8";
 	public static final String CMD_LEAVE = "106"; // 离开大厅
 	public static final String CMD_ROOMINFO = "9"; // 获取桌面信息
 	public static final String CMD_ROUND_OVER = "rover"; // 结束

@@ -3,6 +3,7 @@ package com.archy.dezhou.beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.room.PukerGame;
 
@@ -50,8 +51,9 @@ public class GameState {
         
         if (game != null) {
             // Add game-specific information
-            this.currentPlayerId = game.getCurrentPlayer().getUid();
-            this.currentPlayerSeat = game.getCurrentPlayer().getSeatId();
+            Player currentPlayer = game.getCurrentPlayer();
+            this.currentPlayerId = currentPlayer != null ? currentPlayer.getUid() : 0;
+            this.currentPlayerSeat = currentPlayer != null ? currentPlayer.getSeatId() : 0;
             this.currentBetAmount = 0;//game.getCurrentBet();
             this.potAmount = 0; // game.getPotAmount();
             this.gamePhase = "betting"; // game.getGamePhase();
