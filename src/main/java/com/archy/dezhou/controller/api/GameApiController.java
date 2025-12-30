@@ -1,11 +1,13 @@
 package com.archy.dezhou.controller.api;
 
+import com.archy.dezhou.GameCmdException;
+import com.archy.dezhou.beans.GameState;
+import com.archy.dezhou.beans.PlayerState;
 import com.archy.dezhou.command.GameCommand;
 import com.archy.dezhou.command.GameCommandFactory;
-import com.archy.dezhou.container.JsonObjectWrapper;
+
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.response.GameStateResponse;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
@@ -89,84 +91,21 @@ public class GameApiController extends BaseApiController {
                 player.clearDropCardNum();
             }
 
-            JsonObjectWrapper result = null;
 
             GameCommand gameCommand = this.gameCommandFactory.getCommand(cmd);
 
-            result = gameCommand.execute(room, player, additionalParams);
+            boolean result = gameCommand.execute(room, player, additionalParams);
             
-            return successResponse(result.toJSONString());
+            if (result) {
+                return successResponse( new GameState(room) );
+            } else {
+                return errorResponse("failed");
+            }
             
-        } catch (Exception e) {
+        } catch (GameCmdException e) {
             logger.error("err", e);
             return errorResponse("GameActionProcessingFailed: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Other game operations endpoint
-     */
-    @PostMapping("/{roomId}/other")
-    public ResponseEntity<ApiResponse<?>> handleOtherGameOperations(
-            @PathVariable String roomId,
-            @RequestParam String uid,
-            @RequestParam String cmd) {
-        
-        try {
-            Player user = validateUserAndRoom(uid, roomId);
-            if (user == null) {
-                return errorResponse("UserNotLogined");
-            }
-            
-            // Handle flush achievements command
-            if (ConstList.CMD_FLUSHACH.equals(cmd)) {
-                return successResponse(handleFlushAchievements());
-            }
-            
-            return errorResponse("InvalidOtherCommand");
-            
-        } catch (Exception e) {
-            return errorResponse("OtherGameOperationFailed: " + e.getMessage());
-        }
-    }
-
-    // Helper methods for each game command
-
-    private JsonObjectWrapper handleFlushAchievements() {
-        return new JsonObjectWrapper();
-    }
-
-    // Utility methods
-    private Player validateUserAndRoom(String uid, String roomIdStr) {
-        try {
-            // First try to get user from security context (JWT authentication)
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof Player) {
-                Player authenticatedUser = (Player) authentication.getPrincipal();
-                
-                // Verify that the uid parameter matches the authenticated user
-                if (uid != null && !uid.isEmpty()) {
-                    int uidInt = Integer.parseInt(uid);
-                    if (authenticatedUser.getUid() == uidInt) {
-                        return authenticatedUser;
-                    }
-                }
-                return authenticatedUser;
-            }
-            
-            // Fallback to legacy authentication (for compatibility)
-            int uidInt = Integer.parseInt(uid);
-            Player user = this.userService.getUserByUserId(uidInt);
-
-            if (user == null) {
-                return null;
-            }
-            
-            // Room validation is done in the specific handlers
-            return user;
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        } 
     }
 
     /**
@@ -181,7 +120,7 @@ public class GameApiController extends BaseApiController {
             }
 
             // Use the new GameStateResponse entity instead of JsonObjectWrapper
-            GameStateResponse gameState = new GameStateResponse(room);
+            GameState gameState = new GameState(room);
             
             return successResponse(gameState);
         } catch (Exception e) {
@@ -213,15 +152,7 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("PlayerNotInGame");
             }
             
-            JsonObjectWrapper playerStatus = new JsonObjectWrapper();
-            playerStatus.put("playerId", player.getUid());
-            playerStatus.put("seatId", player.getSeatId());
-            playerStatus.put("chips", player.getChips());
-            playerStatus.put("currentBet", player.getCurrentBet());
-            // playerStatus.put("hasLooked", player.hasLooked().toString());
-            playerStatus.put("isActive", player.isActive());
-            playerStatus.put("isAllIn", player.isAllIn());
-            
+            PlayerState playerStatus = player.toPlayerState();
             return successResponse(playerStatus);
         } catch (Exception e) {
             return errorResponse("FailedToGetPlayerStatus: " + e.getMessage());

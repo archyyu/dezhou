@@ -17,7 +17,7 @@ import com.archy.dezhou.global.ConstList;
 import jakarta.annotation.Resource;
 
 import com.archy.dezhou.GameCmdException;
-import com.archy.dezhou.container.JsonObjectWrapper;
+import com.archy.dezhou.beans.GameState;
 import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
@@ -82,15 +82,6 @@ public class PukerGame extends GameRoom
 			return 0;
 		}
 		return this.winMap.get(seatId);
-	}
-	
-	public String getCurrentTurnPlayerId()
-	{
-		if(this.currentPlayer == null)
-		{
-			return "0";
-		}
-		return this.currentPlayer.getUid() + "";
 	}
 
 	public void beatHeart(long now)
@@ -440,18 +431,6 @@ public class PukerGame extends GameRoom
 		this.publicPoolBet = 0;
 	}
 	
-	
-	public JsonObjectWrapper fiveSharePkToAsob()
-	{
-		JsonObjectWrapper aso = new JsonObjectWrapper();
-		for(int i = 0;i<this.fiveSharePk.size();i++)
-		{
-			aso.put(i,this.fiveSharePk.get(i).toAobj());
-		}
-		return aso;
-	}
-	
-	
 	public void settleRoundPlayersOnStart()
 	{
 		this.playerList.clear();
@@ -487,44 +466,6 @@ public class PukerGame extends GameRoom
 		this.playerList.poll();
 	}
 
-	public JsonObjectWrapper toAsObj()
-	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
-
-		response.put("_cmd",ConstList.CMD_ROOMINFO);
-		response.put("ig", this.isGame()?"yes":"no");
-		response.putNumber("turn",this.getRoundNum());
-		response.putNumber("round",this.getRound());
-
-		response.putNumber("mbet",this.getBbet());
-		response.putNumber("sbet",this.getSbet());
-		response.putNumber("msid",this.maxSeatId());
-		response.putNumber("bsid",this.getBankerSeatId());
-		response.putNumber("wt",this.getNextSeatId());
-
-		response.putNumber("minbuy",this.getMinbuy());
-		response.putNumber("maxbuy",this.getMaxbuy());
-
-		response.put("chname",this.getShowname());
-		response.put("roomName",this.getName());
-		response.putNumber("fpb",this.getPoolBet(1));
-		response.putNumber("spb",this.getPoolBet(2));
-		response.putNumber("tpb",this.getPoolBet(3));
-		response.putNumber("fopb",this.getPoolBet(4));
-
-		if(this.isGame())
-		{
-			response.put("fpk",this.fiveSharePkToAsob());
-		}
-
-		JsonObjectWrapper as_plist = this.playersToList();
-		
-
-		response.putNumber("bsid",this.getBankerSeatId());
-		response.put("plist",as_plist);
-
-		return response;
-	}
 	
 	public void settleRoundPlayerOnRoundOver()
 	{
@@ -617,63 +558,18 @@ public class PukerGame extends GameRoom
 	
 	public void notifyRoomPlayerPokeGameOver()
 	{
-		JsonObjectWrapper asObj = new JsonObjectWrapper();
-		
-		JsonObjectWrapper winList = new JsonObjectWrapper();
-		for(Map.Entry<Integer, Integer> entry : this.winMap.entrySet())
-		{
-			Player player = this.getPlayerBySeat(entry.getKey());
-			if(player == null)
-			{
-				continue;
-			}
-			JsonObjectWrapper winPlayer = new JsonObjectWrapper();
-			
-			winPlayer.put("rlist",new JsonObjectWrapper());
-			winPlayer.putNumber("sid",entry.getKey());
-			winPlayer.putNumber("tbet",entry.getValue());
-			winPlayer.putNumber("gs",player.getPkLevel());
-			winPlayer.put("pkwz",PukerKit.pkPosition(player.getFivePk(), player.getPkType()));
-			
-			winList.put(entry.getKey(),winPlayer);
-		}
-		
-		asObj.put("wlist",winList);
-		asObj.put("blist",new JsonObjectWrapper());
-		
-		JsonObjectWrapper cmList = new JsonObjectWrapper();
-		for(Player entry : this.getPlayers())
-		{
-			if(entry.getPlayerState() == ConstList.PlayerCareerState.PLAYER_STATE_LEAVE)
-			{
-				continue;
-			}
-			cmList.put(entry.getSeatId(),entry.getRmoney() + "");
-		}
-		asObj.put("cmList",cmList);
-		asObj.put("_cmd",ConstList.CMD_DBT); 
-		asObj.putBool("normal", isGameNormalOver());
-		this.notifyRoomPlayer(asObj, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoom(this.toGameState());
 	}
 	
 	
 	public void notifyRoomPlayerPokeGameStart()
 	{
-		JsonObjectWrapper response = this.toAsObj();
-		response.put("_cmd",ConstList.CMD_SBOT);
-		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoom(this.toGameState());
 	}
 	
 	public void notifyRoomWhoTurn()
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
-		
-		response.put("_cmd",ConstList.CMD_WHO_TURN);
-		response.putNumber("mbet",this.maxBet);
-		response.putNumber("wt_sid",currentPlayer.getSeatId());
-		response.put("wt_uid",currentPlayer.getUid());
-		
-		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoom(this.toGameState());
 	}
 	
 	
@@ -854,52 +750,26 @@ public class PukerGame extends GameRoom
 	
 	public void notifyRoomPlayerRoundOver()
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
-		JsonObjectWrapper uList = new JsonObjectWrapper();
-		
-		for(Player entry : this.getPlayers())
-		{
-			JsonObjectWrapper pl = new JsonObjectWrapper();
-			pl.putNumber("sid",entry.getSeatId());
-			pl.putNumber("pkl",entry.getPkLevel());
-			uList.put("sid" + entry.getSeatId(),pl);
-		}
-		
-		response.put("ulist",uList);
-		response.put("_cmd",ConstList.CMD_ROUND_OVER);
-		response.putNumber("round",this.round);
-		response.putNumber("rbet",this.currentRoundBet);
-		response.put("gover", this.isGame() ? "no" : "yes");
-		
-		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		this.notifyRoom(this.toGameState());
 	}
 	
 	
-	public JsonObjectWrapper playerLookCard(Player player)
+	public boolean playerLookCard(Player player)
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
-			response.put("error","notYourTurn");
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return response;
+			return false;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LOOK_CARD);
 		player.setYourTurn(0);
 		
-		JsonObjectWrapper as_player = player.toAsObj();
-		
-		response.put("_cmd", ConstList.CMD_LOOK_CARD);
-		response.put("user", as_player);
-		
-		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " look card " );
-		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
-		return response;
+		return true;
 	}
 	
 	
@@ -909,18 +779,16 @@ public class PukerGame extends GameRoom
 	}
 	
 	
-	public JsonObjectWrapper playerAddBet(Player player,int bet)
+	public boolean playerAddBet(Player player,int bet)
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
-			response.put("error","notYourTurn");
 			
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return response;
+			return false;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_ADD_BET);
@@ -932,13 +800,12 @@ public class PukerGame extends GameRoom
 		
 		if(bet < 2 * (this.maxBet - player.getTempBet()))
 		{
-			response.put("error","YouParmsisNotValid");
 			
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " add bet error bet: " + bet);
 			
-			return response;
+			return false;
 		}
 		
 		this.addPoolBet(bet);
@@ -953,42 +820,35 @@ public class PukerGame extends GameRoom
 			this.maxBetSeatId = player.getSeatId();
 		}
 		
-		JsonObjectWrapper as_player = player.toAsObj();
-		response.put("_cmd",ConstList.CMD_ADD_BET);
-		response.put("user",as_player);
 		
 		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " add " + bet  );
-		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.settleRoundPlayersOnAddBet(player);
 		this.turnOverHandle();
-		return response;
+		return true;
 	}
 
-	public JsonObjectWrapper playerFollow(Player player) {
+	public boolean playerFollow(Player player) {
 		int bet = this.maxBet - player.getTempBet();
 		return this.playerFollowBet(player, bet);
 	}
 
-	public JsonObjectWrapper playerCheck(Player player) {
+	public boolean playerCheck(Player player) {
 		return this.playerFollowBet(player, 0);
 	}
 
-	public JsonObjectWrapper playerRaise(Player player, int bet) {
+	public boolean playerRaise(Player player, int bet) {
 		return this.playerFollowBet(player, bet);
 	}
 	
-	public JsonObjectWrapper playerFollowBet(Player player,int bet)
+	public boolean playerFollowBet(Player player,int bet)
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
-		{
-			response.put("error","notYourTurn");
-			
+		{			
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return response;
+			return false;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_FOLLOW_BET);
@@ -1000,12 +860,11 @@ public class PukerGame extends GameRoom
 		
 		if(player.getTempBet() + bet < this.maxBet)
 		{
-			response.put("error","YouParmsisNotValid");
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " call error,bet: " + bet);
 			
-			return response;
+			return false;
 		}
 		
 		this.addPoolBet(bet);
@@ -1021,64 +880,56 @@ public class PukerGame extends GameRoom
 			this.maxBetSeatId = player.getSeatId();
 		}
 		
-		response.put("_cmd",ConstList.CMD_FOLLOW_BET);
-		JsonObjectWrapper as_player = player.toAsObj();
-		response.put("user",as_player);
 		
 		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " call " + bet + " on round:" + this.round);
-		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		// this.notifyRoom(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		this.notifyPlayer(player.toPlayerState());
 		this.turnOverHandle();
-		return response;
+		return true;
 	}
 	
+	public GameState toGameState() {
+		return new GameState(this);
+	}
 	
-	public JsonObjectWrapper playerDropCard(Player player)
+	public boolean playerDropCard(Player player)
 	{
 		
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
-			response.put("error","notYourTurn");
-			
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return response;
+			return false;
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_DROP_CARD);
 		player.setYourTurn(0);
 		
-		response.put("_cmd",ConstList.CMD_DROP_CARD);
-		response.put("user",player.toAsObj());
-		
 		this.publicPoolBet += player.getTotalGambleBet();
 		
 		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " drop card " );
-		this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
+		// this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 		this.turnOverHandle();
 		if(this.isGame() && this.isGameOverWhenDropCard())
 		{
 			this.gameOverHandle();
 		}
 		
-		return response;
+		return true;
 	}
 	
 	
-	public JsonObjectWrapper playerAllIn(Player player,int bet)
+	public boolean playerAllIn(Player player,int bet)
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(this.isYouTurn(player) == false)
 		{
-			response.put("error","notYourTurn");
-			
 			log.error("roomName: " + this.getName() 
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return response;
+			return false;
 		}
 
 		if(bet > player.getRmoney())
@@ -1101,13 +952,11 @@ public class PukerGame extends GameRoom
 			this.settleRoundPlayersOnAddBet(player);
 		}
 		
-		response.put("_cmd",ConstList.CMD_ALL_IN);
-		response.put("user",player.toAsObj());
 		
 		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " all in " + bet );
-		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
+		// this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
-		return response;
+		return true;
 	}
 	
 	@Override
@@ -1152,7 +1001,7 @@ public class PukerGame extends GameRoom
     }
 
 	@Override
-	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws GameCmdException {
+	public boolean playerSitDown(int seatId, Player player, int cb) throws GameCmdException {
 		return super.playerSitDown(seatId, player, cb);
 	}
 	

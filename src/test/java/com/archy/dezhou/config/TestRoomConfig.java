@@ -61,6 +61,5 @@ public class TestRoomConfig {
         roomService.addRoom(intermediateRoom);
         roomService.addRoom(advancedRoom);
         
-        System.out.println("TestRoomConfig: Added " + roomService.getRoomList().size() + " test rooms");
     }
 }

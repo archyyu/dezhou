@@ -14,9 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import com.archy.dezhou.GameCmdException;
-import com.archy.dezhou.container.JsonObjectWrapper;
+import com.archy.dezhou.beans.GameState;
+import com.archy.dezhou.beans.PlayerState;
 import com.archy.dezhou.entity.Player;
-import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.RoomDB;
 
 @Data
@@ -120,9 +120,8 @@ public class GameRoom
 		return this.playerMap.values().stream().collect(Collectors.toList());
 	}
 	
-	public JsonObjectWrapper playerSitDown(int seatId, Player player, int cb) throws GameCmdException
+	public boolean playerSitDown(int seatId, Player player, int cb) throws GameCmdException
 	{
-		JsonObjectWrapper response = new JsonObjectWrapper();
 		if(player == null)
 		{
 			throw new GameCmdException("playerNotExist");
@@ -161,8 +160,8 @@ public class GameRoom
 		}
 
 		this.addPlayer(seatId,player);
-		this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
-		return response;
+		this.notifyPlayer(player.toPlayerState());
+		return true;
 	}
 	
 	public boolean playerStandUp(Player player)
@@ -346,31 +345,6 @@ public class GameRoom
 		return map;
 	}
 
-	public void notifyRoomPlayerButOne(JsonObjectWrapper aObj, ConstList.MessageType msgType, Integer uId)
-	{
-		long timeStamp = System.currentTimeMillis();
-		Set<User> users = new HashSet<User>();
-
-		synchronized (this.playerMap)
-		{
-			users.addAll(this.playerMap.values());
-		}
-		synchronized (this.spectatorList)
-		{
-			users.addAll(this.spectatorList);
-		}
-
-		for(User user : users)
-		{
-			if(user.getUid().equals(uId))
-			{
-				continue;
-			}
-			// TODO 通知其他用户，我做了什么
-
-		}
-	}
-
 	public boolean isUserPlaying(int uid) {
 		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
 		{
@@ -382,68 +356,25 @@ public class GameRoom
 		return false;
 	}
 
-	public void notifyRoomPlayer(JsonObjectWrapper aObj, ConstList.MessageType msgType)
-	{
-		long timeStamp = System.currentTimeMillis();
-		Set<User> users = new HashSet<User>();
+	public void notifyPlayer(PlayerState playerState) {
+		this.playerMap.values().forEach(player -> {
 
-		synchronized (this.playerMap)
-		{
-			users.addAll(this.playerMap.values());
-		}
-		synchronized (this.spectatorList)
-		{
-			users.addAll(this.spectatorList);
-		}
+		});
 
-		//notify all the uers, game start
+		this.spectatorList.forEach(player -> {
+
+		});
 	}
 
-	public JsonObjectWrapper playersToList() {
-		JsonObjectWrapper as_plist = new JsonObjectWrapper();
-		for(Map.Entry<Integer, Player> entry : this.playerMap.entrySet())
-		{
-			JsonObjectWrapper as_player = new JsonObjectWrapper();
-			Player player = entry.getValue();
+	public void notifyRoom(GameState gameState)
+	{
+		this.playerMap.values().forEach(player -> {
+			
+		});
 
-			JsonObjectWrapper dj_func = new JsonObjectWrapper();
+		this.spectatorList.forEach(player -> {
 
-			as_player.put("dj_func", dj_func);
-
-			as_player.put("un",player.getAccount());
-			as_player.putNumber("lev",0);
-			as_player.putNumber("sid",entry.getKey());
-			as_player.put("uid",player.getUid());
-
-			as_player.putNumber("pkl",player.getPkLevel());
-			as_player.putBool("isp",player.isPlaying());
-			as_player.putNumber("tb",player.getTempBet());
-			as_player.putNumber("yt",player.getYourTurn());
-
-			as_player.putNumber("cm",player.getRmoney());
-			as_player.putNumber("tm",player.getAMoney());
-			as_player.putNumber("gs",player.getGameState().value());
-			as_player.putNumber("ps",player.getPlayerState().value());
-
-
-			if(this.isGame())
-			{
-				Puke p = player.getPuke(5);
-				if(p != null)
-				{
-					as_player.put("pk1",p.toAobj());
-				}
-
-				Puke p2 = player.getPuke(6);
-				if(p2 != null)
-				{
-					as_player.put("pk2",p2.toAobj());
-				}
-
-			}
-			as_plist.put("sid" + entry.getKey(),as_player);
-		}
-		return as_plist;
+		});
 	}
 	
 	public Integer getBbet() {

@@ -4,23 +4,21 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.archy.dezhou.container.JsonObjectWrapper;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.room.PukerGame;
+import com.archy.dezhou.global.ConstList;
 
-// @Component
+@Component
 public class CheckCommand implements GameCommand{
 
     @Override
     public String getCommandName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCommandName'");
+        return ConstList.CMD_CHECK;
     }
 
     @Override
-    public JsonObjectWrapper execute(PukerGame gameRoom, Player player, Map<String, String> params) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'execute'");
+    public boolean execute(PukerGame gameRoom, Player player, Map<String, String> params) {
+        return gameRoom.playerCheck(player);
     }
     
 }
