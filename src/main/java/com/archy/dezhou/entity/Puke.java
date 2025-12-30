@@ -1,7 +1,5 @@
 package com.archy.dezhou.entity;
 
-import com.archy.dezhou.container.JsonObjectWrapper;
-
 public class Puke
 {
 	private String tag; // 图片扑克花色的表示（代表的是红桃、黑桃,梅花、方块
@@ -31,14 +29,6 @@ public class Puke
 	public String getTag()
 	{
 		return tag;
-	}
-	
-	public JsonObjectWrapper toAobj()
-	{
-		JsonObjectWrapper as = new JsonObjectWrapper();
-		as.put("tag",this.tag);
-		as.putNumber("num",this.num);
-		return as;
 	}
 	
 	public String toString()

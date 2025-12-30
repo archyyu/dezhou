@@ -1,6 +1,7 @@
 package com.archy.dezhou.controller.api;
 
-import com.archy.dezhou.container.JsonObjectWrapper;
+
+import com.archy.dezhou.beans.GameState;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
@@ -13,19 +14,12 @@ import com.archy.dezhou.service.UserService;
 
 import jakarta.annotation.Resource;
 
-import com.archy.dezhou.entity.response.RoomResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 
@@ -50,22 +44,6 @@ public class RoomApiController extends BaseApiController {
     private JwtTokenProvider jwtTokenProvider;
 
     private Logger log = LoggerFactory.getLogger(getClass());
-
-    // Get room list endpoint - replaces LIST command
-    @GetMapping("/list")
-    public ResponseEntity<ApiResponse<?>> getRoomList(
-            @RequestParam(required = false, defaultValue = "rg") String rt,
-            @RequestParam(required = false, defaultValue = "-1") String bb,
-            @RequestParam(required = false, defaultValue = "-1") String sb) {
-        
-        try {
-            List<RoomResponse.RoomListItem> roomList = getRoomListFromMemory(rt, bb, sb);
-            log.info("room/list size:" + roomList.size());
-            return successResponse(roomList);
-        } catch (Exception e) {
-            return errorResponse("RoomListRetrievalFailed: " + e.getMessage());
-        }
-    }
 
     @GetMapping("/roomTypeList")
     public ResponseEntity<ApiResponse<?>> getTypeList() {
@@ -170,34 +148,13 @@ public class RoomApiController extends BaseApiController {
         }
     }
 
-    // Helper method to generate room list using modern entities
-    private List<RoomResponse.RoomListItem> getRoomListFromMemory(String roomtype, String bb, String sb) {
-        List<PukerGame> roomlist = this.roomService.getRoomList();
-        List<RoomResponse.RoomListItem> result = new ArrayList<>();
-        
-        if (StringUtils.isNumeric(bb) && StringUtils.isNumeric(sb)) {
-            int minBet = Integer.parseInt(sb);
-            int maxBet = Integer.parseInt(bb);
-
-            roomlist.forEach(room -> {
-                if (room.getBbet() >= minBet && room.getBbet() <= maxBet) {
-                    result.add(new RoomResponse.RoomListItem(room));
-                }
-            });
-        } else {
-            roomlist.forEach(room -> result.add(new RoomResponse.RoomListItem(room)));
-            return result;
-        }
-        
-        return result;
-    }
-
+    
     // Get room details endpoint
-    @GetMapping("/{roomId}")
+    @GetMapping("/{roomId}/info")
     public ResponseEntity<ApiResponse<?>> getRoomDetails(@PathVariable String roomId) {
         PukerGame room = this.roomService.getRoom(Integer.parseInt(roomId));
         if (room != null) {
-            RoomResponse response = new RoomResponse(room);
+            GameState response = room.toGameState();
             return successResponse(response);
         } else {
             return errorResponse("RoomNotFound");

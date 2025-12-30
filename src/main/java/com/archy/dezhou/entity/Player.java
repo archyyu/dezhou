@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
 
-import com.archy.dezhou.container.JsonObjectWrapper;
+
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.global.ConstList.PlayerCareerState;
 import com.archy.dezhou.global.ConstList.PlayerGameState;
@@ -15,9 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 
+import com.archy.dezhou.beans.GameState;
+import com.archy.dezhou.beans.PlayerState;
 import com.archy.dezhou.entity.puker.FivePukeItem;
 import com.archy.dezhou.entity.puker.PukerKit;
-import com.archy.dezhou.entity.response.GameStateResponse.Card;
 
 @Data
 public class Player extends User
@@ -126,18 +127,9 @@ public class Player extends User
 		return totalWinnings;
 	}
 
-	private List<Card> cards;
-
-	// Explicit getter for cards field
-	public List<Card> getCards() {
-		return cards;
-	}
-
 	private PlayerCareerState playerState = PlayerCareerState.PLAYER_STATE_PLAYER;
 
 	private PlayerGameState gameState = PlayerGameState.PLAYER_STATE_PLAYER;
-
-	private Queue<JsonObjectWrapper> msgQueue = new ConcurrentLinkedQueue<>();
 
 	@JsonIgnore
 	protected Logger log = Logger.getLogger(Player.class.getName());
@@ -338,59 +330,6 @@ public class Player extends User
 		this.pkLevel = this.maxFivePukeList.getLevel();
 		
 	}
-	
-	public JsonObjectWrapper toAsObj()
-	{
-		JsonObjectWrapper asObj = new JsonObjectWrapper();
-		
-		asObj.putNumber("sid",this.getSeatId());
-		asObj.put("un",this.getAccount());
-		asObj.put("uid",this.getUid());
-		asObj.putNumber("tb",this.getTempBet());
-		asObj.putNumber("yt",this.getYourTurn());
-		asObj.putNumber("gs",this.getGameState().value());
-		asObj.putNumber("cm",this.getRmoney());
-		
-		return asObj;
-	}
-
-	public void sendMsg(JsonObjectWrapper msg) {
-		this.msgQueue.offer(msg);
-	}
-
-	public List<JsonObjectWrapper> retrieveMsg() {
-		List<JsonObjectWrapper> list = new ArrayList<>();
-
-		JsonObjectWrapper msg = this.msgQueue.poll();
-		while(msg != null) {
-			list.add(msg);
-			msg = this.msgQueue.poll();
-		}
-
-		return list;
-	}
-
-	/**
-	 * Convert player to modern JSON object
-	 * @return JsonObjectWrapper representation of player
-	 */
-	public JsonObjectWrapper toJsonObj()
-	{
-		JsonObjectWrapper jsonObj = new JsonObjectWrapper();
-		
-		jsonObj.putNumber("sid", this.getSeatId());
-		jsonObj.put("un", this.getAccount());
-		jsonObj.put("uid", this.getUid());
-		jsonObj.putNumber("tb", this.getTempBet());
-		jsonObj.putNumber("yt", this.getYourTurn());
-		jsonObj.putNumber("gs", this.getGameState().value());
-		jsonObj.putNumber("cm", this.getRmoney());
-		jsonObj.putNumber("tm", this.getAMoney());
-		jsonObj.putNumber("lev", this.getLevel());
-		jsonObj.putBool("isp", this.isPlaying());
-		
-		return jsonObj;
-	}
 
 	public int getDropCardNum()
 	{
@@ -405,6 +344,18 @@ public class Player extends User
 	public void addDropCardNum()
 	{
 		this.dropCardNum ++;
+	}
+
+	public PlayerState toPlayerState() {
+		return new PlayerState(this);
+	}
+
+	public void notifyClient(PlayerState playerState) {
+		//send player client the updated player state
+	}
+
+	public void notifyClient(GameState gameState) {
+		//send player client the update game state
 	}
 	
 }
