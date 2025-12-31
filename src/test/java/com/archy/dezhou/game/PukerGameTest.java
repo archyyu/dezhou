@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,22 +113,12 @@ public class PukerGameTest {
 
     @Test
     public void testPukerGameFollowBet() {
+        
         this.playersSitdown();
+
         testRoom.initGame();
         testRoom.gameStartHandle();
         
-        // Debug: Check player count and current player
-        System.out.println("Player count: " + testRoom.getPlayerCount());
-        System.out.println("Players list size: " + testRoom.getPlayers().size());
-        System.out.println("Current player: " + testRoom.getCurrentPlayer());
-        
-        // Ensure we have a current player
-        if (testRoom.getCurrentPlayer() == null) {
-            System.out.println("Setting next player...");
-            testRoom.popNextPlayer();
-            System.out.println("Current player after pop: " + testRoom.getCurrentPlayer());
-        }
-
         assertEquals(1, testRoom.getRoundNum());
         assertEquals(1, testRoom.getRound());
         followBet();

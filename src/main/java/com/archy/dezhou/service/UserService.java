@@ -36,7 +36,7 @@ public class UserService {
         Player player = playersMap.get(userId);
         if (player == null)
         {
-            User user = getUserById(userId);
+            User user = this.getUserById(userId);
             if(user != null)
             {
                 player = new Player(user);
