@@ -67,10 +67,10 @@ public class GameApiController extends BaseApiController {
      * Common game operations endpoint
      * Handles various game commands like look card, bet, follow, etc.
      */
-    @PostMapping("/{roomId}/actions")
+    @PostMapping("/{roomId}/action/{cmd}")
     public ResponseEntity<ApiResponse<?>> handleGameAction(
             @PathVariable String roomId,
-            @RequestParam String cmd,
+            @PathVariable String cmd,
             @RequestBody(required = false) Map<String, String> additionalParams) {
         
         try {
