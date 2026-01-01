@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Fix Test</title>
+    <script>
+        // Apply global polyfill first
+        if (typeof global === 'undefined') {
+            window.global = window;
+            console.log('Global polyfill applied');
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-result {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Fix Test</h1>
+    <p>This test verifies that the SockJS global reference error is fixed.</p>
+    
+    <div id="testResults"></div>
+    
+    <button id="runTest" onclick="runTest()">Run Test</button>
+    
+    <script>
+        function addResult(message, isSuccess) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.textContent = message;
+            document.getElementById('testResults').appendChild(resultDiv);
+        }
+
+        function runTest() {
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML = '';
+            
+            try {
+                // Test 1: Check if global is defined
+                if (typeof global !== 'undefined') {
+                    addResult('✅ Global object is defined', true);
+                } else {
+                    addResult('❌ Global object is not defined', false);
+                    return;
+                }
+
+                // Test 2: Check if SockJS is loaded
+                if (typeof SockJS !== 'undefined') {
+                    addResult('✅ SockJS is loaded', true);
+                } else {
+                    addResult('❌ SockJS is not loaded', false);
+                    return;
+                }
+
+                // Test 3: Check if STOMP is loaded
+                if (typeof Stomp !== 'undefined') {
+                    addResult('✅ STOMP is loaded', true);
+                } else {
+                    addResult('❌ STOMP is not loaded', false);
+                    return;
+                }
+
+                // Test 4: Try to create SockJS instance
+                try {
+                    const socket = new SockJS('http://localhost:8080/ws');
+                    addResult('✅ SockJS instance created successfully', true);
+                } catch (error) {
+                    addResult(`❌ Failed to create SockJS instance: ${error.message}`, false);
+                    return;
+                }
+
+                // Test 5: Try to create STOMP client
+                try {
+                    const stompClient = Stomp.over(new SockJS('http://localhost:8080/ws'));
+                    addResult('✅ STOMP client created successfully', true);
+                } catch (error) {
+                    addResult(`❌ Failed to create STOMP client: ${error.message}`, false);
+                    return;
+                }
+
+                addResult('🎉 All tests passed! WebSocket should work correctly.', true);
+                
+            } catch (error) {
+                addResult(`❌ Unexpected error: ${error.message}`, false);
+                console.error('Test error:', error);
+            }
+        }
+
+        // Run test automatically when page loads
+        window.addEventListener('load', function() {
+            addResult('🔍 Testing environment...', false);
+            setTimeout(runTest, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -152,6 +152,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- WebSocket dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
         <!-- Legacy dependencies (keep for compatibility) -->
         <dependency>
             <groupId>io.netty</groupId>

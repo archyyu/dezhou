@@ -52,6 +52,7 @@ export function useApi() {
     joinRoom: (roomId) => api.post(`/api/v1/room/${roomId}/join`),
     leaveRoom: (roomId) => api.post(`/api/v1/room/${roomId}/leave`),
     createRoom: (roomTypeId, roomName) => api.post(`/api/v1/room/create/${roomTypeId}/${roomName}`),
+    getRoomInfo: (roomId) => api.get(`/api/v1/room/info/${roomId}`),
     
     // Game actions
     gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 

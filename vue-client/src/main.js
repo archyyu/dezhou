@@ -3,6 +3,9 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+// Import global polyfill for SockJS compatibility
+import './utils/global-polyfill'
+
 // Import Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
