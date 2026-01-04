@@ -795,7 +795,18 @@ public class PukerGame extends GameRoom
 	{
 		this.currentRoundBet += bet;
 	}
+
+	public int getCurrentRoundBet() {
+		return this.currentRoundBet;
+	}
 	
+	public int getTotalBet() {
+		int result = 0;
+		for(Map.Entry<Integer, Integer> entry : this.roundPoolBet.entrySet()) {
+			result += entry.getValue();
+		}
+		return result;
+	}
 	
 	public boolean playerAddBet(Player player,int bet)
 	{

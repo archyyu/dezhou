@@ -37,7 +37,7 @@ public class Player extends User
 	private int totalGambleBet = 0;
 
 	private int chips;
-	private int currentBet;
+	
 	private boolean hasLooked;
 	private boolean isActive;
 	private boolean isReady;

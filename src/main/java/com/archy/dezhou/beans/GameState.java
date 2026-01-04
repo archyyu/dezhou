@@ -51,8 +51,8 @@ public class GameState {
         Player currentPlayer = game.getCurrentPlayer();
         this.currentPlayerId = currentPlayer != null ? currentPlayer.getUid() : 0;
         this.currentPlayerSeat = currentPlayer != null ? currentPlayer.getSeatId() : 0;
-        this.currentBetAmount = 0;//game.getCurrentBet();
-        this.potAmount = 0; // game.getPotAmount();
+        this.currentBetAmount = game.getCurrentRoundBet();
+        this.potAmount = game.getTotalBet(); // game.getPotAmount();
         this.gamePhase = game.getRoomState().getName(); // game.getGamePhase();
         this.publicPukers = game.getPublicPukes(); // game.getCommunityCards();
         
