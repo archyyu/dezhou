@@ -64,7 +64,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(1), 
               'selected': playerSeatId === 1,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 1
+              'current-turn': gameState?.currentPlayerSeat === 1
             }" @click="!isSeatOccupied(1) && selectSeat(1)">
               <div class="seat-number">1</div>
               <div v-if="isSeatOccupied(1)" class="seat-info">
@@ -73,8 +73,8 @@
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(1) > 0">
                   💰 {{ getPlayerCurrentBet(1) }}
                 </div>
-                <div v-if="getPlayerState(1)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(1)?.lastAction}`">
-                  {{ formatPlayerAction(getPlayerState(1)) }}
+                <div v-if="gameState?.currentPlayerSeat === 1" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -85,7 +85,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(2), 
               'selected': playerSeatId === 2,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 2
+              'current-turn': gameState?.currentPlayerSeat === 2
             }" @click="!isSeatOccupied(2) && selectSeat(2)">
               <div class="seat-number">2</div>
               <div v-if="isSeatOccupied(2)" class="seat-info">
@@ -94,8 +94,8 @@
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(2) > 0">
                   💰 {{ getPlayerCurrentBet(2) }}
                 </div>
-                <div v-if="getPlayerState(2)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(2)?.lastAction}`">
-                  {{ formatPlayerAction(getPlayerState(2)) }}
+                <div v-if="gameState?.currentPlayerSeat === 2" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -106,7 +106,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(3), 
               'selected': playerSeatId === 3,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 3
+              'current-turn': gameState?.currentPlayerSeat === 3
             }" @click="!isSeatOccupied(3) && selectSeat(3)">
               <div class="seat-number">3</div>
               <div v-if="isSeatOccupied(3)" class="seat-info">
@@ -114,6 +114,9 @@
                 <div class="player-chips">{{ getPlayerChips(3) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(3) > 0">
                   💰 {{ getPlayerCurrentBet(3) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 3" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -124,7 +127,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(4), 
               'selected': playerSeatId === 4,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 4
+              'current-turn': gameState?.currentPlayerSeat === 4
             }" @click="!isSeatOccupied(4) && selectSeat(4)">
               <div class="seat-number">4</div>
               <div v-if="isSeatOccupied(4)" class="seat-info">
@@ -132,6 +135,9 @@
                 <div class="player-chips">{{ getPlayerChips(4) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(4) > 0">
                   💰 {{ getPlayerCurrentBet(4) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 4" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -142,7 +148,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(5), 
               'selected': playerSeatId === 5,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 5
+              'current-turn': gameState?.currentPlayerSeat === 5
             }" @click="!isSeatOccupied(5) && selectSeat(5)">
               <div class="seat-number">5</div>
               <div v-if="isSeatOccupied(5)" class="seat-info">
@@ -150,6 +156,9 @@
                 <div class="player-chips">{{ getPlayerChips(5) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(5) > 0">
                   💰 {{ getPlayerCurrentBet(5) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 5" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -160,7 +169,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(6), 
               'selected': playerSeatId === 6,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 6
+              'current-turn': gameState?.currentPlayerSeat === 6
             }" @click="!isSeatOccupied(6) && selectSeat(6)">
               <div class="seat-number">6</div>
               <div v-if="isSeatOccupied(6)" class="seat-info">
@@ -168,6 +177,9 @@
                 <div class="player-chips">{{ getPlayerChips(6) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(6) > 0">
                   💰 {{ getPlayerCurrentBet(6) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 6" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -178,7 +190,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(7), 
               'selected': playerSeatId === 7,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 7
+              'current-turn': gameState?.currentPlayerSeat === 7
             }" @click="!isSeatOccupied(7) && selectSeat(7)">
               <div class="seat-number">7</div>
               <div v-if="isSeatOccupied(7)" class="seat-info">
@@ -186,6 +198,9 @@
                 <div class="player-chips">{{ getPlayerChips(7) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(7) > 0">
                   💰 {{ getPlayerCurrentBet(7) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 7" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -196,7 +211,7 @@
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(8), 
               'selected': playerSeatId === 8,
-              'current-turn': isPlayerTurn && currentPlayer?.seatId === 8
+              'current-turn': gameState?.currentPlayerSeat === 8
             }" @click="!isSeatOccupied(8) && selectSeat(8)">
               <div class="seat-number">8</div>
               <div v-if="isSeatOccupied(8)" class="seat-info">
@@ -204,6 +219,9 @@
                 <div class="player-chips">{{ getPlayerChips(8) }}</div>
                 <div class="player-round-bet" v-if="getPlayerCurrentBet(8) > 0">
                   💰 {{ getPlayerCurrentBet(8) }}
+                </div>
+                <div v-if="gameState?.currentPlayerSeat === 8" class="turn-timer">
+                  {{ localCountDown }}s
                 </div>
               </div>
             </div>
@@ -461,6 +479,22 @@ const showBuyInModal = ref(false)
 const showSeatSelection = ref(false)
 const wsEventsSubId = ref(null)
 const wsStateSubId = ref(null)
+const localCountDown = ref(0)
+let localTimerInterval = null
+
+const startLocalTimer = (initialSeconds) => {
+  if (localTimerInterval) clearInterval(localTimerInterval)
+  
+  localCountDown.value = initialSeconds
+  
+  localTimerInterval = setInterval(() => {
+    if (localCountDown.value > 0) {
+      localCountDown.value--
+    } else {
+      clearInterval(localTimerInterval)
+    }
+  }, 1000)
+}
 
 // Seat to Player State Mapping
 // Maps seatId (number) to player state object
@@ -537,6 +571,9 @@ onUnmounted(() => {
   if (gameStateInterval) {
     clearInterval(gameStateInterval)
   }
+  if (localTimerInterval) {
+    clearInterval(localTimerInterval)
+  }
   
   // Cleanup WebSocket connection
   cleanupWebSocket()
@@ -605,6 +642,11 @@ const loadGameState = async () => {
       }
       
       addGameLog(`Game state updated - ${gameState.value.gamePhase || 'LOBBY'} phase`)
+      
+      // Start turn timer
+      if (gameState.value.currentPlayerId) {
+        startLocalTimer(gameState.value.countDown || 0)
+      }
     }
     
   } catch (err) {
@@ -749,6 +791,11 @@ const handleWebSocketStateUpdate = (message) => {
       }
       
       addGameLog(`Game state updated via WebSocket - ${gameState.value?.gamePhase || 'LOBBY'} phase`)
+
+      // Start turn timer from WebSocket update
+      if (gameState.value?.currentPlayerId) {
+        startLocalTimer(gameState.value?.countDown || 0)
+      }
     }
   } catch (error) {
     console.error('Error updating game state from WebSocket:', error)
@@ -1472,6 +1519,23 @@ const cancelRaise = () => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative; /* Fixed for turn-timer positioning */
+}
+
+.turn-timer {
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e74c3c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  z-index: 20;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
 }
 
 .seat-card.occupied {
