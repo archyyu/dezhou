@@ -100,20 +100,19 @@ export function useWebSocket() {
   }
 
   /**
-   * Subscribe to a game room's events
+   * Generic subscribe method
    * 
-   * @param {string} roomId - The room ID to subscribe to
+   * @param {string} destination - The destination to subscribe to
    * @param {function} callback - Callback function to handle incoming messages
    * @returns {string} Subscription ID
    */
-  const subscribeToGameRoom = (roomId, callback) => {
+  const subscribe = (destination, callback) => {
     if (!isConnected.value) {
       console.warn('Cannot subscribe: WebSocket is not connected')
       return null
     }
-    
-    const subscriptionId = `game-${roomId}-events`
-    const destination = `/topic/game.${roomId}.events`
+
+    const subscriptionId = `sub-${destination}-${Date.now()}`
     
     try {
       const subscription = stompClient.value.subscribe(
@@ -129,20 +128,44 @@ export function useWebSocket() {
       )
       
       subscriptions.value[subscriptionId] = subscription
-      console.log(`Subscribed to game room ${roomId} events`)
+      console.log(`Subscribed to ${destination}`)
       return subscriptionId
     } catch (error) {
-      console.error(`Failed to subscribe to game room ${roomId}:`, error)
+      console.error(`Failed to subscribe to ${destination}:`, error)
       return null
     }
   }
 
   /**
-   * Unsubscribe from a game room's events
+   * Subscribe to a game room's events
+   * 
+   * @param {string} roomId - The room ID to subscribe to
+   * @param {function} callback - Callback function to handle incoming messages
+   * @returns {string} Subscription ID
+   */
+  const subscribeToGameRoom = (roomId, callback) => {
+    const destination = `/topic/game.${roomId}.events`
+    return subscribe(destination, callback)
+  }
+
+  /**
+   * Subscribe to a game room's state updates
+   * 
+   * @param {string} roomId - The room ID to subscribe to
+   * @param {function} callback - Callback function to handle incoming messages
+   * @returns {string} Subscription ID
+   */
+  const subscribeToGameState = (roomId, callback) => {
+    const destination = `/topic/game.${roomId}.state`
+    return subscribe(destination, callback)
+  }
+
+  /**
+   * Unsubscribe from a topic
    * 
    * @param {string} subscriptionId - The subscription ID to unsubscribe from
    */
-  const unsubscribeFromGameRoom = (subscriptionId) => {
+  const unsubscribe = (subscriptionId) => {
     if (subscriptions.value[subscriptionId]) {
       subscriptions.value[subscriptionId].unsubscribe()
       delete subscriptions.value[subscriptionId]
@@ -187,8 +210,10 @@ export function useWebSocket() {
     connectionError,
     connect,
     disconnect,
+    subscribe,
     subscribeToGameRoom,
-    unsubscribeFromGameRoom,
+    subscribeToGameState,
+    unsubscribe,
     sendMessage
   }
 }
