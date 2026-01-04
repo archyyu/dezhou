@@ -333,11 +333,12 @@ public class Player extends User
 	
 	public void setPkLevelByPkType(PukerHelp pukerHelp)
 	{
-		this.maxFivePukeList = pukerHelp.getMaxFive(this.pkType);
-		this.fivePk = this.maxFivePukeList.getList();
-		this.pkValue = this.maxFivePukeList.getPkValue();
-		this.pkLevel = this.maxFivePukeList.getLevel();
-		
+		if (this.pkType.size() >= 7) {
+			this.maxFivePukeList = pukerHelp.getMaxFive(this.pkType);
+			this.fivePk = this.maxFivePukeList.getList();
+			this.pkValue = this.maxFivePukeList.getPkValue();
+			this.pkLevel = this.maxFivePukeList.getLevel();
+		}
 	}
 
 	public int getDropCardNum()

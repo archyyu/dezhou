@@ -1,204 +1,249 @@
-# Docker Setup for Dezhou Poker Server
+# Dezhou Poker - Docker Setup Guide
 
-This guide explains how to run the Dezhou Poker Server using Docker Compose with MySQL database.
+This guide explains how to set up and run the Dezhou Poker application using Docker and Docker Compose.
+
+## 🐳 Docker Architecture
+
+The application consists of three services:
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                        DOCKER COMPOSE                          │
+├─────────────────┬─────────────────┬───────────────────────────┤
+│  MySQL Database  │  Spring Boot    │   Vue.js Frontend         │
+│  (Port: 33306)  │  Backend        │   (Port: 80, 443)         │
+│                 │  (Port: 8080)   │                           │
+└─────────────────┴─────────────────┴───────────────────────────┘
+```
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Docker (v20.10+ recommended)
+- Docker Compose (v1.29+ recommended)
+- At least 4GB RAM available for Docker
+
+### 1. Build and Start the Application
+
 ```bash
-# Build and start the containers
-docker-compose up -d
+# Build and start all services
+docker-compose up --build
+```
 
-# Check running containers
-docker-compose ps
+### 2. Access the Application
 
-# View logs
-docker-compose logs -f
+- **Frontend**: `http://localhost` (Nginx serves the Vue.js app)
+- **Backend API**: `http://localhost:8080` (Spring Boot backend)
+- **MySQL**: `localhost:33306` (Database)
 
-# Stop the containers
+### 3. Stop the Application
+
+```bash
+# Stop all services
 docker-compose down
 ```
 
-## 📋 Services
+## 📦 Service Details
 
-### 1. MySQL Database (`dezhou-mysql`)
+### MySQL Database
 - **Image**: `mysql:8.0`
-- **Port**: `33306:3306`
-- **Root Password**: `aida87014999`
-- **Database**: `dezhou`
-- **User**: `dezhou_user` / `dezhou_pass`
-- **Initialization**: Automatically loads `database.sql` on first run
-- **Volume**: Persistent storage at `mysql_data`
+- **Ports**: `33306:3306`
+- **Credentials**:
+  - Root: `root/aida87014999`
+  - User: `dezhou_user/dezhou_pass`
+  - Database: `dezhou`
+- **Features**:
+  - Persistent volume for data
+  - Health checks
+  - Initial database schema loading
 
-### 2. Dezhou Application (`dezhou-app`)
-- **Image**: Built from `Dockerfile`
-- **Port**: `8080:8080`
-- **Java**: OpenJDK 17 (Eclipse Temurin)
-- **Depends on**: MySQL service (waits for healthy database)
-- **Environment**: Configured to connect to MySQL container
+### Spring Boot Backend
+- **Build**: Multi-stage Maven build
+- **Ports**: `8080:8080`
+- **Features**:
+  - Connects to MySQL database
+  - REST API endpoints
+  - WebSocket support for real-time game updates
+  - Health checks
+  - Production profile
+
+### Vue.js Frontend
+- **Build**: Multi-stage Node.js + Nginx
+- **Ports**: `80:80` (HTTP), `443:443` (HTTPS)
+- **Features**:
+  - Nginx web server
+  - API proxy to backend
+  - WebSocket proxy configuration
+  - Static file serving with caching
+  - Security headers
+  - Gzip compression
+
+## 🛠️ Development Workflow
+
+### 1. Backend Development
+
+```bash
+# Build only backend
+docker-compose build backend
+
+# Start backend with MySQL
+docker-compose up backend mysql
+
+# Access backend directly
+http://localhost:8080
+```
+
+### 2. Frontend Development
+
+```bash
+# Build only frontend
+docker-compose build frontend
+
+# Start frontend (requires backend running)
+docker-compose up frontend
+
+# Access frontend
+http://localhost
+```
+
+### 3. Database Management
+
+```bash
+# Connect to MySQL container
+docker exec -it dezhou-mysql mysql -u root -p
+
+# Import database dump
+cat database.sql | docker exec -i dezhou-mysql mysql -u root -paida87014999 dezhou
+```
 
 ## 🔧 Configuration
 
-### Database Configuration
-The MySQL container is configured to:
-1. Create a `dezhou` database
-2. Set root password to `aida87014999`
-3. Create a user `dezhou_user` with password `dezhou_pass`
-4. Automatically import `database.sql` on first startup
-5. Persist data in a Docker volume
+### Environment Variables
 
-### Application Configuration
-The application connects to MySQL using:
-- **URL**: `jdbc:mysql://mysql:3306/dezhou`
-- **Username**: `root`
-- **Password**: `aida87014999`
-- **Parameters**: Unicode support, multi-queries, UTC timezone
+#### Backend (Spring Boot)
+- `SPRING_DATASOURCE_URL`: MySQL connection URL
+- `SPRING_DATASOURCE_USERNAME`: Database username
+- `SPRING_DATASOURCE_PASSWORD`: Database password
+- `SPRING_PROFILES_ACTIVE`: Active Spring profile (production)
 
-## 📦 Database Schema
+#### Frontend (Vue.js)
+- `VITE_API_BASE_URL`: Backend API base URL
 
-The `database.sql` file contains:
+### Customizing Ports
 
-```sql
--- Users table
-CREATE TABLE dezhou_user (
-    uid INT AUTO_INCREMENT PRIMARY KEY,
-    account VARCHAR(50) DEFAULT '',
-    password VARCHAR(20) DEFAULT '',
-    roommoney INT DEFAULT 0,
-    allmoney INT DEFAULT 100000,
-    -- ... other user fields
-    UNIQUE KEY uidx_account (account)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+Edit `docker-compose.yml` to change ports:
 
--- Rooms table
-CREATE TABLE dezhou_room (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    showname VARCHAR(50) DEFAULT '',
-    name VARCHAR(50) DEFAULT '',
-    bbet INT DEFAULT 0,
-    sbet INT DEFAULT 0,
-    maxbuy INT DEFAULT 0,
-    minbuy INT DEFAULT 0,
-    roomtype VARCHAR(10) DEFAULT ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-```
-
-## 🛠️ Build Process
-
-### 1. Build the Application
-```bash
-mvn clean package
-```
-
-### 2. Build Docker Images
-```bash
-docker-compose build
-```
-
-### 3. Start Services
-```bash
-docker-compose up -d
-```
-
-## 🧪 Testing
-
-### Check Database Connection
-```bash
-# Connect to MySQL container
-docker exec -it dezhou-mysql mysql -uroot -paida87014999 dezhou
-
-# Show tables
-SHOW TABLES;
-
-# Check users
-SELECT * FROM dezhou_user;
-
-# Check rooms
-SELECT * FROM dezhou_room;
-```
-
-### Test Application
-```bash
-# Check application logs
-docker-compose logs app
-
-# Test health endpoint
-curl http://localhost:8080/health
-
-# Test API
-curl -X POST http://localhost:8080/api/game/process \
-  -H "Content-Type: application/json" \
-  -d '{"fn":"login","data":{}}'
-```
-
-## 🔄 Common Commands
-
-```bash
-# Rebuild and restart
-docker-compose down && docker-compose up -d --build
-
-# View specific service logs
-docker-compose logs app
-
-# Connect to MySQL container
-docker exec -it dezhou-mysql bash
-
-# Connect to app container
-docker exec -it dezhou-app bash
-
-# Remove volumes (careful - this deletes data!)
-docker-compose down -v
-```
-
-## 🐳 Docker Network
-
-Both services are connected via a bridge network `dezhou-network`:
-- `mysql` container is accessible as `mysql` hostname from app container
-- `app` container can access MySQL on port 3306
-- Host machine accesses MySQL on port 33306
-
-## 📈 Scaling (Future)
-
-For production, consider:
 ```yaml
-# Example for scaling (not in current compose file)
 services:
-  app:
+  backend:
+    ports:
+      - "8081:8080"  # Change backend port
+  frontend:
+    ports:
+      - "8080:80"    # Change frontend port
+  mysql:
+    ports:
+      - "3307:3306"  # Change MySQL port
+```
+
+## 🧪 Health Checks
+
+All services include health checks:
+
+- **MySQL**: `docker-compose ps` shows healthy status
+- **Backend**: `http://localhost:8080/actuator/health`
+- **Frontend**: `http://localhost/`
+
+## 🔒 Security Considerations
+
+### Production Recommendations
+
+1. **Database Security**:
+   - Change default passwords
+   - Consider using Docker secrets for sensitive data
+
+2. **Frontend Security**:
+   - Add SSL/TLS certificates
+   - Configure proper CORS settings
+   - Set up rate limiting
+
+3. **Network Security**:
+   - Use a reverse proxy (Nginx, Traefik)
+   - Implement proper authentication
+   - Set up firewall rules
+
+## 📈 Scaling
+
+### For Production Deployment
+
+```yaml
+# Example for scaling backend services
+services:
+  backend:
     deploy:
       replicas: 2
-      restart_policy:
-        condition: on-failure
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: '1G'
 ```
 
-## 🔒 Security Notes
+## 🐛 Troubleshooting
 
-1. **Database Credentials**: Change passwords in production
-2. **Root Access**: Consider using non-root user for application
-3. **Network**: Use internal networks, don't expose MySQL to host in production
-4. **Volumes**: Backup `mysql_data` volume regularly
+### Common Issues
 
-## 🚫 Troubleshooting
+1. **Port Conflicts**:
+   ```bash
+   # Check for port conflicts
+   netstat -tuln | grep 8080
+   
+   # Fix: Change ports in docker-compose.yml
+   ```
 
-### MySQL Connection Issues
-- Check if MySQL container is healthy: `docker-compose ps`
-- Verify MySQL logs: `docker-compose logs mysql`
-- Test connection from app container: `docker exec -it dezhou-app bash -c "apt update && apt install -y mysql-client && mysql -h mysql -uroot -paida87014999"`
+2. **Database Connection Issues**:
+   ```bash
+   # Check MySQL container logs
+   docker logs dezhou-mysql
+   
+   # Fix: Ensure MySQL is healthy before starting backend
+   ```
 
-### Application Startup Issues
-- Check application logs: `docker-compose logs app`
-- Verify database is initialized: `docker exec -it dezhou-mysql mysql -uroot -paida87014999 dezhou -e "SHOW TABLES;"`
-- Check Spring Boot configuration matches Docker environment variables
+3. **Build Failures**:
+   ```bash
+   # Clean build
+   docker-compose down --rmi all -v
+   docker-compose up --build
+   ```
 
-### Port Conflicts
-- MySQL: 33306 (host) → 3306 (container)
-- App: 8080 (host) → 8080 (container)
-- Change host ports if conflicts occur
+### Debugging
 
-## 🎯 Next Steps
+```bash
+# View logs for a specific service
+docker logs dezhou-backend
 
-1. **Complete Application Migration**: Fix remaining compilation issues
-2. **Add Health Checks**: Enhance application health monitoring
-3. **Configure Logging**: Set up proper logging in containers
-4. **Add Monitoring**: Prometheus/Grafana for metrics
-5. **Implement CI/CD**: Automated testing and deployment
+# View logs with follow
+docker logs -f dezhou-frontend
 
-The Docker setup is now ready to run the Dezhou Poker Server with MySQL database! 🎉
+# Enter a running container
+docker exec -it dezhou-backend sh
+```
+
+## 📚 Additional Resources
+
+- [Docker Documentation](https://docs.docker.com/)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [Spring Boot Docker Guide](https://spring.io/guides/gs/spring-boot-docker/)
+- [Vue.js Docker Guide](https://vuejs.org/guide/scaling-up/tooling.html#docker)
+
+## 🤝 Contributing
+
+If you make improvements to the Docker setup:
+
+1. Update this README
+2. Test your changes thoroughly
+3. Ensure all health checks pass
+4. Document any new configuration options
+
+---
+
+**Happy Dockerizing!** 🚀🐳

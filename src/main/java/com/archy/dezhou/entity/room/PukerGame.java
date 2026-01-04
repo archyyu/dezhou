@@ -1,6 +1,5 @@
 package com.archy.dezhou.entity.room;
 
-import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -88,6 +87,10 @@ public class PukerGame extends GameRoom
 		return this.winMap.get(seatId);
 	}
 
+	public Map<Integer,Integer> getWinMap() {
+		return this.winMap;
+	}
+
 	public void beatHeart(long now)
 	{
 		// log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
@@ -172,6 +175,7 @@ public class PukerGame extends GameRoom
 		this.roundNum ++;
 		this.round = 1;
 		this.fiveSharePk.clear();
+		this.winMap.clear();
 		this.maxBet = this.getBbet();
 		this.resetAllPlayer();
 		this.autoSetNextBankerSeat();

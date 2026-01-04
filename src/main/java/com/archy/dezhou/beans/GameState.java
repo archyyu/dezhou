@@ -1,10 +1,12 @@
 package com.archy.dezhou.beans;
 
 import java.util.List;
+import java.util.Map;
 
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.room.PukerGame;
+import com.archy.dezhou.global.ConstList;
 
 import lombok.Data;
 
@@ -34,10 +36,13 @@ public class GameState {
     private int potAmount;
     private int roundIndex;
     private int roundNum;
+
+    private int countDown;
     private String gamePhase; // "betting", "showdown", etc.
     private List<PlayerState> players;
     private List<PlayerState> spectaclors;
     private List<Puke> publicPukers;
+    private Map<Integer,Integer> winMap;
     private GameSettings settings;
 
     /**
@@ -60,6 +65,9 @@ public class GameState {
 
         this.roundIndex = game.getRound();
         this.roundNum = game.getRoundNum();
+
+        this.winMap = game.getWinMap();
+        this.countDown = ConstList.DROPCARDTIMEEXPIRED;
         
         // Convert players to PlayerState objects
         this.players = game.getPlayers().stream()
