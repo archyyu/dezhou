@@ -32,6 +32,8 @@ public class GameState {
     private int playerCount;
     private int maxPlayers;
     private int potAmount;
+    private int roundIndex;
+    private int roundNum;
     private String gamePhase; // "betting", "showdown", etc.
     private List<PlayerState> players;
     private List<PlayerState> spectaclors;
@@ -55,6 +57,9 @@ public class GameState {
         this.potAmount = game.getTotalBet(); // game.getPotAmount();
         this.gamePhase = game.getRoomState().getName(); // game.getGamePhase();
         this.publicPukers = game.getPublicPukes(); // game.getCommunityCards();
+
+        this.roundIndex = game.getRound();
+        this.roundNum = game.getRoundNum();
         
         // Convert players to PlayerState objects
         this.players = game.getPlayers().stream()

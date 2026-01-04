@@ -21,11 +21,23 @@
           </button>
         </div>
         <div class="header-stats">
-          <span class="stat-badge">
+          <span class="stat-badge" title="Hand Number">
+            <strong>Hand #</strong>{{ gameState?.roundNum || 0 }}
+          </span>
+          <span class="stat-badge" title="Current Round">
+            <strong>{{ roundIndexName(gameState?.roundIndex) }}</strong>
+          </span>
+          <span class="stat-badge" title="Total Pot">
             <strong>Pot:</strong> {{ gameState?.potAmount || 0 }}
           </span>
-          <span class="stat-badge">
-            <strong>Bet:</strong> {{ gameState?.currentBetAmount || 0 }}
+          <span class="stat-badge" title="Highest bet in current round">
+            <strong>Round Max:</strong> {{ gameState?.currentBetAmount || 0 }}
+          </span>
+          <span class="stat-badge" v-if="currentPlayer" title="Your bets in the current round">
+            <strong>My Round:</strong> {{ currentPlayer?.currentBet || 0 }}
+          </span>
+          <span class="stat-badge" v-if="currentPlayer" title="Your total bets in this hand">
+            <strong>My Total:</strong> {{ currentPlayer?.totalBet || 0 }}
           </span>
           <span class="stat-badge">
             <strong>Chips:</strong> {{ currentPlayer?.chips || player.allMoney || 0 }}
@@ -58,6 +70,9 @@
               <div v-if="isSeatOccupied(1)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(1) }}</div>
                 <div class="player-chips">{{ getPlayerChips(1) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(1) > 0">
+                  💰 {{ getPlayerCurrentBet(1) }}
+                </div>
                 <div v-if="getPlayerState(1)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(1)?.lastAction}`">
                   {{ formatPlayerAction(getPlayerState(1)) }}
                 </div>
@@ -76,6 +91,9 @@
               <div v-if="isSeatOccupied(2)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(2) }}</div>
                 <div class="player-chips">{{ getPlayerChips(2) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(2) > 0">
+                  💰 {{ getPlayerCurrentBet(2) }}
+                </div>
                 <div v-if="getPlayerState(2)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(2)?.lastAction}`">
                   {{ formatPlayerAction(getPlayerState(2)) }}
                 </div>
@@ -94,6 +112,9 @@
               <div v-if="isSeatOccupied(3)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(3) }}</div>
                 <div class="player-chips">{{ getPlayerChips(3) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(3) > 0">
+                  💰 {{ getPlayerCurrentBet(3) }}
+                </div>
               </div>
             </div>
           </div>
@@ -109,6 +130,9 @@
               <div v-if="isSeatOccupied(4)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(4) }}</div>
                 <div class="player-chips">{{ getPlayerChips(4) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(4) > 0">
+                  💰 {{ getPlayerCurrentBet(4) }}
+                </div>
               </div>
             </div>
           </div>
@@ -124,6 +148,9 @@
               <div v-if="isSeatOccupied(5)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(5) }}</div>
                 <div class="player-chips">{{ getPlayerChips(5) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(5) > 0">
+                  💰 {{ getPlayerCurrentBet(5) }}
+                </div>
               </div>
             </div>
           </div>
@@ -139,6 +166,9 @@
               <div v-if="isSeatOccupied(6)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(6) }}</div>
                 <div class="player-chips">{{ getPlayerChips(6) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(6) > 0">
+                  💰 {{ getPlayerCurrentBet(6) }}
+                </div>
               </div>
             </div>
           </div>
@@ -154,6 +184,9 @@
               <div v-if="isSeatOccupied(7)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(7) }}</div>
                 <div class="player-chips">{{ getPlayerChips(7) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(7) > 0">
+                  💰 {{ getPlayerCurrentBet(7) }}
+                </div>
               </div>
             </div>
           </div>
@@ -169,6 +202,9 @@
               <div v-if="isSeatOccupied(8)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(8) }}</div>
                 <div class="player-chips">{{ getPlayerChips(8) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(8) > 0">
+                  💰 {{ getPlayerCurrentBet(8) }}
+                </div>
               </div>
             </div>
           </div>
@@ -904,6 +940,16 @@ const getPlayerChips = (seatId) => {
   return p ? p.chips : 0
 }
 
+const getPlayerCurrentBet = (seatId) => {
+  const p = seatPlayerMap.value.get(seatId)
+  return p ? p.currentBet : 0
+}
+
+const getPlayerTotalBet = (seatId) => {
+  const p = seatPlayerMap.value.get(seatId)
+  return p ? p.totalBet : 0
+}
+
 const getPlayerState = (seatId) => {
   const map = seatPlayerMap.value
   if (!map) return null
@@ -980,6 +1026,16 @@ const gamePhaseText = (phase) => {
     'BETTING': 'Betting'
   }
   return phaseMap[phase] || phase
+}
+
+const roundIndexName = (index) => {
+  const roundMap = {
+    1: 'Pre-Flop',
+    2: 'Flop',
+    3: 'Turn',
+    4: 'River'
+  }
+  return roundMap[index] || 'Lobby'
 }
 
 const formatCardSuit = (tag) => {
@@ -1294,6 +1350,17 @@ const cancelRaise = () => {
 .player-chips {
   font-size: 0.6rem;
   opacity: 0.8;
+}
+
+.player-round-bet {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-top: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .table-center {
