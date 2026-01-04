@@ -67,7 +67,7 @@ public class GameState {
         this.roundNum = game.getRoundNum();
 
         this.winMap = game.getWinMap();
-        this.countDown = ConstList.DROPCARDTIMEEXPIRED;
+        this.countDown = game.getSecsPassByTurn();
         
         // Convert players to PlayerState objects
         this.players = game.getPlayers().stream()
