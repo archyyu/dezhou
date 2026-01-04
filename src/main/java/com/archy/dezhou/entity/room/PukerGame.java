@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.service.WebSocketService;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.archy.dezhou.GameCmdException;
 import com.archy.dezhou.beans.GameState;
 import com.archy.dezhou.entity.HeartTimer;
@@ -28,6 +28,7 @@ import com.archy.dezhou.entity.puker.PukerKit;
 
 public class PukerGame extends GameRoom
 {
+	@JsonIgnore
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	//当前的庄家座位号
@@ -89,7 +90,7 @@ public class PukerGame extends GameRoom
 
 	public void beatHeart(long now)
 	{
-		log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
+		// log.info("roomName: " + this.getName() + " heartbeat at time: " + System.currentTimeMillis());
 		now = System.currentTimeMillis();
 		List<Player> users = this.getPlayers();
 		for(Player user : users)
@@ -794,7 +795,18 @@ public class PukerGame extends GameRoom
 	{
 		this.currentRoundBet += bet;
 	}
+
+	public int getCurrentRoundBet() {
+		return this.currentRoundBet;
+	}
 	
+	public int getTotalBet() {
+		int result = 0;
+		for(Map.Entry<Integer, Integer> entry : this.roundPoolBet.entrySet()) {
+			result += entry.getValue();
+		}
+		return result;
+	}
 	
 	public boolean playerAddBet(Player player,int bet)
 	{
@@ -1166,7 +1178,7 @@ public class PukerGame extends GameRoom
 		{
 			if( this.timer != null && this.timer.Check(now))
 			{
-				beatHeart(now);
+				// beatHeart(now);
 				this.timer.setNextTick();
 			}
 		}

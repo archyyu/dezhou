@@ -15,17 +15,29 @@
       <!-- Mobile Header -->
       <div class="mobile-header">
         <div class="header-top">
-          <h1 class="room-name">{{ gameState.name }}</h1>
+          <h1 class="room-name">{{ gameState.roomName }}</h1>
           <button @click="leaveRoomNow" class="btn btn-danger btn-sm" :disabled="loading">
             Leave
           </button>
         </div>
         <div class="header-stats">
-          <span class="stat-badge">
-            <strong>Pot:</strong> {{ gameState?.pot || 0 }}
+          <span class="stat-badge" title="Hand Number">
+            <strong>Hand #</strong>{{ gameState?.roundNum || 0 }}
           </span>
-          <span class="stat-badge">
-            <strong>Bet:</strong> {{ gameState?.currentBet || 0 }}
+          <span class="stat-badge" title="Current Round">
+            <strong>{{ roundIndexName(gameState?.roundIndex) }}</strong>
+          </span>
+          <span class="stat-badge" title="Total Pot">
+            <strong>Pot:</strong> {{ gameState?.potAmount || 0 }}
+          </span>
+          <span class="stat-badge" title="Highest bet in current round">
+            <strong>Round Max:</strong> {{ gameState?.currentBetAmount || 0 }}
+          </span>
+          <span class="stat-badge" v-if="currentPlayer" title="Your bets in the current round">
+            <strong>My Round:</strong> {{ currentPlayer?.currentBet || 0 }}
+          </span>
+          <span class="stat-badge" v-if="currentPlayer" title="Your total bets in this hand">
+            <strong>My Total:</strong> {{ currentPlayer?.totalBet || 0 }}
           </span>
           <span class="stat-badge">
             <strong>Chips:</strong> {{ currentPlayer?.chips || player.allMoney || 0 }}
@@ -51,13 +63,16 @@
           <div class="seat-wrapper" style="top: 10%; left: 50%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(1), 
-              'selected': playerSeatId.value === 1,
+              'selected': playerSeatId === 1,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 1
             }" @click="!isSeatOccupied(1) && selectSeat(1)">
               <div class="seat-number">1</div>
               <div v-if="isSeatOccupied(1)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(1) }}</div>
                 <div class="player-chips">{{ getPlayerChips(1) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(1) > 0">
+                  💰 {{ getPlayerCurrentBet(1) }}
+                </div>
                 <div v-if="getPlayerState(1)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(1)?.lastAction}`">
                   {{ formatPlayerAction(getPlayerState(1)) }}
                 </div>
@@ -69,13 +84,16 @@
           <div class="seat-wrapper" style="top: 20%; left: 75%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(2), 
-              'selected': playerSeatId.value === 2,
+              'selected': playerSeatId === 2,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 2
             }" @click="!isSeatOccupied(2) && selectSeat(2)">
               <div class="seat-number">2</div>
               <div v-if="isSeatOccupied(2)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(2) }}</div>
                 <div class="player-chips">{{ getPlayerChips(2) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(2) > 0">
+                  💰 {{ getPlayerCurrentBet(2) }}
+                </div>
                 <div v-if="getPlayerState(2)?.lastAction" class="player-action-badge" :title="`Last action: ${getPlayerState(2)?.lastAction}`">
                   {{ formatPlayerAction(getPlayerState(2)) }}
                 </div>
@@ -87,13 +105,16 @@
           <div class="seat-wrapper" style="top: 50%; left: 90%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(3), 
-              'selected': playerSeatId.value === 3,
+              'selected': playerSeatId === 3,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 3
             }" @click="!isSeatOccupied(3) && selectSeat(3)">
               <div class="seat-number">3</div>
               <div v-if="isSeatOccupied(3)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(3) }}</div>
                 <div class="player-chips">{{ getPlayerChips(3) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(3) > 0">
+                  💰 {{ getPlayerCurrentBet(3) }}
+                </div>
               </div>
             </div>
           </div>
@@ -102,13 +123,16 @@
           <div class="seat-wrapper" style="top: 75%; left: 75%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(4), 
-              'selected': playerSeatId.value === 4,
+              'selected': playerSeatId === 4,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 4
             }" @click="!isSeatOccupied(4) && selectSeat(4)">
               <div class="seat-number">4</div>
               <div v-if="isSeatOccupied(4)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(4) }}</div>
                 <div class="player-chips">{{ getPlayerChips(4) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(4) > 0">
+                  💰 {{ getPlayerCurrentBet(4) }}
+                </div>
               </div>
             </div>
           </div>
@@ -117,13 +141,16 @@
           <div class="seat-wrapper" style="top: 90%; left: 50%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(5), 
-              'selected': playerSeatId.value === 5,
+              'selected': playerSeatId === 5,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 5
             }" @click="!isSeatOccupied(5) && selectSeat(5)">
               <div class="seat-number">5</div>
               <div v-if="isSeatOccupied(5)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(5) }}</div>
                 <div class="player-chips">{{ getPlayerChips(5) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(5) > 0">
+                  💰 {{ getPlayerCurrentBet(5) }}
+                </div>
               </div>
             </div>
           </div>
@@ -132,13 +159,16 @@
           <div class="seat-wrapper" style="top: 75%; left: 25%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(6), 
-              'selected': playerSeatId.value === 6,
+              'selected': playerSeatId === 6,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 6
             }" @click="!isSeatOccupied(6) && selectSeat(6)">
               <div class="seat-number">6</div>
               <div v-if="isSeatOccupied(6)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(6) }}</div>
                 <div class="player-chips">{{ getPlayerChips(6) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(6) > 0">
+                  💰 {{ getPlayerCurrentBet(6) }}
+                </div>
               </div>
             </div>
           </div>
@@ -147,13 +177,16 @@
           <div class="seat-wrapper" style="top: 50%; left: 10%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(7), 
-              'selected': playerSeatId.value === 7,
+              'selected': playerSeatId === 7,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 7
             }" @click="!isSeatOccupied(7) && selectSeat(7)">
               <div class="seat-number">7</div>
               <div v-if="isSeatOccupied(7)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(7) }}</div>
                 <div class="player-chips">{{ getPlayerChips(7) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(7) > 0">
+                  💰 {{ getPlayerCurrentBet(7) }}
+                </div>
               </div>
             </div>
           </div>
@@ -162,13 +195,16 @@
           <div class="seat-wrapper" style="top: 20%; left: 25%;">
             <div class="seat-card" :class="{
               'occupied': isSeatOccupied(8), 
-              'selected': playerSeatId.value === 8,
+              'selected': playerSeatId === 8,
               'current-turn': isPlayerTurn && currentPlayer?.seatId === 8
             }" @click="!isSeatOccupied(8) && selectSeat(8)">
               <div class="seat-number">8</div>
               <div v-if="isSeatOccupied(8)" class="seat-info">
                 <div class="player-name">{{ getPlayerName(8) }}</div>
                 <div class="player-chips">{{ getPlayerChips(8) }}</div>
+                <div class="player-round-bet" v-if="getPlayerCurrentBet(8) > 0">
+                  💰 {{ getPlayerCurrentBet(8) }}
+                </div>
               </div>
             </div>
           </div>
@@ -177,13 +213,13 @@
           <div class="table-center">
             <div class="community-cards-display">
               <div class="community-cards-grid">
-                <div v-for="(card, index) in gameState?.communityCards" :key="index" class="playing-card">
-                  <div class="card-content" :class="{'red-suit': card.suit === '♥' || card.suit === '♦'}">
-                    <div class="card-rank">{{ card.rank }}</div>
-                    <div class="card-suit">{{ card.suit }}</div>
+                <div v-for="(card, index) in gameState?.publicPukers" :key="index" class="playing-card">
+                  <div class="card-content" :class="{'red-suit': isRedSuit(card.tag)}">
+                    <div class="card-rank">{{ formatCardRank(card.num) }}</div>
+                    <div class="card-suit">{{ formatCardSuit(card.tag) }}</div>
                   </div>
                 </div>
-                <div v-for="i in (5 - (gameState?.communityCards?.length || 0))" :key="'empty-' + i" class="playing-card empty">
+                <div v-for="i in (5 - (gameState?.publicPukers?.length || 0))" :key="'empty-' + i" class="playing-card empty">
                   <div class="card-content"></div>
                 </div>
               </div>
@@ -196,11 +232,11 @@
       <div class="player-hand-section">
         <h6>Your Hand</h6>
         <div class="hand-cards">
-          <div v-if="currentPlayer?.hand && currentPlayer.hand.length > 0" class="cards-grid">
-            <div v-for="(card, index) in currentPlayer.hand" :key="index" class="playing-card">
-              <div class="card-content" :class="{'red-suit': card.suit === '♥' || card.suit === '♦'}">
-                <div class="card-rank">{{ card.rank }}</div>
-                <div class="card-suit">{{ card.suit }}</div>
+          <div v-if="currentPlayer?.cards && currentPlayer.cards.length > 0" class="cards-grid">
+            <div v-for="(card, index) in currentPlayer.cards" :key="index" class="playing-card">
+              <div class="card-content" :class="{'red-suit': isRedSuit(card.tag)}">
+                <div class="card-rank">{{ formatCardRank(card.num) }}</div>
+                <div class="card-suit">{{ formatCardSuit(card.tag) }}</div>
               </div>
             </div>
           </div>
@@ -244,14 +280,14 @@
               Fold
             </button>
             <button 
-              v-if="gameState.currentBet === 0"
+              v-if="gameState.currentBetAmount === 0"
               @click="performAction('CHECK')" 
               class="btn btn-secondary"
             >
               Check
             </button>
             <button @click="performAction('CALL')" class="btn btn-primary">
-              Call {{ gameState.currentBet }}
+              Call {{ gameState.currentBetAmount }}
             </button>
           </div>
           <div class="action-row">
@@ -268,7 +304,7 @@
         </div>
         
         <div v-if="isGameInProgress && !isPlayerTurn" class="waiting-message">
-          <p>⏳ Waiting for Player {{ gameState.currentTurnPlayerId }}</p>
+          <p>⏳ Waiting for Player {{ gameState.currentPlayerId }} (Seat {{ gameState.currentPlayerSeat }})</p>
         </div>
       </div>
       
@@ -311,19 +347,19 @@
           <button class="btn-close" @click="showSeatSelection = false">×</button>
         </div>
         
-        <div class="modal-body">
+        <div class="modal-body" v-if="playerSeatId !== null">
           <div class="seat-confirmation">
             <div class="selected-seat-display">
-              <div class="seat-icon">{{ playerSeatId.value }}</div>
-              <p>You selected <strong>Seat {{ playerSeatId.value }}</strong></p>
+              <div class="seat-icon">{{ playerSeatId }}</div>
+              <p>You selected <strong>Seat {{ playerSeatId }}</strong></p>
             </div>
           </div>
         </div>
         
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="showSeatSelection = false">Cancel</button>
-          <button class="btn btn-primary" @click="confirmSeatSelection" :disabled="!playerSeatId.value || playerSeatId.value < 1">
-            Confirm Seat {{ playerSeatId.value }}
+          <button class="btn btn-primary" @click="confirmSeatSelection" :disabled="playerSeatId === null || playerSeatId < 1">
+            Confirm Seat {{ playerSeatId }}
           </button>
         </div>
       </div>
@@ -333,7 +369,8 @@
     <div v-if="showBuyInModal" class="modal-overlay" @click="showBuyInModal = false">
       <div class="modal-card" @click.stop>
         <div class="modal-header">
-          <h5>Buy-In for Seat {{ playerSeatId.value }}</h5>
+          <h5 v-if="playerSeatId !== null">Buy-In for Seat {{ playerSeatId }}</h5>
+          <h5 v-else>Buy-In</h5>
           <button class="btn-close" @click="showBuyInModal = false">×</button>
         </div>
         
@@ -353,7 +390,7 @@
         
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="showBuyInModal = false">Cancel</button>
-          <button class="btn btn-primary" @click="performAction('SITDOWN')" :disabled="loading">
+          <button class="btn btn-primary" @click="performAction('SITDOWN')" :disabled="loading || playerSeatId === null">
             Confirm
           </button>
         </div>
@@ -381,7 +418,8 @@ const {
   connect, 
   disconnect, 
   subscribeToGameRoom, 
-  unsubscribeFromGameRoom 
+  subscribeToGameState,
+  unsubscribe 
 } = useWebSocket()
 
 const loading = ref(false)
@@ -397,7 +435,8 @@ const playerStatus = ref('spectator')
 const buyInAmount = ref(1000)
 const showBuyInModal = ref(false)
 const showSeatSelection = ref(false)
-const wsSubscriptionId = ref(null)
+const wsEventsSubId = ref(null)
+const wsStateSubId = ref(null)
 
 // Seat to Player State Mapping
 // Maps seatId (number) to player state object
@@ -407,9 +446,9 @@ const seatPlayerMap = ref(new Map())
 const updateSeatPlayerMap = () => {
   seatPlayerMap.value.clear()
   if (gameState.value?.players) {
-    gameState.value.players.forEach(player => {
-      if (player.seatId !== undefined && player.seatId !== null) {
-        seatPlayerMap.value.set(player.seatId, { ...player })
+    gameState.value.players.forEach(p => {
+      if (p.seatId !== undefined && p.seatId !== null) {
+        seatPlayerMap.value.set(p.seatId, { ...p })
       }
     })
   }
@@ -418,11 +457,12 @@ const updateSeatPlayerMap = () => {
 let gameStateInterval = null
 
 const isPlayerTurn = computed(() => {
-  return gameState.value && gameState.value.currentTurnPlayerId === player.value.uid
+  return gameState.value && player.value && gameState.value.currentPlayerId === player.value.uid
 })
 
 const currentPlayer = computed(() => {
-  return gameState.value?.players?.find(p => p.id === player.value?.uid)
+  if (!gameState.value || !player.value) return null
+  return gameState.value.players?.find(p => p.playerId === player.value.uid) || null
 })
 
 const isGameInProgress = computed(() => {
@@ -495,27 +535,27 @@ const loadGameState = async () => {
     // const stateResponse = await get(`/api/v1/game/${route.params.roomId}/state`)
     const stateResponse = await getRoomInfo(route.params.roomId)
     
-    if (stateResponse.data && stateResponse.data.success) {
+    if (stateResponse.data && stateResponse.data.success && stateResponse.data.data) {
       gameState.value = stateResponse.data.data
       
       // Update seat player map
       updateSeatPlayerMap()
       
       gameStore.setRoom({
-        roomid: gameState.value.roomid,
+        roomid: gameState.value.roomId,
         name: gameState.value.roomName,
-        sbet: 50,
-        bbet: 100,
-        minbuy: 500,
-        maxbuy: 5000
+        sbet: gameState.value.sbet || 5,
+        bbet: gameState.value.bbet || 10,
+        minbuy: gameState.value.minbuy || 1000,
+        maxbuy: gameState.value.maxbuy || 5000
       })
       
-      const currentPlayer = gameState.value.players.find(p => p.id === player.value?.uid)
+      const cp = gameState.value.players?.find(p => p.playerId === player.value?.uid)
       
-      if (currentPlayer) {
-        player.value = { ...player.value, ...currentPlayer }
-        playerSeatId.value = currentPlayer.seatId
-        playerStatus.value = currentPlayer.seatId >= 0 ? 'sitting' : 'spectator'
+      if (cp) {
+        player.value = { ...player.value, ...cp }
+        playerSeatId.value = cp.seatId
+        playerStatus.value = cp.seatId >= 0 ? 'sitting' : 'spectator'
         
         if (playerStatus.value === 'sitting' && isGameInProgress.value) {
           playerStatus.value = 'playing'
@@ -563,7 +603,10 @@ const setupWebSocket = async () => {
     await connect()
     
     // Subscribe to game room events
-    wsSubscriptionId.value = subscribeToGameRoom(route.params.roomId, handleWebSocketMessage)
+    wsEventsSubId.value = subscribeToGameRoom(route.params.roomId, handleWebSocketMessage)
+    
+    // Subscribe to game state updates
+    wsStateSubId.value = subscribeToGameState(route.params.roomId, handleWebSocketStateUpdate)
     
     addGameLog('WebSocket connected - real-time updates enabled')
   } catch (error) {
@@ -576,9 +619,13 @@ const setupWebSocket = async () => {
  * Cleanup WebSocket connection
  */
 const cleanupWebSocket = () => {
-  if (wsSubscriptionId.value) {
-    unsubscribeFromGameRoom(wsSubscriptionId.value)
-    wsSubscriptionId.value = null
+  if (wsEventsSubId.value) {
+    unsubscribe(wsEventsSubId.value)
+    wsEventsSubId.value = null
+  }
+  if (wsStateSubId.value) {
+    unsubscribe(wsStateSubId.value)
+    wsStateSubId.value = null
   }
   disconnect()
 }
@@ -590,8 +637,14 @@ const cleanupWebSocket = () => {
  */
 const handleWebSocketMessage = (message) => {
   try {
-    console.log('WebSocket message received:', message)
+    console.log('WebSocket event received:', message)
     
+    // Handle specific game event data if present
+    if (message.type === 'GAME_STATE_UPDATE') {
+        handleWebSocketStateUpdate(message);
+        return;
+    }
+
     // Handle different message types
     switch (message.eventType) {
       case 'PLAYER_ACTION_FOLD':
@@ -615,18 +668,50 @@ const handleWebSocketMessage = (message) => {
         
       default:
         console.log('Unknown WebSocket message type:', message.eventType)
-        addGameLog(`Game event: ${message.eventType}`)
+        if (message.eventType) {
+          addGameLog(`Game event: ${message.eventType}`)
+        }
         break
     }
     
-    // Refresh game state after receiving any WebSocket message
-    // Use setTimeout to avoid potential race conditions
-    setTimeout(() => {
-      loadGameState()
-    }, 100)
-    
   } catch (error) {
     console.error('Error handling WebSocket message:', error)
+  }
+}
+
+/**
+ * Handle direct Game State Updates from WebSocket
+ * 
+ * @param {Object} message - The WebSocket message containing full game state
+ */
+const handleWebSocketStateUpdate = (message) => {
+  try {
+    if (message && message.type === 'GAME_STATE_UPDATE' && message.data) {
+      console.log('Direct Game State Update received')
+      
+      // Update local game state
+      gameState.value = message.data
+      
+      // Update seat player map
+      updateSeatPlayerMap()
+      
+      // Update current player info
+      // Update current player info
+      const cp = gameState.value?.players?.find(p => p.playerId === player.value?.uid)
+      if (cp) {
+        player.value = { ...player.value, ...cp }
+        playerSeatId.value = cp.seatId
+        playerStatus.value = cp.seatId >= 0 ? 'sitting' : 'spectator'
+        
+        if (playerStatus.value === 'sitting' && isGameInProgress.value) {
+          playerStatus.value = 'playing'
+        }
+      }
+      
+      addGameLog(`Game state updated via WebSocket - ${gameState.value?.gamePhase || 'LOBBY'} phase`)
+    }
+  } catch (error) {
+    console.error('Error updating game state from WebSocket:', error)
   }
 }
 
@@ -657,9 +742,9 @@ const handlePlayerActionMessage = (message) => {
       
       // For betting actions, update the chips
       if (['call', 'raise', 'all_in'].includes(actionType) && message.data.amount) {
-        const currentPlayer = getPlayerState(seatId)
-        if (currentPlayer) {
-          stateUpdates.chips = currentPlayer.chips - message.data.amount
+        const pState = getPlayerState(seatId)
+        if (pState) {
+          stateUpdates.chips = pState.chips - message.data.amount
         }
       }
       
@@ -765,7 +850,7 @@ const performAction = async (action) => {
     
     const commandMap = {
       'FOLD': '4',
-      'CHECK': '2',
+      'CHECK': '8',
       'CALL': '3',
       'RAISE': '2',
       'ALL_IN': '5',
@@ -773,7 +858,7 @@ const performAction = async (action) => {
       'SITDOWN': '6',
       'STANDUP': '7',
       'START': 'sbot',
-      'LEAVE': '8'
+      'LEAVE': '106'
     }
     
     const cmd = commandMap[action]
@@ -790,7 +875,7 @@ const performAction = async (action) => {
       const actionTextMap = {
         'FOLD': 'folded',
         'CHECK': 'checked',
-        'CALL': `called (${gameState.value.currentBet} chips)`,
+        'CALL': `called (${gameState.value.currentBetAmount} chips)`,
         'ALL_IN': 'went all-in',
         'LOOK': 'looked at cards',
         'SITDOWN': `sat down at seat ${playerSeatId.value} with ${buyInAmount.value} chips`,
@@ -837,28 +922,44 @@ const selectSeat = (seatId) => {
 }
 
 const isSeatOccupied = (seatId) => {
-  const player = seatPlayerMap.value.get(seatId)
-  return player !== undefined && player !== null && player.id !== user.value?.uid
+  const map = seatPlayerMap.value
+  if (!map) return false
+  const p = map.get(seatId)
+  return p !== undefined && p !== null && p.playerId !== (user.value?.uid || null)
 }
 
 const getPlayerName = (seatId) => {
-  const player = seatPlayerMap.value.get(seatId)
-  return player ? player.name : ''
+  const map = seatPlayerMap.value
+  if (!map) return ''
+  const p = map.get(seatId)
+  return p ? p.playerName : ''
 }
 
 const getPlayerChips = (seatId) => {
-  const player = seatPlayerMap.value.get(seatId)
-  return player ? player.chips : 0
+  const p = seatPlayerMap.value.get(seatId)
+  return p ? p.chips : 0
+}
+
+const getPlayerCurrentBet = (seatId) => {
+  const p = seatPlayerMap.value.get(seatId)
+  return p ? p.currentBet : 0
+}
+
+const getPlayerTotalBet = (seatId) => {
+  const p = seatPlayerMap.value.get(seatId)
+  return p ? p.totalBet : 0
 }
 
 const getPlayerState = (seatId) => {
-  return seatPlayerMap.value.get(seatId) || null
+  const map = seatPlayerMap.value
+  if (!map) return null
+  return map.get(seatId) || null
 }
 
 const updatePlayerState = (seatId, stateUpdates) => {
-  const currentPlayer = seatPlayerMap.value.get(seatId)
-  if (currentPlayer) {
-    seatPlayerMap.value.set(seatId, { ...currentPlayer, ...stateUpdates })
+  const p = seatPlayerMap.value.get(seatId)
+  if (p) {
+    seatPlayerMap.value.set(seatId, { ...p, ...stateUpdates })
   }
 }
 
@@ -921,9 +1022,42 @@ const gamePhaseText = (phase) => {
     'TURN': 'Turn',
     'RIVER': 'River',
     'SHOWDOWN': 'Showdown',
-    'LOBBY': 'Lobby'
+    'LOBBY': 'Lobby',
+    'BETTING': 'Betting'
   }
   return phaseMap[phase] || phase
+}
+
+const roundIndexName = (index) => {
+  const roundMap = {
+    1: 'Pre-Flop',
+    2: 'Flop',
+    3: 'Turn',
+    4: 'River'
+  }
+  return roundMap[index] || 'Lobby'
+}
+
+const formatCardSuit = (tag) => {
+  const suitMap = {
+    'D': '♠', // 黑桃
+    'C': '♥', // 红桃
+    'B': '♣', // 梅花
+    'A': '♦'  // 方块
+  }
+  return suitMap[tag] || tag
+}
+
+const isRedSuit = (tag) => {
+  return tag === 'C' || tag === 'A'
+}
+
+const formatCardRank = (num) => {
+  if (num === 1) return 'A'
+  if (num === 11) return 'J'
+  if (num === 12) return 'Q'
+  if (num === 13) return 'K'
+  return num
 }
 
 const confirmRaise = async () => {
@@ -931,20 +1065,21 @@ const confirmRaise = async () => {
     loading.value = true
     error.value = ''
     
-    const amount = parseInt(raiseAmount)
+    const amount = parseInt(raiseAmount.value)
     if (isNaN(amount) || amount <= 0) {
       error.value = 'Please enter a valid raise amount'
+      loading.value = false
       return
     }
     
-    const response = await gameAction(route.params.roomId, 'RAISE', { amount })
-    gameLog.value.push(`You raised to ${amount} chips`)
-    showRaiseInput.value = false
-    // raiseAmount = 0
+    const response = await gameAction(route.params.roomId, '2', { cb: amount.toString() })
     
-    await nextTick()
-    if (logContainer.value) {
-      logContainer.value.scrollTop = logContainer.value.scrollHeight
+    if (response.data && response.data.success) {
+        addGameLog(`You raised to ${amount} chips`)
+        showRaiseInput.value = false
+        raiseAmount.value = 0
+    } else {
+        error.value = 'Failed to raise: ' + (response.data?.message || 'Unknown error')
     }
     
   } catch (err) {
@@ -956,7 +1091,7 @@ const confirmRaise = async () => {
 
 const cancelRaise = () => {
   showRaiseInput.value = false
-  raiseAmount = 0
+  raiseAmount.value = 0
 }
 </script>
 
@@ -1215,6 +1350,17 @@ const cancelRaise = () => {
 .player-chips {
   font-size: 0.6rem;
   opacity: 0.8;
+}
+
+.player-round-bet {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-top: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .table-center {

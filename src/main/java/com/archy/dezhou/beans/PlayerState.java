@@ -14,6 +14,7 @@ public class PlayerState {
         private int seatId;
         private int chips;
         private int currentBet;
+        private int totalBet;
         private boolean hasLooked;
         private boolean isActive;
         private boolean isAllIn;
@@ -27,7 +28,8 @@ public class PlayerState {
             this.playerName = player.getAccount();
             this.seatId = player.getSeatId();
             this.chips = player.getChips();
-            this.currentBet = player.getCurrentBet();
+            this.currentBet = player.getTempBet();
+            this.totalBet = player.getTotalGambleBet();
             this.hasLooked = player.isHasLooked();
             this.isActive = player.isActive();
             this.isAllIn = player.isAllIn();

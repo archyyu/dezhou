@@ -54,7 +54,7 @@ public class ConstList
 
 
 
-    public static final int DROPCARDTIMEEXPIRED = 5 * 1000;
+    public static final int DROPCARDTIMEEXPIRED = 150 * 1000;
 
 
 	public enum CardState

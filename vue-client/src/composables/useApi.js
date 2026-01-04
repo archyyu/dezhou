@@ -55,9 +55,7 @@ export function useApi() {
     getRoomInfo: (roomId) => api.get(`/api/v1/room/info/${roomId}`),
     
     // Game actions
-    gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/actions`, additionalParams, { 
-      params: { cmd }
-    }),
+    gameAction: (roomId, cmd, additionalParams) => api.post(`/api/v1/game/${roomId}/action/${cmd}`, additionalParams),
     
     // User
     getUserProfile: (uid) => api.get(`/api/v1/user/info/${uid}`),
