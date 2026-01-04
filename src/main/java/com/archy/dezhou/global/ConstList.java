@@ -167,52 +167,7 @@ public class ConstList
 	public static String ht = "C"; // 红桃
 	public static String mh = "B"; // 梅花
 	public static String fk = "A"; // 方块
-
-	public static final int level_9_ExpireTime = 20000; // 第9级优先级消息队列的过期时间为20秒
-	public static final int level_8_ExpireTime = 40000; // 第8级优先级消息队列的过期时间为40秒
-	public static final int level_7_ExpireTime = 80000; // 第7级优先级消息队列的过期时间为80秒
-	public static final int level_6_ExpireTime = 160000; // 第6级优先级消息队列的过期时间为160秒
-	public static final int level_5_ExpireTime = 360000; // 第5级优先级消息队列的过期时间为360秒
-	public static final int level_4_ExpireTime = 1440000; // 第4级优先级消息队列的过期时间为1440秒，24分
-	public static final int level_3_ExpireTime = 3600000; // 第3级优先级消息队列的过期时间为3600秒，1小时
-	public static final int level_2_ExpireTime = 7200000; // 第2级优先级消息队列的过期时间为7200秒，2小时
-	public static final int level_1_ExpireTime = 14400000; // 第1级优先级消息队列的过期时间为2小时，4小时
-	public static final int level_0_ExpireTime = 86400000 * 7; // 第0级优先级消息队列的过期时间为7*24小时，7天
 	
-	public enum MessageType
-	{
-		MESSAGE_ZERO(0,86400000 * 7),
-		MESSAGE_ONE(1,14400000),
-		MESSAGE_TWO(2,7200000),
-		MESSAGE_THREE(3,3600000),
-		MESSAGE_FORE(4,1440000),
-		MESSAGE_FIVE(5,360000),
-		MESSAGE_SIX(6,160000),
-		MESSAGE_SEVEN(7,80000),
-		MESSAGE_EIGHT(8,40000),
-		MESSAGE_NINE(9,20000);
-		
-		private int level = 0;
-		private int expireTime = 0;
-		MessageType(int level, int expiredTime)
-		{
-			this.level = level;
-			this.expireTime = expiredTime;
-		}
-		
-		public int getMessageLevel()
-		{
-			return this.level;
-		}
-		
-		public int getMessageExpireTime()
-		{
-			return this.expireTime;
-		}
-		
-	}
-	
-
 	public static String[] DebugUidList = new String[]
 	{ "10009", "10010", "10086", "10085", "10090" };
 

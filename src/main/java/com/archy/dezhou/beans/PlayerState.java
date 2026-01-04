@@ -3,6 +3,7 @@ package com.archy.dezhou.beans;
 import java.util.List;
 
 import com.archy.dezhou.entity.Player;
+import com.archy.dezhou.entity.Puke;
 
 import lombok.Data;
 
@@ -17,8 +18,9 @@ public class PlayerState {
         private boolean isActive;
         private boolean isAllIn;
         private boolean isDealer;
-        private List<PukerState> cards;
-        private String status; // "playing", "folded", "all-in", etc.
+        private List<Puke> cards;
+        private int playerCareer;
+        private int playerState;
         
         public PlayerState(Player player) {
             this.playerId = player.getUid();
@@ -30,6 +32,9 @@ public class PlayerState {
             this.isActive = player.isActive();
             this.isAllIn = player.isAllIn();
             this.isDealer = player.isDealer();
+            this.cards = player.getOwnPukers();
+            this.playerCareer = player.getPlayerState().value();
+            this.playerState = player.getGameState().value();
         }
         
 }

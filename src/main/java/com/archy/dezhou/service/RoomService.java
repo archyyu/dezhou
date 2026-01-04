@@ -1,7 +1,6 @@
 package com.archy.dezhou.service;
 
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.archy.dezhou.dao.RoomDBMapper;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.room.GameRoom;
 import com.archy.dezhou.entity.room.PukerGame;
 
@@ -22,6 +22,12 @@ public class RoomService{
 
     @Resource
     private RoomDBMapper roomDBMapper;
+
+	@Resource
+	private PukerHelp pukerHelp;
+
+	@Resource
+	private WebSocketService webSocketService;
 
     private Map<Integer,PukerGame> roomsMap = new HashMap<Integer,PukerGame>();
 	
@@ -57,7 +63,7 @@ public class RoomService{
 
 		RoomDB roomDB = this.roomDBMapper.selectByPrimaryKey(roomTypeId);
 
-		PukerGame gameRoom = new PukerGame(roomDB);
+		PukerGame gameRoom = new PukerGame(roomDB, this.webSocketService, this.pukerHelp);
 		gameRoom.setCreator(userName);
 		gameRoom.setName(roomName);
 

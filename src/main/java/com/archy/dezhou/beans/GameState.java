@@ -1,6 +1,5 @@
 package com.archy.dezhou.beans;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.archy.dezhou.entity.Player;
@@ -47,25 +46,23 @@ public class GameState {
         this.roomName = game.getName();
         this.playerCount = game.getPlayerCount();
         this.maxPlayers = game.getMaxUsers();
-        this.gameStatus = game.isGame() ? "active" : "waiting";
         
-        if (game != null) {
-            // Add game-specific information
-            Player currentPlayer = game.getCurrentPlayer();
-            this.currentPlayerId = currentPlayer != null ? currentPlayer.getUid() : 0;
-            this.currentPlayerSeat = currentPlayer != null ? currentPlayer.getSeatId() : 0;
-            this.currentBetAmount = 0;//game.getCurrentBet();
-            this.potAmount = 0; // game.getPotAmount();
-            this.gamePhase = "betting"; // game.getGamePhase();
-            this.publicPukers = new ArrayList<>(); // game.getCommunityCards();
-            
-            // Convert players to PlayerState objects
-            this.players = game.getPlayers().stream()
-                .map(player -> new PlayerState(player))
-                .toList();
+        // Add game-specific information
+        Player currentPlayer = game.getCurrentPlayer();
+        this.currentPlayerId = currentPlayer != null ? currentPlayer.getUid() : 0;
+        this.currentPlayerSeat = currentPlayer != null ? currentPlayer.getSeatId() : 0;
+        this.currentBetAmount = 0;//game.getCurrentBet();
+        this.potAmount = 0; // game.getPotAmount();
+        this.gamePhase = game.getRoomState().getName(); // game.getGamePhase();
+        this.publicPukers = game.getPublicPukes(); // game.getCommunityCards();
+        
+        // Convert players to PlayerState objects
+        this.players = game.getPlayers().stream()
+            .map(player -> new PlayerState(player))
+            .toList();
 
-            this.spectaclors = game.getSpectatorList().stream().map(player -> new PlayerState(player)).toList();
-        }
+        this.spectaclors = game.getSpectatorList().stream().map(player -> new PlayerState(player)).toList();
+        
     }
     
 }

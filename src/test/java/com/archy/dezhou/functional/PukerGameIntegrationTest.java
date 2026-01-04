@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -37,13 +38,17 @@ import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.User;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.security.JwtTokenProvider;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
+import com.archy.dezhou.service.WebSocketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intuit.karate.http.WebSocketServerBase;
+
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -150,7 +155,9 @@ class PukerGameIntegrationTest {
         roomDB.setMinbuy(500);
         roomDB.setMaxbuy(2000);
 
-        PukerGame room = new PukerGame(roomDB);
+        WebSocketService webSocketService = mock(WebSocketService.class);
+
+        PukerGame room = new PukerGame(roomDB, webSocketService, new PukerHelp());
         room.setRoomid(200);
         room.setName("multiplayer-test");
         room.setMaxPlayers(4);
@@ -166,8 +173,6 @@ class PukerGameIntegrationTest {
             this.playerJoinRoom(player);
             this.playerSitdown(player);
         });
-
-        pukerGame.initGame();
         
         pukerGame.gameStartHandle();
 

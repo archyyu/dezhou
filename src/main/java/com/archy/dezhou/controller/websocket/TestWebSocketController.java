@@ -11,18 +11,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class TestWebSocketController {
 
-    /**
-     * Test endpoint for WebSocket messages
-     * 
-     * @param message The incoming message
-     * @return The same message echoed back
-     */
-    @MessageMapping("/test.message")
-    @SendTo("/topic/test")
-    public WebSocketMessage handleTestMessage(WebSocketMessage message) {
-        System.out.println("Received test message: " + message.getEventType());
-        return message;
-    }
+
 
     /**
      * Test endpoint for echo messages

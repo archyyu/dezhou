@@ -15,6 +15,7 @@ import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
+import com.archy.dezhou.service.WebSocketService;
 
 import jakarta.annotation.Resource;
 
@@ -50,7 +51,7 @@ public class GameApiController extends BaseApiController {
     private GameCommandFactory gameCommandFactory;
 
     @Resource
-    private GameWebSocketController gameWebSocketController;
+    private WebSocketService webSocketService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -76,26 +77,17 @@ public class GameApiController extends BaseApiController {
      * @param player The player who performed the action
      * @param additionalParams Additional parameters from the request
      */
-    private void sendGameActionNotification(String roomId, String actionType, Player player, Map<String, String> additionalParams) {
+    private void sendGameActionNotification(String roomId, String actionType, Player player) {
         try {
             // Create notification data
-            Map<String, Object> notificationData = new HashMap<>();
-            notificationData.put("playerId", player.getUid());
-            notificationData.put("playerName", player.getAccount());
-            notificationData.put("seatId", player.getSeatId());
-            notificationData.put("actionType", actionType);
+            PlayerState playerState = new PlayerState(player);
             
-            // Add additional parameters if present
-            if (additionalParams != null) {
-                notificationData.putAll(additionalParams);
-            }
-            
-            // Send the notification via WebSocket
-            gameWebSocketController.sendPlayerAction(
+            // Send the notification via WebSocket service
+            webSocketService.sendPlayerAction(
                 roomId, 
                 player.getUid() + "", 
                 "PLAYER_ACTION_" + actionType.toUpperCase(), 
-                notificationData
+                playerState
             );
             
             logger.info("Sent WebSocket notification for action {} by player {} in room {}", 
@@ -141,7 +133,7 @@ public class GameApiController extends BaseApiController {
             
             if (result) {
                 // Send WebSocket notification about the game action
-                sendGameActionNotification(roomId, cmd, player, additionalParams);
+                sendGameActionNotification(roomId, cmd, player);
                 
                 return successResponse( new GameState(room) );
             } else {

@@ -1,5 +1,6 @@
 package com.archy.dezhou.entity.room;
 
+import java.net.http.WebSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.archy.dezhou.global.ConstList;
-
-import jakarta.annotation.Resource;
+import com.archy.dezhou.service.WebSocketService;
 
 import com.archy.dezhou.GameCmdException;
 import com.archy.dezhou.beans.GameState;
@@ -22,12 +22,12 @@ import com.archy.dezhou.entity.HeartTimer;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.Puke;
 import com.archy.dezhou.entity.RoomDB;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.puker.PukerKit;
 
 
 public class PukerGame extends GameRoom
 {
-
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	//当前的庄家座位号
@@ -59,22 +59,25 @@ public class PukerGame extends GameRoom
 	//玩家list
 	private Queue<Player> playerList = new LinkedList<Player>();
 	
-	List<Puke> allPukes = new ArrayList<>();
-
 	//扑克牌Map
 	List<Puke> fiveSharePk = new ArrayList<Puke>();
 	
 	Map<Integer,Integer> roundPoolBet = new HashMap<Integer,Integer>();
 
 	private volatile IRoomState roomState = new RoomStateReady();
+
+	private PukerKit pukerKit;
+
+	private PukerHelp pukerHelp;
+
+	private WebSocketService webSocketService;
 	
-	public PukerGame(RoomDB roomDB)
+	public PukerGame(RoomDB roomDB, WebSocketService webSocketService, PukerHelp pukerHelp)
 	{
 		super(roomDB);
-	}
-
-	public void initGame() {
-
+		this.webSocketService = webSocketService;
+		this.pukerHelp = pukerHelp;
+		this.pukerKit = new PukerKit();
 	}
 
 	public int getWinBySeat(int seatId) {
@@ -116,6 +119,10 @@ public class PukerGame extends GameRoom
 		this.checkTheCurrentPlayer(now);
 
 		this.roomState.beatHear(now);
+	}
+
+	public IRoomState getRoomState () {
+		return this.roomState;
 	}
 
 	public void checkTheCurrentPlayer( long now )
@@ -168,7 +175,9 @@ public class PukerGame extends GameRoom
 		this.resetAllPlayer();
 		this.autoSetNextBankerSeat();
 		this.autoSetPlayerState();
-		this.dispatchPukers();
+
+		this.pukerKit.reSeed();
+		this.flopPlayersPukers();
 		
 		log.info("roomName: " + this.getName() + " 第 " + this.round + " 回合开始");
 		this.settleRoundPlayersOnStart();
@@ -176,6 +185,9 @@ public class PukerGame extends GameRoom
 		this.notifyRoomPlayerPokeGameStart();
 		this.notifyRoomWhoTurn();
 		this.clearPublicPoolBet();
+
+		this.webSocketService.sendGameStateUpdate(this);
+
 	}
 	
 	
@@ -284,44 +296,38 @@ public class PukerGame extends GameRoom
 		this.currentPlayer.setYourTurn(1);
 		return this.currentPlayer;
 	}
+
 	
-	
-	public void dispatchPukers()
-	{
-		int totalPuke = 2 * this.getPlayerCount() + 5;
-		Integer[] pukeArray = PukerKit.generateRandomNumArray(totalPuke);
-		
-		for (int j = pukeArray.length - 5; j < pukeArray.length; j++)
-		{
-			fiveSharePk.add(PukerKit.getPuke(pukeArray[j]));
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		for(Puke puke : fiveSharePk)
-		{
-			sb.append(puke.toString());
-		}
-		// log.info("roomName: " + this.getName() + " 公共五张牌: " + sb.toString());
-		
-		int playerCount = this.getPlayerCount();
-		int n = 1;
-		for(Player entry : this.getPlayers())
-		{
-			// entry.getValue().addPukes(fiveSharePk);
-			entry.addPuke(PukerKit.getPuke(pukeArray[n-1]));
-			entry.addPuke(PukerKit.getPuke(pukeArray[n-1 + playerCount]));
-			
-			log.info("roomName: " + this.getName() +
-					" seat: " + entry.getSeatId() +
-					" Id: " + entry.getUid() +
-					" puke1: " + PukerKit.getPuke(pukeArray[n-1]).toString() +
-					" puke2: " + PukerKit.getPuke(pukeArray[n-1 + playerCount]).toString());
-			
-			n++;
+	public void flop3Pukers() {
+		this.dispatchPublicPuker(3);
+	}
+
+	public void turnPuker() {
+		this.dispatchPublicPuker(1);
+	}
+
+	public void riverPuker() {
+		this.dispatchPublicPuker(1);
+	}
+
+	private void dispatchPublicPuker(int size) {
+		List<Integer> pukeArray = this.pukerKit.generateRandomNumArray(size);
+		IntStream.range(0, size).forEach( i -> {
+			this.fiveSharePk.add(this.pukerHelp.getPuke(pukeArray.get(i)));
+		});
+	}
+
+	public void flopPlayersPukers() {
+		int size = 2 * this.getPlayerCount();
+		List<Integer> pukeArray = this.pukerKit.generateRandomNumArray(size);
+		List<Player> players = this.getPlayers();
+		for(int i=0 ; i < players.size() ; i++) {
+			Player player = players.get(i);	
+			player.addPuke(this.pukerHelp.getPuke(pukeArray.get(2*i + 0)));
+			player.addPuke(this.pukerHelp.getPuke(pukeArray.get(2*i + 1)));
 		}
 	}
-	
-	
+
 	public int getSecsPassByTurn()
 	{
 		if(this.currentPlayer == null)
@@ -335,7 +341,7 @@ public class PukerGame extends GameRoom
 	public void balanceBet()
 	{
 		this.winMap.clear();
-		List<Player> players = PukerKit.sortPlayerByPukeMap(this.getPlayers());
+		List<Player> players = this.pukerHelp.sortPlayerByPukeMap(this.getPlayers());
 		
 		log.info("roomName: " + this.getName() + " 开始结算");
 		
@@ -512,7 +518,7 @@ public class PukerGame extends GameRoom
 		for(Player entry : this.getPlayers())
 		{
 			entry.setPlaying(false);
-			entry.setPkLevelByPkType();
+			entry.setPkLevelByPkType(this.pukerHelp);
 		}
 		
 		this.currentPlayer = null;
@@ -524,7 +530,7 @@ public class PukerGame extends GameRoom
 		this.notifyRoomPlayerPokeGameOver();
 
 		this.clearLessMoneyPlayer();
-
+		this.webSocketService.sendGameStateUpdate(this);
 		this.roomState = new RoomStateReady(7);
 	}
 	
@@ -558,27 +564,24 @@ public class PukerGame extends GameRoom
 	
 	public void notifyRoomPlayerPokeGameOver()
 	{
-		this.notifyRoom(this.toGameState());
+		this.notifyRoom();
 	}
 	
 	
 	public void notifyRoomPlayerPokeGameStart()
 	{
-		this.notifyRoom(this.toGameState());
+		this.notifyRoom();
 	}
 	
 	public void notifyRoomWhoTurn()
 	{
-		this.notifyRoom(this.toGameState());
+		this.notifyRoom();
 	}
 	
 	
 	public void turnOverHandle()
 	{
-		if(this.isGame() == false )
-		{
-			return ;
-		}
+		
 		
 		if(this.isRoundOver())
 		{
@@ -691,6 +694,10 @@ public class PukerGame extends GameRoom
 		}
         return this.isSeatTaken(player.getSeatId()) != false;
     }
+
+	public List<Puke> getPublicPukes() {
+		return this.fiveSharePk;
+	}
 	
 	
 	public void roundOverHandle()
@@ -714,22 +721,26 @@ public class PukerGame extends GameRoom
 		this.maxBet = 0;//this.getBbet();
 		log.info("roomName: " + this.getName() + " round " + this.round + " started");
 
-		if (this.round == 2) {
+		if (this.round == ConstList.RoundState.Flop.value()) {
+			this.flop3Pukers();
 			IntStream.range(0, 3).forEach(i -> {
+
 				log.info("public cards: " + fiveSharePk.get(i).toString());
 				this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(i));
-			});
+				});
 			});
 			
 		}
-		else if (this.round == 3) {
+		else if (this.round == ConstList.RoundState.Turn.value()) {
+			this.turnPuker();
 			log.info("public cards: " + fiveSharePk.get(3).toString());
 			this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(3));
 				});
 		}
-		else if (this.round == 4) {
+		else if (this.round == ConstList.RoundState.River.value()) {
+			this.riverPuker();
 			log.info("public cards: " + fiveSharePk.get(4).toString());
 			this.getPlayers().forEach(player -> {
 					player.addPuke(fiveSharePk.get(4));
@@ -750,7 +761,13 @@ public class PukerGame extends GameRoom
 	
 	public void notifyRoomPlayerRoundOver()
 	{
-		this.notifyRoom(this.toGameState());
+		this.notifyRoom();
+	}
+
+	@Override
+	public void notifyRoom()
+	{
+		this.webSocketService.sendGameStateUpdate(this);
 	}
 	
 	
@@ -912,7 +929,7 @@ public class PukerGame extends GameRoom
 		log.info("roomName: " + this.getName() + " seat: " + player.getSeatId() + " Id: " + player.getUid() + " drop card " );
 		// this.notifyRoomPlayer(response, ConstList.MessageType.MESSAGE_NINE);
 		this.turnOverHandle();
-		if(this.isGame() && this.isGameOverWhenDropCard())
+		if(this.roomState.isGame() && this.isGameOverWhenDropCard())
 		{
 			this.gameOverHandle();
 		}
@@ -1002,7 +1019,18 @@ public class PukerGame extends GameRoom
 
 	@Override
 	public boolean playerSitDown(int seatId, Player player, int cb) throws GameCmdException {
-		return super.playerSitDown(seatId, player, cb);
+		boolean result = super.playerSitDown(seatId, player, cb);
+		if(this.roomState.isGame())
+		{
+			player.setGameState(ConstList.PlayerGameState.PLAYER_STATE_WAIT);
+			player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_WAIT);
+		}
+		else
+		{
+			player.setGameState(ConstList.PlayerGameState.PLAYER_STATE_PLAYER);
+			player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
+		}
+		return result;
 	}
 	
 	public boolean playerLeave(Player player)
@@ -1032,8 +1060,7 @@ public class PukerGame extends GameRoom
 	
 	public boolean isUserPlaying(Integer uid)
 	{	
-		if(this.isGame() == false)
-		{
+		if (this.roomState.isGame() == false) {
 			return false;
 		}
 		
@@ -1149,6 +1176,11 @@ public class PukerGame extends GameRoom
 		{
 			return true;
 		}
+
+		@Override
+		public String getName() {
+			return "gaming";
+		}
 		
 		private HeartTimer timer = null;
 		
@@ -1200,6 +1232,11 @@ public class PukerGame extends GameRoom
 		public boolean isGame()
 		{
 			return false;
+		}
+
+		@Override
+		public String getName() {
+			return "waiting";
 		}
 
 	}

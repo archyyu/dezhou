@@ -2,44 +2,46 @@ package com.archy.dezhou.controller.websocket;
 
 import com.archy.dezhou.entity.websocket.GameEventMessage;
 import com.archy.dezhou.entity.websocket.WebSocketMessage;
+import com.archy.dezhou.service.WebSocketService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 /**
- * WebSocket Controller for handling game-related WebSocket messages
+ * WebSocket Controller for handling incoming WebSocket messages
  * 
- * This controller handles real-time game events and broadcasts them to connected clients.
+ * This controller receives WebSocket messages from clients and can broadcast them.
+ * For sending notifications, use the WebSocketService instead.
  */
 @Controller
 public class GameWebSocketController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketService webSocketService;
 
-    public GameWebSocketController(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
+    public GameWebSocketController(WebSocketService webSocketService) {
+        this.webSocketService = webSocketService;
     }
 
     /**
-     * Handle game event messages and broadcast to specific room
+     * Handle game event messages from clients and broadcast to specific room
      * 
-     * @param message The game event message
-     * @param headerAccessor Accessor for message headers
+     * @param message The game event message from client
+     * @return The same message (for potential broadcast)
      */
     @MessageMapping("/game.event")
-    public void handleGameEvent(@Payload GameEventMessage message, SimpMessageHeaderAccessor headerAccessor) {
+    @SendTo("/topic/game.events")
+    public GameEventMessage handleGameEvent(@Payload GameEventMessage message) {
         // Broadcast the message to all subscribers of the specific game room
-        String destination = "/topic/game." + message.getRoomId() + ".events";
-        messagingTemplate.convertAndSend(destination, message);
+        // The actual broadcasting is handled by the @SendTo annotation
+        return message;
     }
 
     /**
-     * Handle general WebSocket messages
+     * Handle general WebSocket messages from clients
      * 
-     * @param message The WebSocket message
+     * @param message The WebSocket message from client
+     * @return The same message echoed back
      */
     @MessageMapping("/ws.message")
     @SendTo("/topic/public")
@@ -48,45 +50,15 @@ public class GameWebSocketController {
     }
 
     /**
-     * Send a game event notification to a specific room
+     * Handle test messages for debugging
      * 
-     * @param roomId The room ID to send the notification to
-     * @param eventType The type of event
-     * @param data The event data
+     * @param message The test message
+     * @return Echo response
      */
-    public void sendGameEvent(String roomId, String eventType, Object data) {
-        GameEventMessage message = new GameEventMessage(
-                roomId, 
-                eventType, 
-                data, 
-                "game-" + roomId, 
-                1, // Default round number
-                "system"
-        );
-        
-        String destination = "/topic/game." + roomId + ".events";
-        messagingTemplate.convertAndSend(destination, message);
-    }
-
-    /**
-     * Send a player action notification
-     * 
-     * @param roomId The room ID
-     * @param playerId The player ID who performed the action
-     * @param actionType The action type (e.g., "BET_FOLLOWED", "PLAYER_FOLDED")
-     * @param actionData Additional action data
-     */
-    public void sendPlayerAction(String roomId, String playerId, String actionType, Object actionData) {
-        GameEventMessage message = new GameEventMessage(
-                roomId, 
-                actionType, 
-                actionData, 
-                "game-" + roomId, 
-                1, // Default round number
-                playerId
-        );
-        
-        String destination = "/topic/game." + roomId + ".events";
-        messagingTemplate.convertAndSend(destination, message);
+    @MessageMapping("/test.message")
+    @SendTo("/topic/test")
+    public WebSocketMessage handleTestMessage(@Payload WebSocketMessage message) {
+        System.out.println("Received test message: " + message.getEventType());
+        return message;
     }
 }
