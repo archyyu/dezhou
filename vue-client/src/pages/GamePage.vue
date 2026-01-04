@@ -208,6 +208,17 @@
               </div>
             </div>
           </div>
+
+          <!-- Individual Seat Win Badges -->
+          <template v-for="seatId in 8" :key="'win-' + seatId">
+            <div v-if="getWinAmount(seatId) > 0" 
+                 class="seat-win-badge-wrapper" 
+                 :style="getSeatPosition(seatId)">
+              <div class="seat-win-badge">
+                <span class="win-plus">+</span>{{ getWinAmount(seatId) }}
+              </div>
+            </div>
+          </template>
           
           <!-- Table Center (Community Cards) -->
           <div class="table-center">
@@ -221,6 +232,19 @@
                 </div>
                 <div v-for="i in (5 - (gameState?.publicPukers?.length || 0))" :key="'empty-' + i" class="playing-card empty">
                   <div class="card-content"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Winner Announcement Overlay -->
+            <div v-if="winners.length > 0" class="winner-announcement shadow-lg">
+              <div class="winner-title">
+                <span class="crown">👑</span> Winners
+              </div>
+              <div class="winner-list">
+                <div v-for="winner in winners" :key="winner.seatId" class="winner-item">
+                  <span class="winner-name">{{ winner.playerName }}</span>
+                  <span class="winner-amount">+{{ winner.winAmount }}</span>
                 </div>
               </div>
             </div>
@@ -467,6 +491,22 @@ const currentPlayer = computed(() => {
 
 const isGameInProgress = computed(() => {
   return gameState.value && gameState.value.gamePhase && gameState.value.gamePhase !== 'LOBBY'
+})
+
+const winners = computed(() => {
+  if (!gameState.value || !gameState.value.winMap) return []
+  
+  return Object.entries(gameState.value.winMap)
+    .filter(([_, amount]) => amount > 0)
+    .map(([seatId, winAmount]) => {
+      const sId = parseInt(seatId)
+      const player = gameState.value.players?.find(p => p.seatId === sId)
+      return {
+        seatId: sId,
+        winAmount: winAmount,
+        playerName: player ? player.playerName : `Seat ${sId}`
+      }
+    }).sort((a, b) => b.winAmount - a.winAmount)
 })
 
 const canSitDown = computed(() => {
@@ -995,6 +1035,26 @@ const confirmSeatSelection = () => {
   }
 }
 
+const getWinAmount = (seatId) => {
+  if (!gameState.value || !gameState.value.winMap) return 0
+  // Jackson Map keys are strings in JSON
+  return gameState.value.winMap[seatId.toString()] || gameState.value.winMap[seatId] || 0
+}
+
+const getSeatPosition = (seatId) => {
+  const positions = {
+    1: { top: '10%', left: '50%' },
+    2: { top: '20%', left: '75%' },
+    3: { top: '50%', left: '90%' },
+    4: { top: '75%', left: '75%' },
+    5: { top: '90%', left: '50%' },
+    6: { top: '75%', left: '25%' },
+    7: { top: '50%', left: '10%' },
+    8: { top: '20%', left: '25%' }
+  }
+  return positions[seatId] || { top: '0%', left: '0%' }
+}
+
 const startGame = async () => {
   await performAction('START')
 }
@@ -1189,6 +1249,112 @@ const cancelRaise = () => {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
+}
+
+.seat-win-badge-wrapper {
+  position: absolute;
+  z-index: 100;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.seat-win-badge {
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  border: 2px solid white;
+  white-space: nowrap;
+  animation: bounceIn 0.8s cubic-bezier(0.36, 0, 0.66, -0.56) infinite alternate;
+}
+
+.win-plus {
+  font-size: 0.7rem;
+  margin-right: 2px;
+}
+
+@keyframes bounceIn {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}
+
+/* Winner Announcement */
+.winner-announcement {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffd700;
+  padding: 25px 40px;
+  border-radius: 30px;
+  z-index: 200;
+  text-align: center;
+  border: 3px solid #ffd700;
+  min-width: 280px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+  animation: winnerAppear 1s ease-out;
+}
+
+.winner-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.crown {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+}
+
+.winner-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.winner-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.winner-name {
+  color: white;
+  font-weight: 600;
+}
+
+.winner-amount {
+  font-weight: 900;
+  color: #4CAF50;
+}
+
+@keyframes winnerAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 /* Poker Table */

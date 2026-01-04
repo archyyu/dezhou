@@ -22,12 +22,12 @@ services:
     networks:
       - dezhou-network
 
-  # Dezhou Poker Application Service
-  app:
+  # Dezhou Poker Backend Service
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dezhou-app
+    container_name: dezhou-backend
     depends_on:
       mysql:
         condition: service_healthy
@@ -37,8 +37,36 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: aida87014999
+      SPRING_PROFILES_ACTIVE: production
     networks:
       - dezhou-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Dezhou Poker Frontend Service
+  frontend:
+    build:
+      context: ./vue-client
+      dockerfile: Dockerfile
+    container_name: dezhou-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080
+    networks:
+      - dezhou-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 # Networks
 networks:

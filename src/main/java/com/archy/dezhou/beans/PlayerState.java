@@ -27,7 +27,7 @@ public class PlayerState {
             this.playerId = player.getUid();
             this.playerName = player.getAccount();
             this.seatId = player.getSeatId();
-            this.chips = player.getChips();
+            this.chips = player.getRmoney();
             this.currentBet = player.getTempBet();
             this.totalBet = player.getTotalGambleBet();
             this.hasLooked = player.isHasLooked();
