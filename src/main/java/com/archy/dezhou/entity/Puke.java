@@ -2,7 +2,7 @@ package com.archy.dezhou.entity;
 
 public class Puke
 {
-	private String tag; // 图片扑克花色的表示（代表的是红桃、黑桃,梅花、方块
+	private String tag; // 图片扑克花色的表示（代表的是红桃、黑桃,梅花、方块)
 	private int num; // 表示扑克牌面的大
 
 	public Puke(String tag, int num)

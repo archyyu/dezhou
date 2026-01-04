@@ -39,7 +39,7 @@ public class FivePukeItem
 	
 	private List<Puke> list = new ArrayList<Puke>();
 	
-	public void calculateHandValue()
+	public void calculateHandValue(PukerHelp pukerHelp)
 	{
 		Collections.sort(list,new Comparator<Puke>(){
 			@Override
@@ -49,13 +49,13 @@ public class FivePukeItem
 			}
 		});
 		
-		this.level = PukerKit.getLevel(this.list);
-		if(PukerKit.needDuplicateSort(this.level))
+		this.level = pukerHelp.getLevel(this.list);
+		if(pukerHelp.needDuplicateSort(this.level))
 		{
-			PukerKit.sortDuplicatePukes(this.list);
+			pukerHelp.sortDuplicatePukes(this.list);
 		}
 		
-		if(PukerKit.needResort(this.level))
+		if(pukerHelp.needResort(this.level))
 		{
 			if(this.list.get(0).getNum() == 14 && this.list.get(1).getNum() == 5)
 			{

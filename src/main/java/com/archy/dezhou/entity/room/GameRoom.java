@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import com.archy.dezhou.GameCmdException;
-import com.archy.dezhou.beans.GameState;
 import com.archy.dezhou.beans.PlayerState;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
@@ -147,17 +146,6 @@ public class GameRoom
 		player.setSeatId(seatId);
 
 		// this.addPlayer(seatId,player);
-
-		if(this.isGame())
-		{
-			player.setGameState(ConstList.PlayerGameState.PLAYER_STATE_WAIT);
-			player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_WAIT);
-		}
-		else
-		{
-			player.setGameState(ConstList.PlayerGameState.PLAYER_STATE_PLAYER);
-			player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_PLAYER);
-		}
 
 		this.addPlayer(seatId,player);
 		this.notifyPlayer(player.toPlayerState());
@@ -302,12 +290,6 @@ public class GameRoom
 		this.isLimbo = isLimbo;
 	}
 
-
-	public boolean isGame()
-	{
-		return true;
-	}
-
 	public int howManyUsers()
 	{
 		return this.playerMap.size();
@@ -366,15 +348,9 @@ public class GameRoom
 		});
 	}
 
-	public void notifyRoom(GameState gameState)
+	public void notifyRoom()
 	{
-		this.playerMap.values().forEach(player -> {
-			
-		});
-
-		this.spectatorList.forEach(player -> {
-
-		});
+		// this.webSocketService.sendGameStateUpdate(this);
 	}
 	
 	public Integer getBbet() {

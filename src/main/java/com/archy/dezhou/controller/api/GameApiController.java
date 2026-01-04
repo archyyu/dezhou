@@ -6,6 +6,7 @@ import com.archy.dezhou.beans.PlayerState;
 import com.archy.dezhou.command.GameCommand;
 import com.archy.dezhou.command.GameCommandFactory;
 
+import com.archy.dezhou.controller.websocket.GameWebSocketController;
 import com.archy.dezhou.entity.ApiResponse;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.room.GameRoom;
@@ -14,6 +15,7 @@ import com.archy.dezhou.global.ConstList;
 import com.archy.dezhou.security.JwtTokenProvider;
 import com.archy.dezhou.service.RoomService;
 import com.archy.dezhou.service.UserService;
+import com.archy.dezhou.service.WebSocketService;
 
 import jakarta.annotation.Resource;
 
@@ -24,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -47,6 +50,9 @@ public class GameApiController extends BaseApiController {
     @Resource
     private GameCommandFactory gameCommandFactory;
 
+    @Resource
+    private WebSocketService webSocketService;
+
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
@@ -61,6 +67,35 @@ public class GameApiController extends BaseApiController {
      */
     protected UserService getUserService() {
         return userService;
+    }
+
+    /**
+     * Send WebSocket notification about game actions
+     * 
+     * @param roomId The room ID where the action occurred
+     * @param actionType The type of action performed
+     * @param player The player who performed the action
+     * @param additionalParams Additional parameters from the request
+     */
+    private void sendGameActionNotification(String roomId, String actionType, Player player) {
+        try {
+            // Create notification data
+            PlayerState playerState = new PlayerState(player);
+            
+            // Send the notification via WebSocket service
+            webSocketService.sendPlayerAction(
+                roomId, 
+                player.getUid() + "", 
+                "PLAYER_ACTION_" + actionType.toUpperCase(), 
+                playerState
+            );
+            
+            logger.info("Sent WebSocket notification for action {} by player {} in room {}", 
+                actionType, player.getUid(), roomId);
+                
+        } catch (Exception e) {
+            logger.error("Failed to send WebSocket notification for action {}: {}", actionType, e.getMessage());
+        }
     }
 
     /**
@@ -97,6 +132,9 @@ public class GameApiController extends BaseApiController {
             boolean result = gameCommand.execute(room, player, additionalParams);
             
             if (result) {
+                // Send WebSocket notification about the game action
+                sendGameActionNotification(roomId, cmd, player);
+                
                 return successResponse( new GameState(room) );
             } else {
                 return errorResponse("failed");

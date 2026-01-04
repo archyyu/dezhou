@@ -13,6 +13,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class SecurityConfig {
                     "/api/v1/test/public",
                     "/api/v1/test/generate-token",
                     "/health",
-                    "/actuator/**"
+                    "/actuator/**",
+                    "/ws/**",           // WebSocket endpoint
+                    "/ws"              // WebSocket endpoint (exact match)
                 ).permitAll() // Public endpoints
                 .requestMatchers(
                     "/api/v1/user/**",
@@ -69,7 +72,9 @@ public class SecurityConfig {
             "http://localhost:5173",  // Vue development server
             "http://localhost:5174",  // Alternative Vue port
             "http://localhost:3000",  // Common alternative
-            "http://localhost:8080"   // Same origin
+            "http://localhost:8080",  // Same origin
+            "http://localhost:5173",  // Vue development server (duplicate for safety)
+            "http://127.0.0.1:5173"   // Alternative localhost format
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

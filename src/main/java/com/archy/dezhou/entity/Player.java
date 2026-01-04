@@ -17,7 +17,9 @@ import lombok.Data;
 
 import com.archy.dezhou.beans.GameState;
 import com.archy.dezhou.beans.PlayerState;
+import com.archy.dezhou.beans.PukerState;
 import com.archy.dezhou.entity.puker.FivePukeItem;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.puker.PukerKit;
 
 @Data
@@ -321,10 +323,17 @@ public class Player extends User
 		}
 		return this.pkType.get(index);
 	}
+
+	public List<Puke> getOwnPukers() {
+		if (this.pkType.size() < 2) {
+			return new ArrayList<>();
+		}
+		return this.pkType.subList(0, 2);
+	}
 	
-	public void setPkLevelByPkType()
+	public void setPkLevelByPkType(PukerHelp pukerHelp)
 	{
-		this.maxFivePukeList = PukerKit.getMaxFive(this.pkType);
+		this.maxFivePukeList = pukerHelp.getMaxFive(this.pkType);
 		this.fivePk = this.maxFivePukeList.getList();
 		this.pkValue = this.maxFivePukeList.getPkValue();
 		this.pkLevel = this.maxFivePukeList.getLevel();

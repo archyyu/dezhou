@@ -1,6 +1,7 @@
 package com.archy.dezhou.config;
 
 import com.archy.dezhou.entity.RoomDB;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.service.RoomService;
 import jakarta.annotation.PostConstruct;
@@ -52,9 +53,9 @@ public class TestRoomConfig {
         advancedRoomDB.setSbet(100);  // Small blind
         
         // Create PukerGame instances
-        PukerGame beginnerRoom = new PukerGame(beginnerRoomDB);
-        PukerGame intermediateRoom = new PukerGame(intermediateRoomDB);
-        PukerGame advancedRoom = new PukerGame(advancedRoomDB);
+        PukerGame beginnerRoom = new PukerGame(beginnerRoomDB, null,  new PukerHelp());
+        PukerGame intermediateRoom = new PukerGame(intermediateRoomDB, null, new PukerHelp());
+        PukerGame advancedRoom = new PukerGame(advancedRoomDB, null, new PukerHelp());
         
         // Add rooms to the service
         roomService.addRoom(beginnerRoom);

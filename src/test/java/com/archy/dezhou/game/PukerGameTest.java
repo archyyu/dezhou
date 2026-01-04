@@ -13,8 +13,10 @@ import com.archy.dezhou.GameCmdException;
 import com.archy.dezhou.entity.Player;
 import com.archy.dezhou.entity.RoomDB;
 import com.archy.dezhou.entity.User;
+import com.archy.dezhou.entity.puker.PukerHelp;
 import com.archy.dezhou.entity.room.PukerGame;
 import com.archy.dezhou.global.ConstList;
+import com.archy.dezhou.service.WebSocketService;
 
 public class PukerGameTest {
     
@@ -24,10 +26,20 @@ public class PukerGameTest {
     private final int Bbet = 10;
     private final int cd = 1000;
 
+    private WebSocketService webSocketService;
+
     @BeforeEach
     public void setUp() {
         // Initialize test data
         testPlayers = new ArrayList<>();
+        
+        // Create a simple mock WebSocketService that implements only what we need
+        webSocketService = new WebSocketService(null) {
+            @Override
+            public void sendGameStateUpdate(PukerGame game) {
+                // Mock implementation - do nothing
+            }
+        };
         
         // Create 4 test users for Texas Hold'em
         setUpTestUsers();
@@ -38,6 +50,7 @@ public class PukerGameTest {
     }
 
     private void setUpTestUsers() {
+
         // Create 4 test players with different characteristics
         String[] names = {"Alice", "Bob", "Charlie", "Diana"};
         int[] chips = {1000, 1000, 1000, 1000};
@@ -71,7 +84,7 @@ public class PukerGameTest {
         roomDB.setRoomtype("public");
         roomDB.setShowname("beginner");
 
-        testRoom = new PukerGame(roomDB);
+        testRoom = new PukerGame(roomDB, this.webSocketService, new PukerHelp());
         testRoom.setName("TexasHoldemTestRoom");
         testRoom.setRoomtype("rg"); // Regular game
         testRoom.setBbet(10); // Big blind
@@ -116,7 +129,6 @@ public class PukerGameTest {
         
         this.playersSitdown();
 
-        testRoom.initGame();
         testRoom.gameStartHandle();
         
         assertEquals(1, testRoom.getRoundNum());
@@ -163,7 +175,6 @@ public class PukerGameTest {
     @Test
     public void testPukerGameRaiseBet() {
         this.playersSitdown();
-        testRoom.initGame();
         testRoom.gameStartHandle();
         
         // Ensure we have a current player
