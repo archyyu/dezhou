@@ -1,0 +1,84 @@
+package com.archy.texasholder.entity.puker;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+
+import com.archy.texasholder.entity.Puke;
+
+public class FivePukeItem
+{
+	
+	public FivePukeItem(List<Puke> list)
+	{
+		this.list.addAll(list);
+	}
+	
+	private long pkValue = 0L;
+	
+	public long getPkValue()
+	{
+		return this.pkValue;
+	}
+	
+	private int level = 0;
+	
+	public int getLevel()
+	{
+		return this.level;
+	}
+	
+	public List<Puke> getList()
+	{
+		List<Puke> list = new ArrayList<Puke>();
+		list.addAll(this.list);
+		return list;
+	}
+	
+	private List<Puke> list = new ArrayList<Puke>();
+	
+	public void calculateHandValue(PukerHelp pukerHelp)
+	{
+		Collections.sort(list,new Comparator<Puke>(){
+			@Override
+			public int compare( Puke arg0, Puke arg1 )
+			{
+				return arg1.getNum() - arg0.getNum();
+			}
+		});
+		
+		this.level = pukerHelp.getLevel(this.list);
+		if(pukerHelp.needDuplicateSort(this.level))
+		{
+			pukerHelp.sortDuplicatePukes(this.list);
+		}
+		
+		if(pukerHelp.needResort(this.level))
+		{
+			if(this.list.get(0).getNum() == 14 && this.list.get(1).getNum() == 5)
+			{
+				Puke puke = this.list.get(0);
+				this.list.remove(0);
+				this.list.add(puke);
+			}
+		}
+		
+		long lon = 1000000000L * 10;
+		this.pkValue = 0L;
+		for(int i = 0 ; i < this.list.size() ; i++)
+		{
+			int interval = 1;
+			for(int j = i ; j < this.list.size() - 1 ; j ++)
+			{
+				interval *= 10;
+				interval *= 10;
+			}
+			this.pkValue += this.list.get(i).getNum() * interval;
+		}
+		this.pkValue += this.level * lon;
+		
+	}
+	
+}

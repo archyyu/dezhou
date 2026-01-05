@@ -2,7 +2,7 @@
   <div id="app">
     <header class="bg-dark text-white p-3">
       <div class="container">
-        <h1 class="h3">Dezhou Puker Game</h1>
+        <h1 class="h3">Texas Holder Poker Game</h1>
       </div>
     </header>
     
@@ -11,7 +11,7 @@
     </main>
     
     <footer class="bg-light text-center p-3 mt-5">
-      <p class="mb-0">© 2023 Dezhou Puker. All rights reserved.</p>
+      <p class="mb-0">© 2023 Texas Holder Poker. All rights reserved.</p>
     </footer>
   </div>
 </template>

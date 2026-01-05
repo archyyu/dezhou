@@ -2,7 +2,7 @@
 
 ## 🎮 Overview
 
-Modern Vue.js client for the Dezhou Puker game, replacing the legacy Flash frontend with a responsive web application.
+Modern Vue.js client for the Texas Holder Poker game, replacing the legacy Flash frontend with a responsive web application.
 
 ## 🚀 Quick Start
 

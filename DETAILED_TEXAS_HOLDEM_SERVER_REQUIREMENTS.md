@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-**Project Name**: Dezhou Poker Server (Texas Hold'em Implementation)
+**Project Name**: TexasHolder Poker Server (Texas Hold'em Implementation)
 **Type**: Backend Server Application
 **Technology Stack**: 
 - Spring Boot 3.2.0
@@ -307,9 +307,9 @@
 
 ### 5. Database Schema - Complete
 
-#### 5.1 Users Table (`dezhou_user`)
+#### 5.1 Users Table (`texasholder_user`)
 ```sql
-CREATE TABLE dezhou_user (
+CREATE TABLE texasholder_user (
     uid INT AUTO_INCREMENT PRIMARY KEY,
     account VARCHAR(50) DEFAULT '' COMMENT 'Username',
     password VARCHAR(20) DEFAULT '' COMMENT 'Hashed password',
@@ -332,9 +332,9 @@ CREATE TABLE dezhou_user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player information';
 ```
 
-#### 5.2 Rooms Table (`dezhou_room`)
+#### 5.2 Rooms Table (`texasholder_room`)
 ```sql
-CREATE TABLE dezhou_room (
+CREATE TABLE texasholder_room (
     id INT AUTO_INCREMENT PRIMARY KEY,
     showname VARCHAR(50) DEFAULT '' COMMENT 'Display name',
     name VARCHAR(50) DEFAULT '' COMMENT 'Internal name',
@@ -354,9 +354,9 @@ CREATE TABLE dezhou_room (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Game room information';
 ```
 
-#### 5.3 Game History Table (`dezhou_game_history`)
+#### 5.3 Game History Table (`texasholder_game_history`)
 ```sql
-CREATE TABLE dezhou_game_history (
+CREATE TABLE texasholder_game_history (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     gameId VARCHAR(50) COMMENT 'Game ID',
     roomId VARCHAR(50) COMMENT 'Room ID',

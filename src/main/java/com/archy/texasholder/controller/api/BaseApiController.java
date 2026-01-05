@@ -1,0 +1,93 @@
+package com.archy.texasholder.controller.api;
+
+import com.archy.texasholder.entity.ApiResponse;
+import com.archy.texasholder.entity.Player;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+/**
+ * Base API Controller for handling common functionality
+ * Replaces the legacy Backlet pattern with modern Spring Boot REST controllers
+ */
+public abstract class BaseApiController {
+
+    /**
+     * Create a successful API response
+     */
+    @SuppressWarnings("unchecked")
+    protected ResponseEntity<ApiResponse<?>> successResponse(Object data) {
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @SuppressWarnings("unchecked")
+    protected ResponseEntity<ApiResponse<?>> successResponse(String msg) {
+        return ResponseEntity.ok(ApiResponse.success(msg));
+    }
+
+    /**
+     * Create an error API response
+     */
+    @SuppressWarnings("unchecked")
+    protected ResponseEntity<ApiResponse<?>> errorResponse(String errorMessage) {
+        ApiResponse<?> errorResponse = ApiResponse.error(errorMessage);
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    /**
+     * Create an error API response with custom status code
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> errorResponse(String errorMessage, int statusCode) {
+        ApiResponse<?> errorResponse = ApiResponse.error(errorMessage);
+        return ResponseEntity.status(statusCode).body((ApiResponse<T>) errorResponse);
+    }
+
+    /**
+     * Create a custom API response
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> customResponse(boolean success, String status, String code, String message, T data) {
+        return ResponseEntity.ok(new ApiResponse<>(success, status, code, message, data));
+    }
+
+    /**
+     * Create a custom API response with HTTP status code
+     */
+    @SuppressWarnings("unchecked")
+    protected <T> ResponseEntity<ApiResponse<T>> customResponse(boolean success, String status, String code, String message, T data, int httpStatus) {
+        return ResponseEntity.status(httpStatus).body(new ApiResponse<>(success, status, code, message, data));
+    }
+
+    /**
+     * Validate required parameters
+     */
+    protected boolean validateRequiredParams(String... params) {
+        for (String param : params) {
+            if (param == null || param.trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    protected Player getAuthentificatedPlayer() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.isAuthenticated() == false) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Player) {
+            return (Player) principal;
+        }
+        return null;
+
+    }
+
+    
+}

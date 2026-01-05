@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.archy.texasholder.dao.RoomDBMapper" >
+  <resultMap id="BaseResultMap" type="com.archy.texasholder.entity.RoomDB" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="showname" property="showname" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="bbet" property="bbet" jdbcType="INTEGER" />
+    <result column="sbet" property="sbet" jdbcType="INTEGER" />
+    <result column="maxbuy" property="maxbuy" jdbcType="INTEGER" />
+    <result column="minbuy" property="minbuy" jdbcType="INTEGER" />
+    <result column="roomtype" property="roomtype" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, showname, name, bbet, sbet, maxbuy, minbuy, roomtype
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from dezhou_room
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAllRooms" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from dezhou_room
+  </select>
+  <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from dezhou_room
+    where name = #{name,jdbcType=VARCHAR}
+  </select>
+  <insert id="insertSelective" parameterType="com.archy.texasholder.entity.RoomDB" >
+    insert into dezhou_room
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="showname != null" >
+        showname,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="bbet != null" >
+        bbet,
+      </if>
+      <if test="sbet != null" >
+        sbet,
+      </if>
+      <if test="maxbuy != null" >
+        maxbuy,
+      </if>
+      <if test="minbuy != null" >
+        minbuy,
+      </if>
+      <if test="roomtype != null" >
+        roomtype,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="showname != null" >
+        #{showname,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="bbet != null" >
+        #{bbet,jdbcType=INTEGER},
+      </if>
+      <if test="sbet != null" >
+        #{sbet,jdbcType=INTEGER},
+      </if>
+      <if test="maxbuy != null" >
+        #{maxbuy,jdbcType=INTEGER},
+      </if>
+      <if test="minbuy != null" >
+        #{minbuy,jdbcType=INTEGER},
+      </if>
+      <if test="roomtype != null" >
+        #{roomtype,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.archy.texasholder.entity.RoomDB" >
+    update dezhou_room
+    <set >
+      <if test="showname != null" >
+        showname = #{showname,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="bbet != null" >
+        bbet = #{bbet,jdbcType=INTEGER},
+      </if>
+      <if test="sbet != null" >
+        sbet = #{sbet,jdbcType=INTEGER},
+      </if>
+      <if test="maxbuy != null" >
+        maxbuy = #{maxbuy,jdbcType=INTEGER},
+      </if>
+      <if test="minbuy != null" >
+        minbuy = #{minbuy,jdbcType=INTEGER},
+      </if>
+      <if test="roomtype != null" >
+        roomtype = #{roomtype,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from dezhou_room
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+</mapper>

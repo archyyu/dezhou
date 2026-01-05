@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: dezhou-poker-server
+    name: texasholder-poker-server
   
   datasource:
-    url: jdbc:mysql://localhost:33306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:33306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
     username: root
     password: aida87014999
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -21,8 +21,8 @@ spring:
 
 mybatis:
   # MyBatis configuration moved directly into application.yml
-  mapper-locations: classpath:com/archy/dezhou/dao/*.xml
-  type-aliases-package: com.archy.dezhou.entity
+  mapper-locations: classpath:com/archy/texasholder/dao/*.xml
+  type-aliases-package: com.archy.texasholder.entity
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: true
@@ -45,6 +45,6 @@ jwt:
 logging:
   level:
     root: INFO
-    com.archy.dezhou: DEBUG
+    com.archy.texasholder: DEBUG
     org.springframework.web: INFO
     org.hibernate: INFO

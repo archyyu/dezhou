@@ -1,6 +1,6 @@
-# Dezhou Poker - Load Testing
+# TexasHolder Poker - Load Testing
 
-This directory contains all load testing scripts and documentation for the Dezhou Poker application.
+This directory contains all load testing scripts and documentation for the TexasHolder Poker application.
 
 ## 📁 Directory Structure
 

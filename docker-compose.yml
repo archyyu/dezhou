@@ -4,12 +4,12 @@ services:
   # MySQL Database Service
   mysql:
     image: mysql:8.0
-    container_name: dezhou-mysql
+    container_name: texasholder-mysql
     environment:
       MYSQL_ROOT_PASSWORD: aida87014999
-      MYSQL_DATABASE: dezhou
-      MYSQL_USER: dezhou_user
-      MYSQL_PASSWORD: dezhou_pass
+      MYSQL_DATABASE: texasholder
+      MYSQL_USER: texasholder_user
+      MYSQL_PASSWORD: texasholder_pass
     ports:
       - "33306:3306"
     volumes:
@@ -20,38 +20,38 @@ services:
       timeout: 20s
       retries: 10
     networks:
-      - dezhou-network
+      - texasholder-network
 
-  # Dezhou Poker Backend Service
+  # Texas Holder Poker Backend Service
   backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dezhou-backend
+    container_name: texasholder-backend
     depends_on:
       mysql:
         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: aida87014999
       SPRING_PROFILES_ACTIVE: production
     networks:
-      - dezhou-network
+      - texasholder-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
       interval: 30s
       timeout: 5s
       retries: 3
 
-  # Dezhou Poker Frontend Service
+  # Texas Holder Poker Frontend Service
   frontend:
     build:
       context: ./vue-client
       dockerfile: Dockerfile
-    container_name: dezhou-frontend
+    container_name: texasholder-frontend
     depends_on:
       backend:
         condition: service_healthy
@@ -61,7 +61,7 @@ services:
     environment:
       - VITE_API_BASE_URL=http://localhost:8080
     networks:
-      - dezhou-network
+      - texasholder-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -70,7 +70,7 @@ services:
 
 # Networks
 networks:
-  dezhou-network:
+  texasholder-network:
     driver: bridge
 
 # Volumes

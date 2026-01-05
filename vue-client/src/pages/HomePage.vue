@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <div class="jumbotron bg-light p-5 rounded">
-      <h1 class="display-4">Welcome to Dezhou Puker!</h1>
+      <h1 class="display-4">Welcome to Texas Holder Poker!</h1>
       <p class="lead">A modern poker game experience</p>
       <hr class="my-4">
       <p>Join exciting poker games with players from around the world.</p>

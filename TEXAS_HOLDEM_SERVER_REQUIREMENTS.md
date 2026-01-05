@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-**Project Name**: Dezhou Poker Server (Texas Hold'em Implementation)
+**Project Name**: TexasHolder Poker Server (Texas Hold'em Implementation)
 **Type**: Backend Server Application
 **Technology Stack**: Spring Boot, MySQL, MyBatis, Java 17+
 **Current Status**: Functional server with core game logic and API endpoints
@@ -62,9 +62,9 @@
 
 ## 🗃️ Database Schema
 
-### Users Table (`dezhou_user`)
+### Users Table (`texasholder_user`)
 ```sql
-CREATE TABLE dezhou_user (
+CREATE TABLE texasholder_user (
     uid INT AUTO_INCREMENT PRIMARY KEY,
     account VARCHAR(50) DEFAULT '',
     password VARCHAR(20) DEFAULT '',
@@ -83,9 +83,9 @@ CREATE TABLE dezhou_user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
-### Rooms Table (`dezhou_room`)
+### Rooms Table (`texasholder_room`)
 ```sql
-CREATE TABLE dezhou_room (
+CREATE TABLE texasholder_room (
     id INT AUTO_INCREMENT PRIMARY KEY,
     showname VARCHAR(50) DEFAULT '',
     name VARCHAR(50) DEFAULT '',

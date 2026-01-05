@@ -1,6 +1,6 @@
-# Dezhou Poker - AWS Terraform Deployment
+# TexasHolder Poker - AWS Terraform Deployment
 
-This directory contains Terraform configuration for deploying the Dezhou Poker application on AWS. The infrastructure includes VPC, subnets, security groups, EC2 instances, RDS database, and Application Load Balancers.
+This directory contains Terraform configuration for deploying the TexasHolder Poker application on AWS. The infrastructure includes VPC, subnets, security groups, EC2 instances, RDS database, and Application Load Balancers.
 
 ## 🚀 Quick Start
 
@@ -150,12 +150,12 @@ terraform init
 
 ### 2. Plan
 ```bash
-terraform plan -out=dezhou.plan
+terraform plan -out=texasholder.plan
 ```
 
 ### 3. Apply
 ```bash
-terraform apply dezhou.plan
+terraform apply texasholder.plan
 ```
 
 ### 4. Verify
@@ -164,7 +164,7 @@ terraform apply dezhou.plan
 terraform output
 
 # SSH to instances
-ssh -i ~/.ssh/dezhou-key-pair.pem ubuntu@<instance-ip>
+ssh -i ~/.ssh/texasholder-key-pair.pem ubuntu@<instance-ip>
 ```
 
 ### 5. Destroy (when needed)
@@ -225,7 +225,7 @@ curl http://<frontend-alb-dns-name>
 curl http://<backend-alb-dns-name>:8080/actuator/health
 
 # Check database connection
-mysql -h <database-endpoint> -u dezhou_user -p
+mysql -h <database-endpoint> -u texasholder_user -p
 ```
 
 ### 2. Load Testing
@@ -262,7 +262,7 @@ terraform state list
 terraform state show aws_instance.backend_instances
 
 # Import existing resources
-terraform import aws_vpc.dezhou_vpc vpc-12345678
+terraform import aws_vpc.texasholder_vpc vpc-12345678
 ```
 
 ## 📖 Additional Resources
