@@ -36,6 +36,7 @@ public class GameState {
     private int potAmount;
     private int roundIndex;
     private int roundNum;
+    private int maxBet;
 
     private int countDown;
     private String gamePhase; // "betting", "showdown", etc.
@@ -68,6 +69,8 @@ public class GameState {
 
         this.winMap = game.getWinMap();
         this.countDown = game.getSecsPassByTurn();
+
+        this.maxBet = game.getMaxBet();
         
         // Convert players to PlayerState objects
         this.players = game.getPlayers().stream()

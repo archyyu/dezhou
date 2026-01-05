@@ -317,19 +317,27 @@
         </div>
         
         <div v-if="isGameInProgress && isPlayerTurn" class="game-actions">
+          <div class="your-turn-header">
+            <div class="turn-timer-prominent" :class="{ 'warning': localCountDown <= 5 }">
+              <span class="timer-icon">⏳</span>
+              <span class="timer-value">{{ localCountDown }}</span>
+              <span class="timer-unit">s</span>
+            </div>
+            <div class="turn-label">YOUR TURN</div>
+          </div>
           <div class="action-row">
             <button @click="performAction('FOLD')" class="btn btn-danger">
               Fold
             </button>
             <button 
-              v-if="gameState.currentBetAmount === 0"
+              v-if="callAmount === 0"
               @click="performAction('CHECK')" 
               class="btn btn-secondary"
             >
               Check
             </button>
-            <button @click="performAction('CALL')" class="btn btn-primary">
-              Call {{ gameState.currentBetAmount }}
+            <button v-else @click="performAction('CALL')" class="btn btn-primary">
+              Call {{ callAmount }}
             </button>
           </div>
           <div class="action-row">
@@ -521,6 +529,12 @@ const isPlayerTurn = computed(() => {
 const currentPlayer = computed(() => {
   if (!gameState.value || !player.value) return null
   return gameState.value.players?.find(p => p.playerId === player.value.uid) || null
+})
+
+const callAmount = computed(() => {
+  if (!gameState.value || !currentPlayer.value) return 0
+  // maxBet is current bet to match, currentBet is player's bet in this round
+  return Math.max(0, (gameState.value.maxBet || 0) - (currentPlayer.value.currentBet || 0))
 })
 
 const isGameInProgress = computed(() => {
@@ -983,6 +997,12 @@ const performAction = async (action) => {
         playerStatus.value = 'playing'
       }
       
+      // Stop timer after action (turn is over)
+      if (['FOLD', 'CHECK', 'CALL', 'RAISE', 'ALL_IN', 'LOOK'].includes(action)) {
+        if (localTimerInterval) clearInterval(localTimerInterval)
+        localCountDown.value = 0
+      }
+      
       await loadGameState()
     } else {
       error.value = 'Failed to perform action: ' + (response.data?.message || 'Unknown error')
@@ -1185,6 +1205,12 @@ const confirmRaise = async () => {
         addGameLog(`You raised to ${amount} chips`)
         showRaiseInput.value = false
         raiseAmount.value = 0
+        
+        // Stop timer after action
+        if (localTimerInterval) clearInterval(localTimerInterval)
+        localCountDown.value = 0
+        
+        await loadGameState()
     } else {
         error.value = 'Failed to raise: ' + (response.data?.message || 'Unknown error')
     }
@@ -1730,6 +1756,52 @@ const cancelRaise = () => {
 .lobby-actions button {
   padding: 15px;
   font-size: 1.1rem;
+}
+
+.your-turn-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: linear-gradient(to right, rgba(81, 207, 102, 0.1), rgba(81, 207, 102, 0.2), rgba(81, 207, 102, 0.1));
+  border-radius: 10px;
+  border: 1px solid rgba(81, 207, 102, 0.3);
+}
+
+.turn-timer-prominent {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #2f9e44;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 8px rgba(47, 158, 68, 0.3);
+  min-width: 80px;
+  justify-content: center;
+}
+
+.turn-timer-prominent.warning {
+  background: #e03131;
+  box-shadow: 0 4px 8px rgba(224, 49, 49, 0.4);
+  animation: pulse-red 1s infinite;
+}
+
+.turn-label {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2f9e44;
+  letter-spacing: 1px;
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .waiting-message {

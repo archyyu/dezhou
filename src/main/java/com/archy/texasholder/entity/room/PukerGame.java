@@ -264,10 +264,12 @@ public class PukerGame extends GameRoom
 		bigBlind.addTempBet(this.maxBet);
 		bigBlind.addTotalGambleBet(this.maxBet);
         bigBlind.deductRmoney(this.maxBet);
+		this.addPoolBet(this.maxBet);
 		
 		smallBlind.addTempBet(this.maxBet/2);
 		smallBlind.addTotalGambleBet(this.maxBet/2);
 		smallBlind.deductRmoney(this.maxBet/2);
+		this.addPoolBet(this.maxBet/2);
 		
 		log.info("roomName: " + this.getName() + " smallBlind seat : " + smallBlind.getSeatId() + " Id: " + smallBlind.getUid() + " deduct Bet " + this.maxBet/2);
 		log.info("roomName: " + this.getName() + " big  Blind seat : " + bigBlind.getSeatId()   + " Id: " +   bigBlind.getUid() + " deduct Bet " + this.maxBet);
@@ -809,7 +811,7 @@ public class PukerGame extends GameRoom
 		for(Map.Entry<Integer, Integer> entry : this.roundPoolBet.entrySet()) {
 			result += entry.getValue();
 		}
-		return result;
+		return result + this.currentRoundBet;
 	}
 	
 	public boolean playerAddBet(Player player,int bet)
@@ -919,6 +921,10 @@ public class PukerGame extends GameRoom
 		this.notifyPlayer(player.toPlayerState());
 		this.turnOverHandle();
 		return true;
+	}
+
+	public int getMaxBet() {
+		return this.maxBet;
 	}
 	
 	public GameState toGameState() {
