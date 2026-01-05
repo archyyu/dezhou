@@ -1,240 +1,65 @@
-# TexasHolder Poker - Load Testing
+# TexasHolder Poker - Load Testing Suite
 
-This directory contains all load testing scripts and documentation for the TexasHolder Poker application.
+Modern load testing suite using **k6** to validate performance, scalability, and stability of the TexasHolder Poker server.
 
-## 📁 Directory Structure
+## 🚀 Structure
 
-```
+```text
 load-testing/
-├── load_test.js              # Main k6 load test script
-├── LOAD_TESTING_DOCUMENTATION.md # Comprehensive load testing guide
-├── test-game-process.html     # Game process test HTML
-├── test-login.html           # Login functionality test HTML
-├── test-websocket.html       # WebSocket functionality test HTML
-├── test-websocket-security.html # WebSocket security test HTML
-├── test-simple.html          # Simple test HTML
-├── test-vite.js             # Vite test script
-└── test-websocket-fix.html   # WebSocket fix test HTML
+├── libs/                  # Reusable libraries
+│   ├── api.js             # API client (Login, Room, Game actions)
+│   └── utils.js           # Random generators and sleep helpers
+├── scripts/               # Test scenarios
+│   ├── smoke.js           # Verification test (1 VU)
+│   ├── load.js            # Standard load test (ramp-up to 20+ VUs)
+│   ├── stress.js          # Stress test (ramp-up to failure point)
+│   └── gameplay_flow.js   # Complex simulation (Join -> Play -> Leave)
+├── legacy/                # Old scripts and HTML tests
+└── README.md              # This file
 ```
 
-## 🚀 Quick Start
+## 🛠️ Prerequisites
 
-### Prerequisites
-- [k6](https://k6.io/) installed (for load testing)
-- Modern web browser (for HTML tests)
-- Node.js (for JavaScript tests)
+1. **Install k6**:
+   - macOS: `brew install k6`
+   - Linux: `sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69 && echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list && sudo apt-get update && sudo apt-get install k6`
+   - Windows: `choco install k6`
 
-### Running Load Tests
+2. **Server Running**:
+   Ensure the TexasHolder server is running at `http://localhost:8080`.
 
+## 🏃 Running Tests
+
+### Smoke Test
+Verify that the system is up and basic endpoints work.
 ```bash
-# Install k6 (if not already installed)
-brew install k6  # macOS
-
-# Run the main load test
-k6 run load_test.js
-
-# Run with specific options
-k6 run --vus 50 --duration 30s load_test.js
+k6 run load-testing/scripts/smoke.js
 ```
 
-## 📋 Test Files Description
-
-### `load_test.js`
-Main k6 load testing script that simulates multiple virtual users interacting with the poker game API.
-
-**Features:**
-- Configurable virtual users (VUs)
-- Multiple test scenarios
-- Performance metrics collection
-- Threshold-based validation
-
-### `LOAD_TESTING_DOCUMENTATION.md`
-Comprehensive guide covering:
-- Load testing methodology
-- Test scenarios and setup
-- Performance metrics analysis
-- Result interpretation
-- Best practices
-
-### HTML Test Files
-- **`test-game-process.html`**: Tests complete game flow
-- **`test-login.html`**: Tests authentication functionality
-- **`test-websocket.html`**: Tests WebSocket connections
-- **`test-websocket-security.html`**: Tests WebSocket security
-- **`test-simple.html`**: Simple functionality test
-- **`test-websocket-fix.html`**: WebSocket fix verification
-
-### `test-vite.js`
-Vite-specific test script for frontend testing.
-
-## 🎯 Load Testing Scenarios
-
-### 1. Basic API Testing
-```javascript
-// Example from load_test.js
-import http from 'k6/http';
-import { check, sleep } from 'k6';
-
-export default function () {
-  // Test API endpoints
-  let res = http.get('http://localhost:8080/api/health');
-  check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
-  sleep(1);
-}
-```
-
-### 2. Game Process Testing
-Tests the complete poker game flow including:
-- Player registration and login
-- Room creation and joining
-- Game actions (bet, fold, check, raise)
-- Game completion and results
-
-### 3. WebSocket Testing
-Tests real-time WebSocket functionality:
-- Connection establishment
-- Message sending/receiving
-- Game state updates
-- Error handling
-
-### 4. Stress Testing
-Simulates high load scenarios:
+### Load Test
+Test the system under expected concurrent load.
 ```bash
-# 100 virtual users for 5 minutes
-k6 run --vus 100 --duration 300s load_test.js
+k6 run load-testing/scripts/load.js
 ```
 
-## 📊 Performance Metrics
-
-Key metrics collected during load tests:
-
-- **Request Rate**: Requests per second
-- **Response Time**: Average, median, 95th percentile
-- **Error Rate**: Failed request percentage
-- **Throughput**: Data transfer rate
-- **Virtual Users**: Concurrent user simulation
-
-## 🔧 Configuration
-
-### k6 Options
-
-| Option | Description | Example |
-|--------|-------------|---------|
-| `--vus` | Virtual users | `--vus 50` |
-| `--duration` | Test duration | `--duration 30s` |
-| `--rps` | Requests per second | `--rps 100` |
-| `--stage` | Ramp-up stages | `--stage 10s:10,30s:50` |
-
-### Environment Setup
-
+### Gameplay Simulation
+Simulate realistic user behavior (login, join room, play hands, leave).
 ```bash
-# Set environment variables
-export API_BASE_URL="http://localhost:8080"
-export TEST_DURATION="60s"
-export VIRTUAL_USERS="25"
+k6 run load-testing/scripts/gameplay_flow.js
 ```
 
-## 📈 Test Results Analysis
-
-### Sample Output
-```
-          /\      |‾‾|  /‾‾/  /‾/
-     /
-    /  \     |  |_/  /  / /
-   /___\    |      |  /  /__\
-  /____ \   |  |\/|  /  /____\
- /      \  |__|  |__/______/
-
-  execution: local
-     script: load_test.js
-     output: -
-
-  scenarios: (100.00%) 1 scenario, 50 max VUs, 1m30s max duration (incl. graceful stop):
-           * default: 50 looping VUs for 1m0s (gracefulStop: 30s)
-
-  ✓ status is 200
-  ✓ status is 201
-  ✓ response time < 500ms
-
-  checks.........................: 100.00% ✓ 15000     ✗ 0
-  data_received..................: 12 MB   200 kB/s
-  data_sent......................: 2.1 MB 35 kB/s
-  http_req_blocked...............: avg=1.23ms  min=1µs    med=1µs    max=10ms
-  http_req_connecting............: avg=1.12ms  min=0s     med=0s     max=5ms
-  http_req_duration..............: avg=45.2ms  min=10ms   med=35ms   max=200ms
-  http_req_failed................: 0.00%   ✓ 0        ✗ 15000
-  http_req_receiving.............: avg=120µs  min=50µs   med=100µs max=1ms
-  http_req_sending...............: avg=50µs   min=10µs   med=40µs   max=500µs
-  http_req_tls_handshaking.......: avg=0s     min=0s     med=0s     max=0s
-  http_req_waiting...............: avg=45ms   min=10ms   med=35ms   max=200ms
-  http_reqs......................: 15000   250.123457/s
-  iteration_duration.............: avg=1.05s   min=1s     med=1s     max=1.5s
-  iterations.....................: 15000   250.123457/s
-  vus............................: 50      min=50      max=50
-  vus_max........................: 50      min=50      max=50
-```
-
-## 🛠️ Advanced Testing
-
-### 1. Ramp-up Testing
+### Custom Configuration
+You can override environment variables and k6 options:
 ```bash
-k6 run --stage 10s:10,30s:50,1m:100,30s:50,10s:10 load_test.js
+k6 run -e BASE_URL=http://production-api:8080 --vus 50 --duration 5m load-testing/scripts/gameplay_flow.js
 ```
 
-### 2. Spike Testing
-```bash
-k6 run --stage 10s:10,10s:100,10s:10 load_test.js
-```
+## 📊 Thresholds
 
-### 3. Soak Testing
-```bash
-k6 run --duration 1h --vus 20 load_test.js
-```
+The following performance thresholds are defined across scripts:
+- **Success Rate**: > 99% of requests must succeed.
+- **Response Time**: 95% of requests must be faster than 500ms (smoke) or 1000ms (load).
 
-## 📚 Best Practices
+## 📄 Documentation
 
-### 1. Test Environment
-- Use a dedicated test environment
-- Ensure database is properly seeded
-- Monitor server resources during tests
-
-### 2. Test Design
-- Start with small loads and increase gradually
-- Test individual components before full system
-- Include realistic think times
-- Validate both success and failure scenarios
-
-### 3. Result Analysis
-- Compare results against baselines
-- Identify performance bottlenecks
-- Analyze error patterns
-- Monitor resource utilization
-
-## 🔒 Security Testing
-
-The WebSocket security tests verify:
-- Proper authentication
-- Message validation
-- Connection security
-- Error handling
-
-## 🤝 Contributing
-
-If you add new load tests:
-
-1. **Document the test purpose** in the file header
-2. **Add to this README** with usage instructions
-3. **Include sample output** for reference
-4. **Update documentation** with new scenarios
-
-## 📖 Additional Resources
-
-- [k6 Documentation](https://k6.io/docs/)
-- [Load Testing Guide](https://k6.io/docs/test-types/load-testing/)
-- [Performance Testing Best Practices](https://www.guru99.com/performance-testing.html)
-
----
-
-**Happy Load Testing!** 🚀📊
+For detailed analysis and methodology, see the [LOAD_TESTING_DOCUMENTATION.md](./LOAD_TESTING_DOCUMENTATION.md).
