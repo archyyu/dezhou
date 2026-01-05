@@ -85,7 +85,6 @@ create table dezhou_room (
 	primary key(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-// generate some rooms please run below sqls
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('初级场', 'beginner', 20, 10, 2000, 200, 'public');
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('中级场', 'intermediate', 200, 100, 20000, 2000, 'public');
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('高级场', 'advanced', 2000, 1000, 200000, 20000, 'public');

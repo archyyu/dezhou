@@ -115,6 +115,8 @@ public class GameApiController extends BaseApiController {
                 return errorResponse("UserNotLogined");
             }
 
+            logger.info("cmd:" + cmd + " , roomId:" + roomId + ", player uid:" + user.getUid());
+
             PukerGame room = this.roomService.getRoom(user.getRoomid());
             if (room == null) {
                 return errorResponse("RoomNotFound");

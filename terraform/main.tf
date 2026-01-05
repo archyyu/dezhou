@@ -299,6 +299,84 @@ resource "aws_db_instance" "texasholder_mysql" {
   }
 }
 
+# IAM Resources for EC2 instances
+
+# IAM Role for EC2 instances
+resource "aws_iam_role" "texasholder_ec2_role" {
+  name = "texasholder-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "texasholder-ec2-role"
+    Environment = var.environment
+    Project     = "texasholder-poker"
+  }
+}
+
+# Instance Profile
+resource "aws_iam_instance_profile" "texasholder_instance_profile" {
+  name = "texasholder-instance-profile"
+  role = aws_iam_role.texasholder_ec2_role.name
+}
+
+# Basic EC2 Policy with minimum required permissions
+resource "aws_iam_role_policy" "texasholder_ec2_policy" {
+  name = "texasholder-ec2-policy"
+  role = aws_iam_role.texasholder_ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeTags",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "ssm:GetParameter",
+          "ssm:GetParameters"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# RDS Access Policy for backend instances
+resource "aws_iam_role_policy" "texasholder_rds_access_policy" {
+  name = "texasholder-rds-access-policy"
+  role = aws_iam_role.texasholder_ec2_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:ListTagsForResource"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # Create EC2 instances for backend
 resource "aws_instance" "backend_instances" {
   count                  = var.backend_instance_count
@@ -307,6 +385,7 @@ resource "aws_instance" "backend_instances" {
   subnet_id              = aws_subnet.public_subnets[count.index % length(aws_subnet.public_subnets)].id
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
   key_name               = var.ssh_key_name
+  iam_instance_profile   = aws_iam_instance_profile.texasholder_instance_profile.name
 
   tags = {
     Name        = "texasholder-backend-${count.index}"
@@ -346,6 +425,7 @@ resource "aws_instance" "frontend_instances" {
   subnet_id              = aws_subnet.public_subnets[count.index % length(aws_subnet.public_subnets)].id
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
   key_name               = var.ssh_key_name
+  iam_instance_profile   = aws_iam_instance_profile.texasholder_instance_profile.name
 
   tags = {
     Name        = "texasholder-frontend-${count.index}"

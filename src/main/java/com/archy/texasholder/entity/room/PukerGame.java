@@ -1052,12 +1052,14 @@ public class PukerGame extends GameRoom
 	public boolean playerLeave(Player player)
 	{
 
+		log.info("player:" + player.getAccount() + ", uid:" + player.getUid() + ", try to leave the room");
+
 		if (this.isPlayerSitDown(player.getUid())) {
 			super.playerStandUp(player);
-		} else {
-			this.removePlayerFromSpectaclors(player);
-		}
-
+		} 
+		
+		this.removePlayerFromSpectaclors(player);
+		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
@@ -1068,8 +1070,10 @@ public class PukerGame extends GameRoom
 		
 		if(this.isGameOver())
 		{
-			// this.gameOverHandle();
+			//this.gameOverHandle();
 		}
+
+		this.notifyRoom();
 		
 		return true;
 	}

@@ -1111,7 +1111,7 @@ const leaveRoomNow = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await leaveRoom(route.params.roomId)
+    const response = await performAction('LEAVE')
     gameStore.clearRoom()
     router.push({ name: 'rooms' })
     
