@@ -1,4 +1,4 @@
-# Terraform Variables for Dezhou Poker AWS Deployment
+# Terraform Variables for TexasHolder Poker AWS Deployment
 
 # AWS Configuration
 variable "aws_region" {
@@ -48,7 +48,7 @@ variable "ami_id" {
 variable "ssh_key_name" {
   description = "Name of the SSH key pair"
   type        = string
-  default     = "dezhou-key-pair"
+  default     = "texasholder-key-pair"
 }
 
 variable "backend_instance_type" {
@@ -91,13 +91,13 @@ variable "db_allocated_storage" {
 variable "db_name" {
   description = "Database name"
   type        = string
-  default     = "dezhou"
+  default     = "texasholder"
 }
 
 variable "db_username" {
   description = "Database username"
   type        = string
-  default     = "dezhou_user"
+  default     = "texasholder_user"
   sensitive   = true
 }
 
@@ -126,7 +126,7 @@ variable "tags" {
   description = "Additional tags for resources"
   type        = map(string)
   default     = {
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
     Environment = "production"
     ManagedBy   = "terraform"
   }

@@ -1,6 +1,6 @@
-# Dezhou Poker Server - Spring Boot Edition
+# Texas Holder Poker Server - Spring Boot Edition
 
-A poker game server built with Spring Boot, providing a modern architecture for the classic Dezhou poker game.
+A poker game server built with Spring Boot, providing a modern architecture for the classic Texas Holder poker game.
 
 ## Technology Stack
 

@@ -1,6 +1,6 @@
-# Terraform configuration for Dezhou Poker AWS Deployment
+# Terraform configuration for TexasHolder Poker AWS Deployment
 # This configuration sets up a complete VPC, security groups, and EC2 instances
-# for running the Dezhou Poker application with Docker
+# for running the TexasHolder Poker application with Docker
 
 terraform {
   required_version = ">= 1.0.0"
@@ -18,57 +18,57 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Create a VPC for the Dezhou Poker application
-resource "aws_vpc" "dezhou_vpc" {
+# Create a VPC for the TexasHolder Poker application
+resource "aws_vpc" "texasholder_vpc" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
   instance_tenancy     = "default"
 
   tags = {
-    Name        = "dezhou-poker-vpc"
+    Name        = "texasholder-poker-vpc"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create public subnets in multiple availability zones
 resource "aws_subnet" "public_subnets" {
   count                   = length(var.public_subnet_cidrs)
-  vpc_id                  = aws_vpc.dezhou_vpc.id
+  vpc_id                  = aws_vpc.texasholder_vpc.id
   cidr_block              = var.public_subnet_cidrs[count.index]
   availability_zone       = var.availability_zones[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "dezhou-public-subnet-${count.index}"
+    Name        = "texasholder-public-subnet-${count.index}"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create private subnets for database
 resource "aws_subnet" "private_subnets" {
   count             = length(var.private_subnet_cidrs)
-  vpc_id            = aws_vpc.dezhou_vpc.id
+  vpc_id            = aws_vpc.texasholder_vpc.id
   cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = var.availability_zones[count.index]
 
   tags = {
-    Name        = "dezhou-private-subnet-${count.index}"
+    Name        = "texasholder-private-subnet-${count.index}"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create Internet Gateway for public subnets
-resource "aws_internet_gateway" "dezhou_igw" {
-  vpc_id = aws_vpc.dezhou_vpc.id
+resource "aws_internet_gateway" "texasholder_igw" {
+  vpc_id = aws_vpc.texasholder_vpc.id
 
   tags = {
-    Name        = "dezhou-internet-gateway"
+    Name        = "texasholder-internet-gateway"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
@@ -77,53 +77,53 @@ resource "aws_eip" "nat_eip" {
   domain = "vpc"
 
   tags = {
-    Name        = "dezhou-nat-eip"
+    Name        = "texasholder-nat-eip"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
-resource "aws_nat_gateway" "dezhou_nat" {
+resource "aws_nat_gateway" "texasholder_nat" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnets[0].id
 
   tags = {
-    Name        = "dezhou-nat-gateway"
+    Name        = "texasholder-nat-gateway"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 
-  depends_on = [aws_internet_gateway.dezhou_igw]
+  depends_on = [aws_internet_gateway.texasholder_igw]
 }
 
 # Create route tables
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.dezhou_vpc.id
+  vpc_id = aws_vpc.texasholder_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.dezhou_igw.id
+    gateway_id = aws_internet_gateway.texasholder_igw.id
   }
 
   tags = {
-    Name        = "dezhou-public-route-table"
+    Name        = "texasholder-public-route-table"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.dezhou_vpc.id
+  vpc_id = aws_vpc.texasholder_vpc.id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.dezhou_nat.id
+    nat_gateway_id = aws_nat_gateway.texasholder_nat.id
   }
 
   tags = {
-    Name        = "dezhou-private-route-table"
+    Name        = "texasholder-private-route-table"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
@@ -142,9 +142,9 @@ resource "aws_route_table_association" "private_subnet_association" {
 
 # Create security groups
 resource "aws_security_group" "backend_sg" {
-  name        = "dezhou-backend-sg"
-  description = "Security group for Dezhou Poker backend servers"
-  vpc_id      = aws_vpc.dezhou_vpc.id
+  name        = "texasholder-backend-sg"
+  description = "Security group for TexasHolder Poker backend servers"
+  vpc_id      = aws_vpc.texasholder_vpc.id
 
   # Inbound rules
   ingress {
@@ -181,16 +181,16 @@ resource "aws_security_group" "backend_sg" {
   }
 
   tags = {
-    Name        = "dezhou-backend-sg"
+    Name        = "texasholder-backend-sg"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 resource "aws_security_group" "frontend_sg" {
-  name        = "dezhou-frontend-sg"
-  description = "Security group for Dezhou Poker frontend servers"
-  vpc_id      = aws_vpc.dezhou_vpc.id
+  name        = "texasholder-frontend-sg"
+  description = "Security group for TexasHolder Poker frontend servers"
+  vpc_id      = aws_vpc.texasholder_vpc.id
 
   # Inbound rules
   ingress {
@@ -227,16 +227,16 @@ resource "aws_security_group" "frontend_sg" {
   }
 
   tags = {
-    Name        = "dezhou-frontend-sg"
+    Name        = "texasholder-frontend-sg"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 resource "aws_security_group" "database_sg" {
-  name        = "dezhou-database-sg"
-  description = "Security group for Dezhou Poker database"
-  vpc_id      = aws_vpc.dezhou_vpc.id
+  name        = "texasholder-database-sg"
+  description = "Security group for TexasHolder Poker database"
+  vpc_id      = aws_vpc.texasholder_vpc.id
 
   # Inbound rules - only allow traffic from backend
   ingress {
@@ -257,26 +257,26 @@ resource "aws_security_group" "database_sg" {
   }
 
   tags = {
-    Name        = "dezhou-database-sg"
+    Name        = "texasholder-database-sg"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create RDS MySQL database
-resource "aws_db_subnet_group" "dezhou_db_subnet_group" {
-  name       = "dezhou-db-subnet-group"
+resource "aws_db_subnet_group" "texasholder_db_subnet_group" {
+  name       = "texasholder-db-subnet-group"
   subnet_ids = aws_subnet.private_subnets[*].id
 
   tags = {
-    Name        = "dezhou-db-subnet-group"
+    Name        = "texasholder-db-subnet-group"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
-resource "aws_db_instance" "dezhou_mysql" {
-  identifier             = "dezhou-mysql"
+resource "aws_db_instance" "texasholder_mysql" {
+  identifier             = "texasholder-mysql"
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = var.db_instance_class
@@ -289,13 +289,13 @@ resource "aws_db_instance" "dezhou_mysql" {
   skip_final_snapshot    = true
   publicly_accessible    = false
   vpc_security_group_ids = [aws_security_group.database_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.dezhou_db_subnet_group.name
+  db_subnet_group_name   = aws_db_subnet_group.texasholder_db_subnet_group.name
   multi_az               = var.db_multi_az
 
   tags = {
-    Name        = "dezhou-mysql"
+    Name        = "texasholder-mysql"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
@@ -309,9 +309,9 @@ resource "aws_instance" "backend_instances" {
   key_name               = var.ssh_key_name
 
   tags = {
-    Name        = "dezhou-backend-${count.index}"
+    Name        = "texasholder-backend-${count.index}"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
     Role        = "backend"
   }
 
@@ -324,11 +324,11 @@ resource "aws_instance" "backend_instances" {
               sudo usermod -aG docker ubuntu
               
               # Clone the repository (replace with your actual repo)
-              git clone https://github.com/yourusername/dezhou-poker.git /home/ubuntu/dezhou-poker
-              cd /home/ubuntu/dezhou-poker
+              git clone https://github.com/yourusername/texasholder-poker.git /home/ubuntu/texasholder-poker
+              cd /home/ubuntu/texasholder-poker
               
               # Set environment variables
-              echo "SPRING_DATASOURCE_URL=jdbc:mysql://${aws_db_instance.dezhou_mysql.endpoint}:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC" >> .env
+              echo "SPRING_DATASOURCE_URL=jdbc:mysql://${aws_db_instance.texasholder_mysql.endpoint}:3306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC" >> .env
               echo "SPRING_DATASOURCE_USERNAME=${var.db_username}" >> .env
               echo "SPRING_DATASOURCE_PASSWORD=${var.db_password}" >> .env
               echo "SPRING_PROFILES_ACTIVE=production" >> .env
@@ -348,9 +348,9 @@ resource "aws_instance" "frontend_instances" {
   key_name               = var.ssh_key_name
 
   tags = {
-    Name        = "dezhou-frontend-${count.index}"
+    Name        = "texasholder-frontend-${count.index}"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
     Role        = "frontend"
   }
 
@@ -363,8 +363,8 @@ resource "aws_instance" "frontend_instances" {
               sudo usermod -aG docker ubuntu
               
               # Clone the repository
-              git clone https://github.com/yourusername/dezhou-poker.git /home/ubuntu/dezhou-poker
-              cd /home/ubuntu/dezhou-poker
+              git clone https://github.com/yourusername/texasholder-poker.git /home/ubuntu/texasholder-poker
+              cd /home/ubuntu/texasholder-poker
               
               # Set environment variables
               echo "VITE_API_BASE_URL=http://${aws_instance.backend_instances[0].private_ip}:8080" >> vue-client/.env
@@ -377,7 +377,7 @@ resource "aws_instance" "frontend_instances" {
 
 # Create Application Load Balancer for backend
 resource "aws_lb" "backend_alb" {
-  name               = "dezhou-backend-alb"
+  name               = "texasholder-backend-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.backend_sg.id]
@@ -386,18 +386,18 @@ resource "aws_lb" "backend_alb" {
   enable_deletion_protection = false
 
   tags = {
-    Name        = "dezhou-backend-alb"
+    Name        = "texasholder-backend-alb"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create ALB Target Group for backend
 resource "aws_lb_target_group" "backend_tg" {
-  name     = "dezhou-backend-tg"
+  name     = "texasholder-backend-tg"
   port     = 8080
   protocol = "HTTP"
-  vpc_id   = aws_vpc.dezhou_vpc.id
+  vpc_id   = aws_vpc.texasholder_vpc.id
 
   health_check {
     path                = "/actuator/health"
@@ -410,9 +410,9 @@ resource "aws_lb_target_group" "backend_tg" {
   }
 
   tags = {
-    Name        = "dezhou-backend-tg"
+    Name        = "texasholder-backend-tg"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
@@ -438,7 +438,7 @@ resource "aws_lb_target_group_attachment" "backend_attachment" {
 
 # Create Application Load Balancer for frontend
 resource "aws_lb" "frontend_alb" {
-  name               = "dezhou-frontend-alb"
+  name               = "texasholder-frontend-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.frontend_sg.id]
@@ -447,18 +447,18 @@ resource "aws_lb" "frontend_alb" {
   enable_deletion_protection = false
 
   tags = {
-    Name        = "dezhou-frontend-alb"
+    Name        = "texasholder-frontend-alb"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
 # Create ALB Target Group for frontend
 resource "aws_lb_target_group" "frontend_tg" {
-  name     = "dezhou-frontend-tg"
+  name     = "texasholder-frontend-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = aws_vpc.dezhou_vpc.id
+  vpc_id   = aws_vpc.texasholder_vpc.id
 
   health_check {
     path                = "/"
@@ -471,9 +471,9 @@ resource "aws_lb_target_group" "frontend_tg" {
   }
 
   tags = {
-    Name        = "dezhou-frontend-tg"
+    Name        = "texasholder-frontend-tg"
     Environment = var.environment
-    Project     = "dezhou-poker"
+    Project     = "texasholder-poker"
   }
 }
 
@@ -518,7 +518,7 @@ resource "aws_lb_target_group_attachment" "frontend_attachment" {
 
 # Output useful information
 output "vpc_id" {
-  value = aws_vpc.dezhou_vpc.id
+  value = aws_vpc.texasholder_vpc.id
 }
 
 output "public_subnet_ids" {
@@ -538,7 +538,7 @@ output "frontend_alb_dns_name" {
 }
 
 output "database_endpoint" {
-  value = aws_db_instance.dezhou_mysql.endpoint
+  value = aws_db_instance.texasholder_mysql.endpoint
 }
 
 output "backend_instance_ips" {
