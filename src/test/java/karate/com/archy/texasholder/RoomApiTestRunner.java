@@ -9,6 +9,6 @@ public class RoomApiTestRunner {
 
     @Karate.Test
     Karate testRoomApiFeature() {
-        return Karate.run("classpath:karate/com/archy/dezhou/room-api").relativeTo(getClass());
+        return Karate.run("classpath:karate/com/archy/texasholder/room-api").relativeTo(getClass());
     }
 }

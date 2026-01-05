@@ -1,6 +1,6 @@
-# Dezhou Poker - Docker Setup Guide
+# TexasHolder Poker - Docker Setup Guide
 
-This guide explains how to set up and run the Dezhou Poker application using Docker and Docker Compose.
+This guide explains how to set up and run the TexasHolder Poker application using Docker and Docker Compose.
 
 ## 🐳 Docker Architecture
 
@@ -50,8 +50,8 @@ docker-compose down
 - **Ports**: `33306:3306`
 - **Credentials**:
   - Root: `root/aida87014999`
-  - User: `dezhou_user/dezhou_pass`
-  - Database: `dezhou`
+  - User: `texasholder_user/texasholder_pass`
+  - Database: `texasholder`
 - **Features**:
   - Persistent volume for data
   - Health checks
@@ -110,10 +110,10 @@ http://localhost
 
 ```bash
 # Connect to MySQL container
-docker exec -it dezhou-mysql mysql -u root -p
+docker exec -it texasholder-mysql mysql -u root -p
 
 # Import database dump
-cat database.sql | docker exec -i dezhou-mysql mysql -u root -paida87014999 dezhou
+cat database.sql | docker exec -i texasholder-mysql mysql -u root -paida87014999 texasholder
 ```
 
 ## 🔧 Configuration
@@ -203,7 +203,7 @@ services:
 2. **Database Connection Issues**:
    ```bash
    # Check MySQL container logs
-   docker logs dezhou-mysql
+   docker logs texasholder-mysql
    
    # Fix: Ensure MySQL is healthy before starting backend
    ```
@@ -219,13 +219,13 @@ services:
 
 ```bash
 # View logs for a specific service
-docker logs dezhou-backend
+docker logs texasholder-backend
 
 # View logs with follow
-docker logs -f dezhou-frontend
+docker logs -f texasholder-frontend
 
 # Enter a running container
-docker exec -it dezhou-backend sh
+docker exec -it texasholder-backend sh
 ```
 
 ## 📚 Additional Resources

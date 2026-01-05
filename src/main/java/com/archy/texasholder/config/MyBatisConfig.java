@@ -23,7 +23,7 @@ public class MyBatisConfig {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setMapperLocations(new PathMatchingResourcePatternResolver()
-            .getResources("classpath:com/archy/dezhou/dao/*.xml"));
+            .getResources("classpath:com/archy/texasholder/dao/*.xml"));
         return factoryBean.getObject();
     }
     */

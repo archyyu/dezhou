@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: dezhou-frontend:latest
+        image: texasholder-frontend:latest
         imagePullPolicy: Never
         env:
         - name: VITE_API_BASE_URL

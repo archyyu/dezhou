@@ -13,7 +13,7 @@ function fn() {
     
     // Database configuration for test data setup
     db: {
-      url: 'jdbc:mysql://localhost:33306/dezhou',
+      url: 'jdbc:mysql://localhost:33306/texasholder',
       username: 'root',
       password: 'aida87014999',
       driver: 'com.mysql.cj.jdbc.Driver'
@@ -21,8 +21,8 @@ function fn() {
   };
   
   if (env == 'docker') {
-    config.baseUrl = 'http://dezhou-app:8080';
-    config.db.url = 'jdbc:mysql://mysql:3306/dezhou';
+    config.baseUrl = 'http://texasholder-app:8080';
+    config.db.url = 'jdbc:mysql://mysql:3306/texasholder';
   }
   
   // don't waste time waiting for a connection or element to appear

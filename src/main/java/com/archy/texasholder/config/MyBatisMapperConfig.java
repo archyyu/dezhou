@@ -30,7 +30,7 @@ public class MyBatisMapperConfig {
         
         // Explicitly set mapper locations
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-        factoryBean.setMapperLocations(resolver.getResources("classpath:com/archy/dezhou/dao/*.xml"));
+        factoryBean.setMapperLocations(resolver.getResources("classpath:com/archy/texasholder/dao/*.xml"));
         
         // Set type aliases package
         factoryBean.setTypeAliasesPackage("com.archy.texasholder.entity");

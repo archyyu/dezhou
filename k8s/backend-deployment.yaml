@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
       - name: backend
-        image: dezhou-backend:latest
+        image: texasholder-backend:latest
         imagePullPolicy: Never
         env:
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql:3306/dezhou?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC"
+          value: "jdbc:mysql://mysql:3306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC"
         - name: SPRING_DATASOURCE_USERNAME
           value: "root"
         - name: SPRING_DATASOURCE_PASSWORD

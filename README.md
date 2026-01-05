@@ -32,8 +32,8 @@ A poker game server built with Spring Boot, providing a modern architecture for 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/dezhou.git
-   cd dezhou
+   git clone https://github.com/your-repo/texasholder.git
+   cd texasholder
    ```
 
 2. Build the project:
@@ -75,12 +75,12 @@ The application uses `application.yml` for configuration. Key properties:
 
 1. Create the database:
    ```sql
-   CREATE DATABASE dezhou CHARACTER SET utf8 COLLATE utf8_general_ci;
+   CREATE DATABASE texasholder CHARACTER SET utf8 COLLATE utf8_general_ci;
    ```
 
 2. Import the schema:
    ```bash
-   mysql -u root -p dezhou < database.sql
+   mysql -u root -p texasholder < database.sql
    ```
 
 3. Update `application.yml` with your database credentials
@@ -88,7 +88,7 @@ The application uses `application.yml` for configuration. Key properties:
 ## Architecture
 
 ```
-DezhouApplication (Spring Boot Main)
+TexasHolderApplication (Spring Boot Main)
 ├── GameRestController (REST API)
 ├── GameController (Game Logic)
 ├── AppConfig (Configuration)

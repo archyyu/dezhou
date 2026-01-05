@@ -20,11 +20,11 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           value: aida87014999
         - name: MYSQL_DATABASE
-          value: dezhou
+          value: texasholder
         - name: MYSQL_USER
-          value: dezhou_user
+          value: texasholder_user
         - name: MYSQL_PASSWORD
-          value: dezhou_pass
+          value: texasholder_pass
         ports:
         - containerPort: 3306
           name: mysql
