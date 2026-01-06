@@ -3,20 +3,20 @@
 ## 🚀 Simplified Architecture
 
 ```
-Client → Backend (NodePort 30880)
-Client → Frontend (NodePort 30888)
+Client → Backend (NodePort 30080)
+Client → Frontend (NodePort 30088)
 ```
 
 ## 📋 Access Information
 
 ### Backend Service
-- **URL**: `http://<your-k3s-node-ip>:30880`
-- **Example**: `http://localhost:30880/api/v1/test/public`
+- **URL**: `http://<your-k3s-node-ip>:30080`
+- **Example**: `http://localhost:30080/api/v1/test/public`
 - **CORS Configured**: ✅ Yes (allows `http://localhost:8888`)
 
 ### Frontend Service  
-- **URL**: `http://<your-k3s-node-ip>:30888`
-- **Example**: `http://localhost:30888`
+- **URL**: `http://<your-k3s-node-ip>:30088`
+- **Example**: `http://localhost:30088`
 
 ## 🎯 How to Access from Your Frontend
 
@@ -24,7 +24,7 @@ Client → Frontend (NodePort 30888)
 
 ```javascript
 // Make a request from your frontend (running on http://localhost:8888)
-fetch('http://localhost:30880/api/v1/user/login', {
+fetch('http://localhost:30080/api/v1/user/login', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -56,14 +56,14 @@ fetch('http://localhost:30880/api/v1/user/login', {
 curl -I -X OPTIONS \
   -H "Origin: http://localhost:8888" \
   -H "Access-Control-Request-Method: POST" \
-  http://localhost:30880/api/v1/user/login
+  http://localhost:30080/api/v1/user/login
 
 # Test actual API call
 curl -X POST \
   -H "Content-Type: application/json" \
   -H "Origin: http://localhost:8888" \
   -d '{"name":"user1","password":"1212"}' \
-  http://localhost:30880/api/v1/user/login
+  http://localhost:30080/api/v1/user/login
 ```
 
 ## 🔧 CORS Configuration Summary
@@ -99,11 +99,11 @@ Access-Control-Max-Age: 3600
 
 - **Missing Origin header**: Ensure your frontend sends the `Origin: http://localhost:8888` header
 - **Credentials issue**: Use `credentials: 'include'` in fetch requests
-- **Port conflicts**: Make sure nothing else is using ports 30880 or 30888
+- **Port conflicts**: Make sure nothing else is using ports 30080 or 30088
 
 ## 🎉 Expected Result
 
-When you make a request from `http://localhost:8888` to `http://localhost:30880`, you should:
+When you make a request from `http://localhost:8888` to `http://localhost:30080`, you should:
 
 1. ✅ See CORS headers in the response
 2. ✅ Get a successful response (no CORS errors)
@@ -114,11 +114,11 @@ When you make a request from `http://localhost:8888` to `http://localhost:30880`
 ```bash
 # Backend
 kubectl get service backend
-# Output: backend   NodePort   10.43.61.180   <none>        8080:30880/TCP
+# Output: backend   NodePort   10.43.61.180   <none>        8080:30080/TCP
 
 # Frontend  
 kubectl get service frontend
-# Output: frontend   NodePort   10.43.125.157   <none>        80:30888/TCP
+# Output: frontend   NodePort   10.43.125.157   <none>        80:30088/TCP
 ```
 
 This simple setup eliminates the complexity of proxy servers and gives you direct access to your services with proper CORS configuration!
