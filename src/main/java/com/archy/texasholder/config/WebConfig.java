@@ -31,7 +31,8 @@ public class WebConfig implements WebMvcConfigurer {
             "http://localhost:5173",  // Vue development server
             "http://localhost:5174",  // Alternative Vue port
             "http://localhost:3000",  // Common alternative
-            "http://localhost:8080"   // Same origin
+            "http://localhost:8080",  // Same origin
+            "http://localhost:8888"   // Additional development port
         ));
 
         // Configure allowed methods
@@ -69,6 +70,7 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:5174", 
                 "http://localhost:3000",
                 "http://localhost:8080",
+                "http://localhost:8888",
                 "http://127.0.0.1:5173"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

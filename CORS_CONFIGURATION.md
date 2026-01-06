@@ -102,6 +102,7 @@ The application allows requests from:
 - `http://localhost:5174` - Alternative Vue.js port
 - `http://localhost:3000` - Common development port (React, etc.)
 - `http://localhost:8080` - Same origin (Spring Boot default port)
+- `http://localhost:8888` - Additional development port
 - `http://127.0.0.1:5173` - Alternative localhost format
 
 ### HTTP Methods

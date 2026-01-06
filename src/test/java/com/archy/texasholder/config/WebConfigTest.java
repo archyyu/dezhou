@@ -36,7 +36,7 @@ class WebConfigTest {
                 return new org.springframework.web.servlet.config.annotation.CorsRegistration(pathPattern) {
                     @Override
                     public org.springframework.web.servlet.config.annotation.CorsRegistration allowedOrigins(String... origins) {
-                        assertArrayEquals(new String[]{"http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:8080", "http://127.0.0.1:5173"}, origins);
+                        assertArrayEquals(new String[]{"http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:8080", "http://localhost:8888", "http://127.0.0.1:5173"}, origins);
                         return this;
                     }
                 };
@@ -59,7 +59,8 @@ class WebConfigTest {
             "http://localhost:5173",  // Vue development server
             "http://localhost:5174",  // Alternative Vue port
             "http://localhost:3000",  // Common alternative
-            "http://localhost:8080"   // Same origin
+            "http://localhost:8080",  // Same origin
+            "http://localhost:8888"   // Additional development port
         ));
 
         // Configure allowed methods
