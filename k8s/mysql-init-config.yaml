@@ -1,13 +1,13 @@
 apiVersion: v1
 data:
-  database.sql: "\ncreate table texasholder_user (\n\tuid int(11) auto_increment,\n\taccount
+  database.sql: "\ncreate table dezhou_user (\n\tuid int(11) auto_increment,\n\taccount
     varchar(50) default '',\n\tpassword varchar(20) default '',\n\troommoney int(11)
     default 0,\n\tallmoney int(11) default 100000,\n\texprience int default 0,\n\tgold
     int default 0,\n\tmobile varchar(20),\n\tlevel int default 0,\n\tsex varchar(10)
     default 'male',\n\taddress varchar(50) default '',\n\tregtime varchar(30) default
     '',\n\tbirthday varchar(30) default '',\n\tlogintime varchar(20) default '',\n\tprimary
     key(uid),\n\tUNIQUE KEY uidx_account (account)\n)ENGINE=InnoDB DEFAULT CHARSET=utf8;\n\nINSERT
-    INTO texasholder_user (\n    account, password, roommoney, allmoney, exprience, gold,
+    INTO dezhou_user (\n    account, password, roommoney, allmoney, exprience, gold,
     mobile, level, sex, address, regtime, birthday, logintime\n) VALUES\n('user1',
     'pass123', 0, 100000, 0, 0, '13800000001', 1, 'male', 'Address 1', '2025-01-01
     10:00:00', '1990-01-01', '2025-01-01 10:00:00'),\n('user2', 'pass123', 0, 100000,
@@ -92,17 +92,15 @@ data:
     'pass123', 0, 100000, 0, 0, '13800000049', 49, 'male', 'Address 49', '2025-02-19
     10:00:00', '1977-01-19', '2025-02-19 10:00:00'),\n('user50', 'pass123', 0, 100000,
     0, 0, '13800000050', 50, 'female', 'Address 50', '2025-02-20 11:00:00', '1976-02-20',
-    '2025-02-20 11:00:00');\n\n\ncreate table texasholder_room (\n\tid int(11) auto_increment,\n\tshowname
+    '2025-02-20 11:00:00');\n\n\ncreate table dezhou_room (\n\tid int(11) auto_increment,\n\tshowname
     varchar(50) default '',\n\tname varchar(50) default '',\n\tbbet int(11) default
     0,\n\tsbet int(11) default 0,\n\tmaxbuy int(11) default 0,\n\tminbuy int(11) default
     0,\n\troomtype varchar(10) default '',\n\tprimary key(id)\n)ENGINE=InnoDB DEFAULT
-    CHARSET=utf8;\n\n// generate some rooms please run below sqls\ninsert into texasholder_room
-    (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('初级场', 'beginner',
-    20, 10, 2000, 200, 'public');\ninsert into texasholder_room (showname, name, bbet,
-    sbet, maxbuy, minbuy, roomtype) values ('中级场', 'intermediate', 200, 100, 20000,
-    2000, 'public');\ninsert into texasholder_room (showname, name, bbet, sbet, maxbuy,
+    CHARSET=utf8;\n\ninsert into dezhou_room(showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('初级场', 'beginner',
+    20, 10, 2000, 200, 'public');\ninsert into dezhou_room(showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('中级场', 'intermediate', 200, 100, 20000,
+    2000, 'public');\ninsert into dezhou_room(showname, name, bbet, sbet, maxbuy,
     minbuy, roomtype) values ('高级场', 'advanced', 2000, 1000, 200000, 20000, 'public');\ninsert
-    into texasholder_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values
+    into dezhou_room(showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values
     ('土豪场', 'tycoon', 20000, 10000, 2000000, 200000, 'public');"
 kind: ConfigMap
 metadata:

@@ -6,7 +6,8 @@ import { useAuthStore } from '@/stores/authStore'
  */
 export function useApi() {
   // Create axios instance
-  const apiBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+  // Use empty string as default to allow Nginx proxy to handle the request (avoiding CORS)
+  const apiBaseURL = import.meta.env.VITE_API_BASE_URL || ''
   console.log('API Base URL:', apiBaseURL) // Debug logging
   
   const api = axios.create({
