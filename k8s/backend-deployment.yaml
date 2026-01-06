@@ -50,6 +50,10 @@ spec:
   selector:
     app: backend
   ports:
-  - port: 8080
+  - name: http
+    port: 8080
+    targetPort: 8080
+  - name: alt-http
+    port: 8880
     targetPort: 8080
   type: LoadBalancer
