@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .info {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Texas Holder CORS Test</h1>
+        
+        <div class="info">
+            <strong>📋 Instructions:</strong><br>
+            1. Open this file in your browser (File → Open File)<br>
+            2. Click the test buttons below<br>
+            3. Check if you see CORS headers in the response
+        </div>
+
+        <h2>⚡ Quick Tests</h2>
+        
+        <button onclick="testPublicEndpoint()">Test Public Endpoint</button>
+        <button onclick="testCorsHeaders()">Test CORS Headers</button>
+        <button onclick="testLogin()">Test Login</button>
+
+        <h2>🔧 Configuration</h2>
+        
+        <div>
+            <label for="apiBaseUrl">API Base URL:</label>
+            <input type="text" id="apiBaseUrl" value="http://localhost:30080" style="width: 300px; padding: 8px; margin: 10px 0;">
+        </div>
+
+        <h2>📊 Results</h2>
+        <div id="result">Ready to test CORS configuration...</div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            const timestamp = new Date().toISOString();
+            resultDiv.innerHTML += `\n[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            resultDiv.scrollTop = resultDiv.scrollHeight;
+        }
+
+        function testPublicEndpoint() {
+            const apiBaseUrl = document.getElementById('apiBaseUrl').value;
+            const url = `${apiBaseUrl}/api/v1/test/public`;
+            
+            log(`Testing public endpoint: ${url}`, 'info');
+            
+            fetch(url, {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(response => {
+                log(`Response status: ${response.status}`, 'info');
+                log(`Response headers:`, 'info');
+                
+                // Log CORS headers
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials'),
+                    'Access-Control-Max-Age': response.headers.get('Access-Control-Max-Age')
+                };
+                
+                Object.entries(corsHeaders).forEach(([key, value]) => {
+                    if (value) {
+                        log(`  ${key}: ${value}`, 'success');
+                    }
+                });
+                
+                return response.json();
+            })
+            .then(data => {
+                log(`Response data: ${JSON.stringify(data, null, 2)}`, 'success');
+            })
+            .catch(error => {
+                log(`Error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            });
+        }
+
+        function testCorsHeaders() {
+            const apiBaseUrl = document.getElementById('apiBaseUrl').value;
+            const url = `${apiBaseUrl}/api/v1/test/public`;
+            
+            log(`Testing CORS headers with OPTIONS request: ${url}`, 'info');
+            
+            fetch(url, {
+                method: 'OPTIONS',
+                headers: {
+                    'Origin': 'http://localhost:8888',
+                    'Access-Control-Request-Method': 'GET'
+                }
+            })
+            .then(response => {
+                log(`OPTIONS response status: ${response.status}`, 'info');
+                
+                if (response.status === 204) {
+                    log('✅ CORS preflight successful (204 No Content)', 'success');
+                }
+                
+                log('OPTIONS response headers:', 'info');
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials'),
+                    'Access-Control-Max-Age': response.headers.get('Access-Control-Max-Age')
+                };
+                
+                Object.entries(corsHeaders).forEach(([key, value]) => {
+                    if (value) {
+                        log(`  ${key}: ${value}`, 'success');
+                    }
+                });
+            })
+            .catch(error => {
+                log(`OPTIONS request error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            });
+        }
+
+        function testLogin() {
+            const apiBaseUrl = document.getElementById('apiBaseUrl').value;
+            const url = `${apiBaseUrl}/api/v1/user/login`;
+            
+            log(`Testing login endpoint: ${url}`, 'info');
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'user1',
+                    password: '1212'
+                }),
+                credentials: 'include'
+            })
+            .then(response => {
+                log(`Login response status: ${response.status}`, 'info');
+                
+                // Check CORS headers
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+                };
+                
+                Object.entries(corsHeaders).forEach(([key, value]) => {
+                    if (value) {
+                        log(`  ${key}: ${value}`, 'success');
+                    }
+                });
+                
+                return response.json();
+            })
+            .then(data => {
+                log(`Login response: ${JSON.stringify(data, null, 2)}`, 'success');
+            })
+            .catch(error => {
+                log(`Login error: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            });
+        }
+
+        // Log initial message
+        log('CORS Test Page loaded. Click buttons above to test.', 'info');
+    </script>
+</body>
+</html>
