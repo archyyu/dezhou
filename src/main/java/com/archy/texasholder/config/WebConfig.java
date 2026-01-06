@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
  * Web Configuration for CORS and other web-related settings
  */
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
 
     /**
      * CORS Filter configuration
@@ -53,5 +55,25 @@ public class WebConfig {
         source.registerCorsConfiguration("/**", config);
 
         return new CorsFilter(source);
+    }
+
+    /**
+     * WebMvcConfigurer implementation for CORS configuration
+     * This provides global CORS configuration for Spring MVC
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedOrigins(
+                "http://localhost:5173",
+                "http://localhost:5174", 
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://127.0.0.1:5173"
+            )
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true)
+            .maxAge(3600);
     }
 }
