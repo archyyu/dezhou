@@ -73,6 +73,7 @@ public class SecurityConfig {
             "http://localhost:5174",  // Alternative Vue port
             "http://localhost:3000",  // Common alternative
             "http://localhost:8080",  // Same origin
+            "http://localhost:8880",  // Backend service port
             "http://localhost:8888",  // Additional development port
             "http://localhost:5173",  // Vue development server (duplicate for safety)
             "http://127.0.0.1:5173"   // Alternative localhost format
