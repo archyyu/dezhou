@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: texasholder
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: texasholder-backend:latest
+        imagePullPolicy: Never
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://mysql:3306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "root"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "aida87014999"
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production"
+        - name: SPRING_MAIN_ALLOW-BEAN-DEFINITION-OVERRIDING
+          value: "true"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/application.yml
+          subPath: application.yml
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 2
+      volumes:
+      - name: config-volume
+        configMap:
+          name: backend-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: texasholder
+  labels:
+    app: backend
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30081
+    name: http
+  selector:
+    app: backend
