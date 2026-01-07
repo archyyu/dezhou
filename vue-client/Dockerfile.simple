@@ -1,0 +1,16 @@
+# Simple Nginx Dockerfile for serving pre-built frontend
+FROM nginx:1.25-alpine
+WORKDIR /usr/share/nginx/html
+
+# Copy pre-built files
+COPY dist .
+
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost/ || exit 1

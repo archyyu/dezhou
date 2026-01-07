@@ -33,7 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
             "http://localhost:3000",  // Common alternative
             "http://localhost:8080",  // Same origin
             "http://localhost:8880",  // Backend service port
-            "http://localhost:8888"   // Additional development port
+            "http://localhost:8888",  // Additional development port
+            "http://localhost:30082"  // Frontend service port
         ));
 
         // Configure allowed methods
@@ -73,7 +74,8 @@ public class WebConfig implements WebMvcConfigurer {
                 "http://localhost:8080",
                 "http://localhost:8880",
                 "http://localhost:8888",
-                "http://127.0.0.1:5173"
+                "http://127.0.0.1:5173",
+                "http://localhost:30082"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
