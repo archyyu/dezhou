@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql
-  namespace: default
+  namespace: texasholder
+  labels:
+    app: mysql
 spec:
   replicas: 1
   selector:
@@ -18,13 +20,13 @@ spec:
         image: mysql:8.0
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: aida87014999
+          value: "aida87014999"
         - name: MYSQL_DATABASE
-          value: texasholder
+          value: "texasholder"
         - name: MYSQL_USER
-          value: texasholder_user
+          value: "texasholder_user"
         - name: MYSQL_PASSWORD
-          value: texasholder_pass
+          value: "texasholder_pass"
         ports:
         - containerPort: 3306
           name: mysql
@@ -38,28 +40,34 @@ spec:
             command: ["mysqladmin", "ping", "-h", "localhost"]
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
         readinessProbe:
           exec:
             command: ["mysqladmin", "ping", "-h", "localhost"]
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
       volumes:
       - name: mysql-data
         persistentVolumeClaim:
           claimName: mysql-pvc
       - name: mysql-init
         configMap:
-          name: mysql-init-config
+          name: mysql-init-scripts
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql
-  namespace: default
-spec:
-  selector:
+  namespace: texasholder
+  labels:
     app: mysql
+spec:
+  type: ClusterIP
   ports:
   - port: 3306
     targetPort: 3306
-  type: ClusterIP
+    name: mysql
+  selector:
+    app: mysql

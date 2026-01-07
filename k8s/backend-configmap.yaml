@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  application.yml: "server:\n  port: 8080\n\nspring:\n  application:\n    name: texasholder-poker-server\n
+    \ main:\n    allow-bean-definition-overriding: true\n  \n  datasource:\n    url:
+    jdbc:mysql://localhost:33306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC\n
+    \   username: root\n    password: aida87014999\n    driver-class-name: com.mysql.cj.jdbc.Driver\n
+    \   \n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\n    properties:\n
+    \     hibernate:\n        dialect: org.hibernate.dialect.MySQL8Dialect\n\nmybatis:\n
+    \ # MyBatis configuration moved directly into application.yml\n  mapper-locations:
+    classpath:com/archy/texasholder/dao/*.xml\n  type-aliases-package: com.archy.texasholder.entity\n
+    \ configuration:\n    map-underscore-to-camel-case: true\n    cache-enabled: true\n
+    \   lazy-loading-enabled: true\n    aggressive-lazy-loading: false\n    default-fetch-size:
+    100\n    default-statement-timeout: 30\n    # MySQL specific settings\n    jdbc-type-for-null:
+    'null'\n\n# JWT Configuration\njwt:\n  secret: dezhou-secret-key-1234567890-abcdefghijklmnopqrstuvwxyz\n
+    \ expiration: 86400000 # 24 hours in milliseconds\n  header: Authorization\n  prefix:
+    Bearer \n\n# Server configuration (from server.json)\n\nlogging:\n  level:\n    root:
+    INFO\n    com.archy.texasholder: DEBUG\n    org.springframework.web: INFO\n    org.hibernate:
+    INFO"
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: texasholder

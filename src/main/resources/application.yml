@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: texasholder-poker-server
+  main:
+    allow-bean-definition-overriding: true
   
   datasource:
     url: jdbc:mysql://localhost:33306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC

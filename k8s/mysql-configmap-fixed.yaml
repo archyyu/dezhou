@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init-scripts
+  namespace: texasholder
+data:
+  database.sql: |+
+    create table dezhou_user (
+        uid int(11) auto_increment,
+        account varchar(50) default '',
+        password varchar(20) default '',
+        roommoney int(11) default 0,
+        allmoney int(11) default 100000,
+        exprience int default 0,
+        gold int default 0,
+        mobile varchar(20),
+        level int default 0,
+        sex varchar(10) default 'male',
+        address varchar(50) default '',
+        regtime varchar(30) default '',
+        birthday varchar(30) default '',
+        logintime varchar(20) default '',
+        primary key(uid),
+        UNIQUE KEY uidx_account (account)
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+    INSERT INTO dezhou_user (
+        account, password, roommoney, allmoney, exprience, gold, mobile, level, sex, address, regtime, birthday, logintime
+    ) VALUES
+    ('user1', 'pass123', 0, 100000, 0, 0, '13800000001', 1, 'male', 'Address 1', '2025-01-01 10:00:00', '1990-01-01', '2025-01-01 10:00:00'),
+    ('user2', 'pass123', 0, 100000, 0, 0, '13800000002', 2, 'female', 'Address 2', '2025-01-02 11:00:00', '1991-02-02', '2025-01-02 11:00:00'),
+    ('user3', 'pass123', 0, 100000, 0, 0, '13800000003', 3, 'male', 'Address 3', '2025-01-03 12:00:00', '1992-03-03', '2025-01-03 12:00:00'),
+    ('user4', 'pass123', 0, 100000, 0, 0, '13800000004', 4, 'female', 'Address 4', '2025-01-04 13:00:00', '1993-04-04', '2025-01-04 13:00:00'),
+    ('user5', 'pass123', 0, 100000, 0, 0, '13800000005', 5, 'male', 'Address 5', '2025-01-05 14:00:00', '1994-05-05', '2025-01-05 14:00:00'),
+    ('user6', 'pass123', 0, 100000, 0, 0, '13800000006', 6, 'female', 'Address 6', '2025-01-06 15:00:00', '1995-06-06', '2025-01-06 15:00:00'),
+    ('user7', 'pass123', 0, 100000, 0, 0, '13800000007', 7, 'male', 'Address 7', '2025-01-07 16:00:00', '1996-07-07', '2025-01-07 16:00:00'),
+    ('user8', 'pass123', 0, 100000, 0, 0, '13800000008', 8, 'female', 'Address 8', '2025-01-08 17:00:00', '1997-08-08', '2025-01-08 17:00:00'),
+    ('user9', 'pass123', 0, 100000, 0, 0, '13800000009', 9, 'male', 'Address 9', '2025-01-09 18:00:00', '1998-09-09', '2025-01-09 18:00:00'),
+    ('user10', 'pass123', 0, 100000, 0, 0, '13800000010', 10, 'female', 'Address 10', '2025-01-10 19:00:00', '1999-10-10', '2025-01-10 19:00:00');
+
+    create table dezhou_room (
+        id int(11) auto_increment,
+        showname varchar(50) default '',
+        name varchar(50) default '',
+        bbet int(11) default 0,
+        sbet int(11) default 0,
+        maxbuy int(11) default 0,
+        minbuy int(11) default 0,
+        roomtype varchar(10) default '',
+        primary key(id)
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+    insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('初级场', 'beginner', 20, 10, 2000, 200, 'public');
+    insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('中级场', 'intermediate', 200, 100, 20000, 2000, 'public');
+    insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('高级场', 'advanced', 2000, 1000, 200000, 20000, 'public');
+    insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('土豪场', 'tycoon', 20000, 10000, 2000000, 200000, 'public');

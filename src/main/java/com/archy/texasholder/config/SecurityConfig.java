@@ -3,6 +3,7 @@ package com.archy.texasholder.config;
 import com.archy.texasholder.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -12,6 +13,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 
 import java.util.Arrays;
@@ -73,6 +76,8 @@ public class SecurityConfig {
             "http://localhost:5174",  // Alternative Vue port
             "http://localhost:3000",  // Common alternative
             "http://localhost:8080",  // Same origin
+            "http://localhost:8880",  // Backend service port
+            "http://localhost:8888",  // Additional development port
             "http://localhost:5173",  // Vue development server (duplicate for safety)
             "http://127.0.0.1:5173"   // Alternative localhost format
         ));
@@ -83,5 +88,45 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Ensure CORS filter is applied before JWT filter
+     */
+    @Bean
+    public org.springframework.boot.web.servlet.FilterRegistrationBean<org.springframework.web.filter.CorsFilter> corsFilterRegistration() {
+        org.springframework.boot.web.servlet.FilterRegistrationBean<org.springframework.web.filter.CorsFilter> registration = 
+            new org.springframework.boot.web.servlet.FilterRegistrationBean<>();
+        registration.setFilter(corsFilter());
+        registration.setOrder(org.springframework.core.Ordered.HIGHEST_PRECEDENCE); // Apply CORS first
+        registration.addUrlPatterns("/*");
+        return registration;
+    }
+
+    /**
+     * CORS Filter bean for explicit registration
+     */
+    @Bean
+    public org.springframework.web.filter.CorsFilter corsFilter() {
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
+            new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+        
+        config.setAllowedOrigins(java.util.List.of(
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:3000", 
+            "http://localhost:8080",
+            "http://localhost:8880",
+            "http://localhost:8888",
+            "http://127.0.0.1:5173"
+        ));
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(java.util.List.of("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+        
+        source.registerCorsConfiguration("/**", config);
+        return new org.springframework.web.filter.CorsFilter(source);
     }
 }
