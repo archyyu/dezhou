@@ -715,6 +715,7 @@ public class PukerGame extends GameRoom
 			return ;
 		}
 		this.notifyRoomPlayerRoundOver();
+		
 		this.roundPoolBet.put(this.round,this.currentRoundBet);
 		this.currentRoundBet = 0;
 		
