@@ -2,68 +2,95 @@ package com.archy.texasholder.entity;
 
 import java.util.logging.Logger;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 @Data
-public class User
-{
+@Entity
+@Table(name = "dezhou_user")
+public class User {
 
-	protected Logger log = Logger.getLogger(getClass().getName());
+    @Transient
+    protected Logger log = Logger.getLogger(getClass().getName());
 
-	private Integer uid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "uid")
+    private Integer uid;
 
-	private String account = "";
+    @Column(name = "account")
+    private String account = "";
 
-	private String password ="";
+    @Column(name = "password")
+    private String password = "";
 
-	private boolean isPlaying = false;
+    @Transient
+    private boolean isPlaying = false;
 
-	private int roommoney = 0; //带入房间的钱， 变量名与数据库保持一致，主要用于在新用户注册时给rmoney传值
+    @Column(name = "roommoney")
+    private int roommoney = 0;
 
-	private int allmoney = 0;  //点数
+    @Column(name = "allmoney")
+    private int allmoney = 0;
 
-	private int exprience = 0;
+    @Column(name = "exprience")
+    private int exprience = 0;
 
-	private int gold = 0;
+    @Column(name = "gold")
+    private int gold = 0;
 
-	private String mobile = "";
+    @Column(name = "mobile")
+    private String mobile = "";
 
-	private String email = ""; // 邮箱地址
+    @Transient
+    private String email = "";
 
-	private int level = 0; // 等级
+    @Column(name = "level")
+    private int level = 0;
 
-	private String sex = ""; // 性别
+    @Column(name = "sex")
+    private String sex = "";
 
-	private String address = ""; // 住址
+    @Column(name = "address")
+    private String address = "";
 
-	private String regtime = ""; // 注册时间
+    @Column(name = "regtime")
+    private String regtime = "";
 
-	private String birthday = ""; // 生日
+    @Column(name = "birthday")
+    private String birthday = "";
 
-	private String logintime = ""; // 登陆时间
+    @Column(name = "logintime")
+    private String logintime = "";
 
-	private long lastUpdateTime = System.currentTimeMillis(); // 最后修改时间
+    @Transient
+    private long lastUpdateTime = System.currentTimeMillis();
 
-	private Integer roomId;
+    @Transient
+    private Integer roomId;
 
-	public User()
-	{
-	}
+    public User() {
+    }
 
-	public User(User user)
-	{
-		this.uid = user.getUid();
-		this.account = user.getAccount();
-		this.password = user.getPassword();
-		this.isPlaying = user.isPlaying();
-		this.roommoney = user.getRoommoney();
-		this.allmoney = user.getAllmoney();
-		this.exprience = user.getExprience();
-		this.gold = user.getGold();
-		this.mobile = user.getMobile();
-		this.email = user.getEmail();
-		this.level = user.getLevel();
-	}
+    public User(User user) {
+        this.uid = user.getUid();
+        this.account = user.getAccount();
+        this.password = user.getPassword();
+        this.isPlaying = user.isPlaying();
+        this.roommoney = user.getRoommoney();
+        this.allmoney = user.getAllmoney();
+        this.exprience = user.getExprience();
+        this.gold = user.getGold();
+        this.mobile = user.getMobile();
+        this.email = user.getEmail();
+        this.level = user.getLevel();
+    }
 
     public Integer getRoomid() {
         return roomId;
@@ -73,285 +100,240 @@ public class User
         this.roomId = roomId;
     }
 
-    public boolean isStandUpExpired(long time)
-    {
+    public boolean isStandUpExpired(long time) {
         return false;
     }
 
-    public boolean isLeaveExpired(long time)
-    {
+    public boolean isLeaveExpired(long time) {
         return false;
     }
 
-	public boolean isPlaying()
-	{
-		return isPlaying;
-	}
+    public boolean isPlaying() {
+        return isPlaying;
+    }
 
-	public void setPlaying(boolean isPlaying)
-	{
-		this.isPlaying = isPlaying;
-	}
+    public void setPlaying(boolean isPlaying) {
+        this.isPlaying = isPlaying;
+    }
 
-	public int getAMoney()
-	{
-		return allmoney;
-	}
+    public int getAMoney() {
+        return allmoney;
+    }
 
-	public void setAmoney(int mtmoneyoney)
-	{
-		this.allmoney = mtmoneyoney;
-	}
-	
-	public void addAmoney(int money)
-	{
-		if(money > 0)
-		{
-			this.allmoney += money;
-		}
-	}
-	
-	public void deductAmoney(int money)
-	{
-		if(money < this.allmoney)
-		{
-			this.allmoney -= money;
-		}
-		else
-		{
-			this.allmoney = 0;
-		}
-	}
-	
+    public void setAmoney(int mtmoneyoney) {
+        this.allmoney = mtmoneyoney;
+    }
 
-	public String getAccount()
-	{
-		return account;
-	}
+    public void addAmoney(int money) {
+        if (money > 0) {
+            this.allmoney += money;
+        }
+    }
 
-	public void setAccount(String account)
-	{
-		this.account = account;
-	}
+    public void deductAmoney(int money) {
+        if (money < this.allmoney) {
+            this.allmoney -= money;
+        } else {
+            this.allmoney = 0;
+        }
+    }
 
+    public String getAccount() {
+        return account;
+    }
 
-	public Integer getUid()
-	{
-		return uid;
-	}
+    public void setAccount(String account) {
+        this.account = account;
+    }
 
-	public String getPassWord()
-	{
-		return password;
-	}
-	public void setPassWord(String password)
-	{
-		this.password = password;
-	}
-	public void setUid(int uid)
-	{
-		this.uid = uid;
-	}
+    public Integer getUid() {
+        return uid;
+    }
 
+    public String getPassWord() {
+        return password;
+    }
 
-	public int getExprience()
-	{
-		return exprience;
-	}
+    public void setPassWord(String password) {
+        this.password = password;
+    }
 
-	public void setExprience(int exprience)
-	{
-		this.exprience = exprience;
-	}
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
 
-	public int getGold()
-	{
-		return gold;
-	}
+    public int getExprience() {
+        return exprience;
+    }
 
-	public void setGold(int gold)
-	{
-		this.gold = gold;
-	}
+    public void setExprience(int exprience) {
+        this.exprience = exprience;
+    }
 
-	public int getLevel()
-	{
-		return level;
-	}
+    public int getGold() {
+        return gold;
+    }
 
-	public void setLevel(int level)
-	{
-		this.level = level;
-	}
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
 
-	public int getRmoney()
-	{
-		return roommoney;
-	}
+    public int getLevel() {
+        return level;
+    }
 
-	public void clearRoomMoney()
-	{
-		this.roommoney = 0;
-	}
-	
-	public void addRmoney(int rmoney)
-	{
-		if(rmoney >= 0)
-		{
-			this.roommoney += rmoney;
-		}
-	}
-	public void deductRmoney(int rmoney)
-	{
-		if(rmoney >= 0 && rmoney <= this.roommoney)
-		{
-			this.roommoney -= rmoney;
-		}
-	}
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
-	public boolean isOffLine()
-    {
+    public int getRmoney() {
+        return roommoney;
+    }
+
+    public void clearRoomMoney() {
+        this.roommoney = 0;
+    }
+
+    public void addRmoney(int rmoney) {
+        if (rmoney >= 0) {
+            this.roommoney += rmoney;
+        }
+    }
+
+    public void deductRmoney(int rmoney) {
+        if (rmoney >= 0 && rmoney <= this.roommoney) {
+            this.roommoney -= rmoney;
+        }
+    }
+
+    public boolean isOffLine() {
         return false;
     }
-	
 
-	public void setBackupRmoney(int rmoney)
-	{
-	}
+    public void setBackupRmoney(int rmoney) {
+    }
 
-	public String getEmail()
-	{
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getGendar()
-	{
-		return sex;
-	}
+    public String getGendar() {
+        return sex;
+    }
 
-	public void setGendar(String gendar)
-	{
-		this.sex = gendar;
-	}
+    public void setGendar(String gendar) {
+        this.sex = gendar;
+    }
 
-	public String getAddress()
-	{
-		return address;
-	}
+    public String getAddress() {
+        return address;
+    }
 
-	public void setAddress(String address)
-	{
-		this.address = address;
-	}
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-	public String getBirthday()
-	{
-		return birthday;
-	}
+    public String getBirthday() {
+        return birthday;
+    }
 
-	public void setBirthday(String birthday)
-	{
-		this.birthday = birthday;
-	}
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
 
-	public String getLogintime()
-	{
-		return logintime;
-	}
+    public String getLogintime() {
+        return logintime;
+    }
 
-	public void setLogintime(String logintime)
-	{
-		this.logintime = logintime;
-	}
+    public void setLogintime(String logintime) {
+        this.logintime = logintime;
+    }
 
-	public long getLastUpdateTime()
-	{
-		return lastUpdateTime;
-	}
+    public long getLastUpdateTime() {
+        return lastUpdateTime;
+    }
 
-	public void setLastUpdateTime(Long TimeStamp)
-	{
-		this.lastUpdateTime = TimeStamp;
-	}
+    public void setLastUpdateTime(Long timeStamp) {
+        this.lastUpdateTime = timeStamp;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public int getRoommoney() {
-		return roommoney;
-	}
+    public int getRoommoney() {
+        return roommoney;
+    }
 
-	public void setRoommoney(int roommoney) {
-		this.roommoney = roommoney;
-	}
+    public void setRoommoney(int roommoney) {
+        this.roommoney = roommoney;
+    }
 
-	public int getAllmoney() {
-		return allmoney;
-	}
+    public int getAllmoney() {
+        return allmoney;
+    }
 
-	public void setAllmoney(int allmoney) {
-		this.allmoney = allmoney;
-	}
+    public void setAllmoney(int allmoney) {
+        this.allmoney = allmoney;
+    }
 
-	public String getMobile() {
-		return mobile;
-	}
+    public String getMobile() {
+        return mobile;
+    }
 
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
 
-	public String getSex() {
-		return sex;
-	}
+    public String getSex() {
+        return sex;
+    }
 
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
 
-	public String getRegtime() {
-		return regtime;
-	}
+    public String getRegtime() {
+        return regtime;
+    }
 
-	public void setRegtime(String regtime) {
-		this.regtime = regtime;
-	}
+    public void setRegtime(String regtime) {
+        this.regtime = regtime;
+    }
 
-	public void setLastUpdateTime(long lastUpdateTime) {
-		this.lastUpdateTime = lastUpdateTime;
-	}
+    public void setLastUpdateTime(long lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+    }
 
-	@Override
-	public String toString() {
-		return "User{" +
-				"uid=" + uid +
-				", account='" + account + '\'' +
-				", password='" + password + '\'' +
-				", isPlaying=" + isPlaying +
-				", roommoney=" + roommoney +
-				", allmoney=" + allmoney +
-				", exprience=" + exprience +
-				", gold=" + gold +
-				", mobile='" + mobile + '\'' +
-				", email='" + email + '\'' +
-				", level=" + level +
-				", sex='" + sex + '\'' +
-				", address='" + address + '\'' +
-				", regtime='" + regtime + '\'' +
-				", birthday='" + birthday + '\'' +
-				", logintime='" + logintime + '\'' +
-				", lastUpdateTime=" + lastUpdateTime +
-				", roomId=" + roomId +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "User{" +
+                "uid=" + uid +
+                ", account='" + account + '\'' +
+                ", password='" + password + '\'' +
+                ", isPlaying=" + isPlaying +
+                ", roommoney=" + roommoney +
+                ", allmoney=" + allmoney +
+                ", exprience=" + exprience +
+                ", gold=" + gold +
+                ", mobile='" + mobile + '\'' +
+                ", email='" + email + '\'' +
+                ", level=" + level +
+                ", sex='" + sex + '\'' +
+                ", address='" + address + '\'' +
+                ", regtime='" + regtime + '\'' +
+                ", birthday='" + birthday + '\'' +
+                ", logintime='" + logintime + '\'' +
+                ", lastUpdateTime=" + lastUpdateTime +
+                ", roomId=" + roomId +
+                '}';
+    }
 }

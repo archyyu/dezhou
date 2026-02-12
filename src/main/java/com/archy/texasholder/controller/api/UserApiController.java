@@ -108,7 +108,7 @@ public class UserApiController extends BaseApiController {
 
         try {
             String[] userID = {"uid", "name"};
-            if (!PlayerService.isvalidEmail(email, userID)) {
+            if (!playerService.isvalidEmail(email, userID)) {
                 return errorResponse("EmailIsinValid");
             }
             

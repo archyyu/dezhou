@@ -1,20 +1,43 @@
 package com.archy.texasholder.dao;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.archy.texasholder.entity.RoomDB;
 
-public interface RoomDBMapper {
+@Repository
+public interface RoomDBMapper extends JpaRepository<RoomDB, Integer> {
 
-    int insertSelective(RoomDB record);
+    Optional<RoomDB> findByName(String name);
 
-    RoomDB selectByPrimaryKey(Integer id);
+    default int insertSelective(RoomDB record) {
+        return save(record) != null ? 1 : 0;
+    }
 
-    List<RoomDB> selectAllRooms();
+    default RoomDB selectByPrimaryKey(Integer id) {
+        return findById(id).orElse(null);
+    }
 
-    RoomDB selectByName(String name);
+    default List<RoomDB> selectAllRooms() {
+        return findAll();
+    }
 
-    int updateByPrimaryKeySelective(RoomDB record);
+    default RoomDB selectByName(String name) {
+        return findByName(name).orElse(null);
+    }
 
-    int deleteByPrimaryKey(Integer id);
+    default int updateByPrimaryKeySelective(RoomDB record) {
+        return save(record) != null ? 1 : 0;
+    }
+
+    default int deleteByPrimaryKey(Integer id) {
+        if (existsById(id)) {
+            deleteById(id);
+            return 1;
+        }
+        return 0;
+    }
 }

@@ -6,13 +6,13 @@ spring:
     name: texasholder-poker-server
   main:
     allow-bean-definition-overriding: true
-  
+
   datasource:
     url: jdbc:mysql://localhost:33306/texasholder?useUnicode=true&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=UTC
     username: root
     password: aida87014999
     driver-class-name: com.mysql.cj.jdbc.Driver
-    
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,28 +21,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-mybatis:
-  # MyBatis configuration moved directly into application.yml
-  mapper-locations: classpath:com/archy/texasholder/dao/*.xml
-  type-aliases-package: com.archy.texasholder.entity
-  configuration:
-    map-underscore-to-camel-case: true
-    cache-enabled: true
-    lazy-loading-enabled: true
-    aggressive-lazy-loading: false
-    default-fetch-size: 100
-    default-statement-timeout: 30
-    # MySQL specific settings
-    jdbc-type-for-null: 'null'
-
-# JWT Configuration
 jwt:
   secret: dezhou-secret-key-1234567890-abcdefghijklmnopqrstuvwxyz
-  expiration: 86400000 # 24 hours in milliseconds
+  expiration: 86400000
   header: Authorization
-  prefix: Bearer 
-
-# Server configuration (from server.json)
+  prefix: Bearer
 
 logging:
   level:
