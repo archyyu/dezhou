@@ -89,3 +89,30 @@ insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) v
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('中级场', 'intermediate', 200, 100, 20000, 2000, 'public');
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('高级场', 'advanced', 2000, 1000, 200000, 20000, 'public');
 insert into dezhou_room (showname, name, bbet, sbet, maxbuy, minbuy, roomtype) values ('土豪场', 'tycoon', 20000, 10000, 2000000, 200000, 'public');
+
+create table dezhou_game (
+	id int(11) auto_increment,
+	room_id int(11) default 0,
+	name varchar(50) default '',
+	starttime int(11) default 0,
+	endtime int(11) default 0,
+	primary key(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table dezhou_gameuser (
+	id int(11) auto_increment,
+	room_id int(11) default 0,
+	user_id int(11) default 0
+	primary key(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table dezhou_gameaction (
+	id int(11) auto_increment,
+	game_id int(11) default 0,
+	user_id int(11) default 0,
+	action varchar(50) default '',
+	money int(11) default 0,
+	round int(11) default 0,
+	turn int(11) default 0,
+	primary key(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

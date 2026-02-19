@@ -1,6 +1,7 @@
 package com.archy.texasholder.entity;
 
-import java.util.logging.Logger;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,9 +16,6 @@ import lombok.Data;
 @Entity
 @Table(name = "dezhou_user")
 public class User {
-
-    @Transient
-    protected Logger log = Logger.getLogger(getClass().getName());
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
