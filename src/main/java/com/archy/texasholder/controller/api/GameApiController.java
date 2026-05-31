@@ -6,12 +6,10 @@ import com.archy.texasholder.beans.PlayerState;
 import com.archy.texasholder.command.GameCommand;
 import com.archy.texasholder.command.GameCommandFactory;
 
-import com.archy.texasholder.controller.websocket.GameWebSocketController;
 import com.archy.texasholder.entity.ApiResponse;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.room.GameRoom;
 import com.archy.texasholder.entity.room.PukerGame;
-import com.archy.texasholder.global.ConstList;
 import com.archy.texasholder.security.JwtTokenProvider;
 import com.archy.texasholder.service.RoomService;
 import com.archy.texasholder.service.UserService;
@@ -22,11 +20,8 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -117,7 +112,7 @@ public class GameApiController extends BaseApiController {
 
             logger.info("cmd:" + cmd + " , roomId:" + roomId + ", player uid:" + user.getUid());
 
-            PukerGame room = this.roomService.getRoom(user.getRoomid());
+            PukerGame room = this.roomService.getRoom(user.getRoomId());
             if (room == null) {
                 return errorResponse("RoomNotFound");
             }

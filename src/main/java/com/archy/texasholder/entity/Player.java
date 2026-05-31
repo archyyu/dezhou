@@ -2,8 +2,6 @@ package com.archy.texasholder.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
 
@@ -17,10 +15,8 @@ import lombok.Data;
 
 import com.archy.texasholder.beans.GameState;
 import com.archy.texasholder.beans.PlayerState;
-import com.archy.texasholder.beans.PukerState;
 import com.archy.texasholder.entity.puker.FivePukeItem;
 import com.archy.texasholder.entity.puker.PukerHelp;
-import com.archy.texasholder.entity.puker.PukerKit;
 
 @Data
 public class Player extends User

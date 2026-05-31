@@ -44,7 +44,7 @@ public class UserResponse {
         this.username = user.getAccount();
         this.email = user.getEmail();
         this.mobile = user.getMobile();
-        this.gender = user.getGendar();
+        this.gender = user.getSex();
         this.birthday = user.getBirthday();
         this.address = user.getAddress();
         this.roomMoney = user.getRoommoney();
@@ -70,7 +70,7 @@ public class UserResponse {
         this.username = player.getAccount();
         this.email = includeSensitiveData ? player.getEmail() : "*****@*****.***";
         this.mobile = includeSensitiveData ? player.getMobile() : "***********";
-        this.gender = player.getGendar();
+        this.gender = player.getSex();
         this.birthday = player.getBirthday();
         this.address = player.getAddress();
         this.roomMoney = player.getRoommoney();

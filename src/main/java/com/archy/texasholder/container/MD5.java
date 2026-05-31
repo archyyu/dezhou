@@ -3,8 +3,6 @@ package com.archy.texasholder.container;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.archy.texasholder.global.ConstList;
-
 public class MD5
 {
 

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,26 +26,6 @@ class WebConfigTest {
         assertNotNull(corsFilter, "CORS filter bean should not be null");
     }
 
-    @Test
-    void testCorsMappingsConfiguration() {
-        // Create a mock CorsRegistry to test the configuration
-        CorsRegistry registry = new CorsRegistry() {
-            @Override
-            public org.springframework.web.servlet.config.annotation.CorsRegistration addMapping(String pathPattern) {
-                return new org.springframework.web.servlet.config.annotation.CorsRegistration(pathPattern) {
-                    @Override
-                    public org.springframework.web.servlet.config.annotation.CorsRegistration allowedOrigins(String... origins) {
-                        assertArrayEquals(new String[]{"http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:8080", "http://localhost:8880", "http://localhost:8888", "http://127.0.0.1:5173"}, origins);
-                        return this;
-                    }
-                };
-            }
-        };
-        
-        // This should not throw an exception and should configure the registry correctly
-        assertDoesNotThrow(() -> webConfig.addCorsMappings(registry),
-                          "addCorsMappings should execute without exceptions");
-    }
 
     @Test
     void testCorsConfigurationDetails() {

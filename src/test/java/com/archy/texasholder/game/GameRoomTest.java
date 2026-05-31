@@ -37,14 +37,15 @@ public class GameRoomTest {
         player.setActive(true);
         player.setReady(true);
 
-        roomDB = new RoomDB();
-        roomDB.setId(1);
-        roomDB.setBbet(10);
-        roomDB.setName("beginner");
-        roomDB.setMinbuy(1000);
-        roomDB.setMaxbuy(2000);
-        roomDB.setRoomtype("public");
-        roomDB.setShowname("beginner");
+        roomDB = RoomDB.builder()
+                .id(1)
+                .bbet(10)
+                .name("beginner")
+                .minbuy(1000)
+                .maxbuy(2000)
+                .roomtype("public")
+                .showname("beginner")
+                .build();
 
         this.gameRoom = new GameRoom(roomDB);
     }
@@ -76,7 +77,7 @@ public class GameRoomTest {
         assertFalse(gameRoom.playerStandUp(player));
         
         gameRoom.userJoin(player);
-        assertEquals(gameRoom.getRoomid(), player.getRoomid());
+        assertEquals(gameRoom.getRoomid(), player.getRoomId());
 
         gameRoom.playerSitDown(seatId, player, 10);
 

@@ -75,14 +75,15 @@ public class PukerGameTest {
 
     private void setUpTestRoom() {
         // Create a Texas Hold'em room
-        RoomDB roomDB = new RoomDB();
-        roomDB.setId(1);
-        roomDB.setBbet(Bbet);
-        roomDB.setName("beginner");
-        roomDB.setMinbuy(1000);
-        roomDB.setMaxbuy(2000);
-        roomDB.setRoomtype("public");
-        roomDB.setShowname("beginner");
+        RoomDB roomDB = RoomDB.builder()
+                .id(1)
+                .bbet(Bbet)
+                .name("beginner")
+                .minbuy(1000)
+                .maxbuy(2000)
+                .roomtype("public")
+                .showname("beginner")
+                .build();
 
         testRoom = new PukerGame(roomDB, this.webSocketService, new PukerHelp());
         testRoom.setName("TexasHoldemTestRoom");
@@ -162,7 +163,7 @@ public class PukerGameTest {
 
         int allmoney = 0;
         for(Player player : testPlayers) {
-            allmoney += player.getRmoney();
+            allmoney += player.getRoommoney();
         }
         assertEquals(cd * testPlayers.size() ,allmoney);
 
@@ -213,7 +214,7 @@ public class PukerGameTest {
 
         int allmoney = 0;
         for(Player player : testPlayers) {
-            allmoney += player.getRmoney();
+            allmoney += player.getRoommoney();
         }
         assertEquals(cd * testPlayers.size() ,allmoney);
 

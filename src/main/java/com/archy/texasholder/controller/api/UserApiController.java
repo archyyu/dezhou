@@ -62,7 +62,7 @@ public class UserApiController extends BaseApiController {
             
             
             // Get the user from the response
-            User user = userService.getUserByAccount(name);
+            User user = userService.getUserByAccount(name).orElse(null);
             
             if (user == null) {
 
@@ -70,13 +70,13 @@ public class UserApiController extends BaseApiController {
                 // '13800000001', 1, 'male', 'Address 1', '2025-01-01 10:00:00', '1990-01-01', '2025-01-01 10:00:00'),
                 user = new User();
                 user.setAccount(name);
-                user.setGendar("male");
+                user.setSex("male");
                 user.setMobile("13800000050");
                 user.setAllmoney(10000);
 
                 userService.registerUser(user);
 
-                user = userService.getUserByAccount(name);
+                user = userService.getUserByAccount(name).orElse(null);
             }
 
             Player player = new Player(user);

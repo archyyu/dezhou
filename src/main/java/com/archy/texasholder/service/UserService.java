@@ -2,12 +2,14 @@ package com.archy.texasholder.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
-import com.archy.texasholder.dao.UserMapper;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.User;
+import com.archy.texasholder.repo.UserRepository;
 
 import jakarta.annotation.Resource;
 
@@ -15,20 +17,21 @@ import jakarta.annotation.Resource;
 public class UserService {
 
     @Resource
-    private UserMapper userMapper;
+    private UserRepository userRepository;
 
     private Map<Integer, Player> playersMap = new HashMap<Integer, Player>();
 
-    public User getUserById(int userId){
-        return userMapper.selectByPrimaryKey(userId);
+    public Optional<User> getUserById(int userId) {
+        return this.userRepository.findById(userId);
     }
 
-    public User getUserByAccount(String account) {
-        return this.userMapper.selectByAccount(account);
+    public Optional<User> getUserByAccount(String account) {
+        return this.userRepository.findOne(Example.of(User.builder().account(account).build()));
     }
 
     public int registerUser(User user) {
-        return this.userMapper.insertSelective(user);
+        this.userRepository.save(user);
+        return 1;
     }
 
     public Player getUserByUserId(int userId)
@@ -36,10 +39,10 @@ public class UserService {
         Player player = playersMap.get(userId);
         if (player == null)
         {
-            User user = this.getUserById(userId);
-            if(user != null)
+            Optional<User> user = this.getUserById(userId);
+            if(user.isPresent())
             {
-                player = new Player(user);
+                player = new Player(user.get());
                 playersMap.put(userId, player);
             }
         }
@@ -48,17 +51,18 @@ public class UserService {
     
     public Player getUserByUsername(String username)
     {
-        User user = userMapper.selectByAccount(username);
-        if(user != null)
+        Optional<User> user = this.getUserByAccount(username);
+        if(user.isPresent())
         {
-            Player player = new Player(user);
-            playersMap.put(user.getUid(), player);
+            Player player = new Player(user.get());
+            playersMap.put(user.get().getUid(), player);
             return player;
         }
         return null;
     }
 
     public boolean addUser(User user){
-        return this.userMapper.insertSelective(user) > 0;
+        this.userRepository.save(user);
+        return true;
     }
 }

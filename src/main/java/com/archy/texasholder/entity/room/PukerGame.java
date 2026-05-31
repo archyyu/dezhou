@@ -202,7 +202,7 @@ public class PukerGame extends GameRoom
 		List<Player> tempPlayerMap = this.getPlayers();
 		for(Player entry : tempPlayerMap)
 		{
-			if(entry.getRmoney() < this.getBbet())
+			if(entry.getRoommoney() < this.getBbet())
 			{
 				this.playerStandUp(entry);
 			}
@@ -828,9 +828,9 @@ public class PukerGame extends GameRoom
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_ADD_BET);
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		if(bet < 2 * (this.maxBet - player.getTempBet()))
@@ -888,9 +888,9 @@ public class PukerGame extends GameRoom
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_FOLLOW_BET);
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		if(player.getTempBet() + bet < this.maxBet)
@@ -971,9 +971,9 @@ public class PukerGame extends GameRoom
 			return false;
 		}
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		this.addPoolBet(bet);
@@ -1013,7 +1013,7 @@ public class PukerGame extends GameRoom
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
-		player.addAmoney(player.getRmoney());
+		player.addAmoney(player.getRoommoney());
 		player.clearRoomMoney();
 
 		super.playerStandUp(player);
@@ -1069,7 +1069,7 @@ public class PukerGame extends GameRoom
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
-		player.addAmoney(player.getRmoney());
+		player.addAmoney(player.getRoommoney());
 
 		player.setRoomId(-1);
 		player.setSeatId(-1);

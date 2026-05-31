@@ -1,11 +1,8 @@
 package com.archy.texasholder.functional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -21,9 +18,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -47,7 +42,6 @@ import com.archy.texasholder.service.RoomService;
 import com.archy.texasholder.service.UserService;
 import com.archy.texasholder.service.WebSocketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intuit.karate.http.WebSocketServerBase;
 
 import org.junit.jupiter.api.Test;
 
@@ -146,14 +140,15 @@ class PukerGameIntegrationTest {
     }
 
     private PukerGame createTestRoomForMultiplePlayers() {
-        RoomDB roomDB = new RoomDB();
-        roomDB.setId(200);
-        roomDB.setName("multiplayer-test");
-        roomDB.setRoomtype("public");
-        roomDB.setBbet(10);
-        roomDB.setSbet(5);
-        roomDB.setMinbuy(500);
-        roomDB.setMaxbuy(2000);
+        RoomDB roomDB = RoomDB.builder()
+                .id(200)
+                .name("multiplayer-test")
+                .roomtype("public")
+                .bbet(10)
+                .sbet(5)
+                .minbuy(500)
+                .maxbuy(2000)
+                .build();
 
         WebSocketService webSocketService = mock(WebSocketService.class);
 
