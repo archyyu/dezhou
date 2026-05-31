@@ -44,5 +44,8 @@ public class GameActionDB {
 
     @Column(name = "turn")
     private Integer turn;
+
+    @Column(name = "params")
+    private String params;
     
 }

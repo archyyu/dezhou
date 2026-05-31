@@ -91,6 +91,8 @@ public class GameRoom
 		this.minbuy = roomDB.getMinbuy();
 		this.maxbuy = roomDB.getMaxbuy();
 		this.showname = roomDB.getShowname();
+		this.maxPlayers = 9;
+		this.minPlayers = 2;
 
 	}
 

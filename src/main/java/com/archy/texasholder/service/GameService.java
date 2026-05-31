@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.archy.texasholder.GameCmdException;
 import com.archy.texasholder.command.GameCommand;
 import com.archy.texasholder.command.GameCommandFactory;
@@ -33,9 +34,11 @@ public class GameService {
 
             GameActionDB gameActionDB = GameActionDB.builder()
                                                     .gameroomId(room.getRoomid())
-                                                    .action(cmd)
+                                                    .action(gameCommand.getCommandName())
+                                                    .userId(player.getUid())
                                                     .money(gameCommand.getBet())
                                                     .timestamp(System.currentTimeMillis()/1000)
+                                                    .params(JSON.toJSONString(additionalParams))
                                                     .build();
                                                     
             gameActionDBRepository.save(gameActionDB);

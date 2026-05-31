@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.archy.texasholder.entity.GameActionDB;
@@ -99,7 +100,14 @@ public class RoomService{
 		return gameRoom;
 	}
 
+	@Scheduled(fixedRate = 5000)
+	public void tickAllRoom() {
 
+		long now = System.currentTimeMillis();
+
+		this.roomsMap.values().forEach( item -> { item.beatHeart(now); });
+
+	}
 	
 	public void addRoom(PukerGame room)
 	{

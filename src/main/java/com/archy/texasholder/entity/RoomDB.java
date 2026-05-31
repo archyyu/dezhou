@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public class RoomDB {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "roomid")
+    @Column(name = "id")
     private Integer roomid;
 
     @Column(name = "showname")

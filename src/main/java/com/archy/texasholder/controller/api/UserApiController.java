@@ -62,7 +62,9 @@ public class UserApiController extends BaseApiController {
             
             
             // Get the user from the response
-            User user = userService.getUserByAccount(name).orElse(null);
+            User user = userService.getUserByAccount(name).get();
+
+            logger.info("user:" + user.toString());
             
             if (user == null) {
 

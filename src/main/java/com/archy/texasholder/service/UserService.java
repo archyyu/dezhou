@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 import com.archy.texasholder.entity.Player;
@@ -26,7 +25,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByAccount(String account) {
-        return this.userRepository.findOne(Example.of(User.builder().account(account).build()));
+        return this.userRepository.findByAccount(account);
     }
 
     public int registerUser(User user) {
