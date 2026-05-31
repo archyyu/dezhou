@@ -10,11 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.archy.texasholder.entity.User;
 import com.archy.texasholder.global.ConstList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.beanutils.BeanUtils;
 
 import lombok.Data;
 
 import com.archy.texasholder.GameCmdException;
 import com.archy.texasholder.beans.PlayerState;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 
@@ -73,16 +75,13 @@ public class GameRoom
 		return this.playerMap.get(seatId);
 	}
 
-	public GameRoom() {
-		setRoomID();
-	}
-
-	public GameRoom(RoomDB roomDB)
+	public GameRoom(GameRoomDB roomDB)
 	{
-		setRoomID();
-
+		//setRoomID(); 
+		this.roomid = roomDB.getGameroomid();
+		this.creator = roomDB.getAccount();
 		
-		this.roomTypeId = roomDB.getId();
+		this.roomTypeId = roomDB.getRoomid();
 		this.name = roomDB.getName();
 		
 		// this.zone = roomDB.getZone();

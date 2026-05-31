@@ -22,6 +22,11 @@ public class LookCardCommand implements GameCommand{
         return gameRoom.playerLookCard(player);
     }
 
+    @Override
+    public int getBet() {
+        return 0;
+    }
 
+    
     
 }

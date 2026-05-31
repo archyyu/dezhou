@@ -11,6 +11,7 @@ import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.room.GameRoom;
 import com.archy.texasholder.entity.room.PukerGame;
 import com.archy.texasholder.security.JwtTokenProvider;
+import com.archy.texasholder.service.GameService;
 import com.archy.texasholder.service.RoomService;
 import com.archy.texasholder.service.UserService;
 import com.archy.texasholder.service.WebSocketService;
@@ -43,10 +44,10 @@ public class GameApiController extends BaseApiController {
     private JwtTokenProvider jwtTokenProvider;
 
     @Resource
-    private GameCommandFactory gameCommandFactory;
+    private WebSocketService webSocketService;
 
     @Resource
-    private WebSocketService webSocketService;
+    private GameService gameService;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -123,10 +124,7 @@ public class GameApiController extends BaseApiController {
                 player.clearDropCardNum();
             }
 
-
-            GameCommand gameCommand = this.gameCommandFactory.getCommand(cmd);
-
-            boolean result = gameCommand.execute(room, player, additionalParams);
+            boolean result = this.gameService.exec(cmd, room, player, additionalParams);
             
             if (result) {
                 // Send WebSocket notification about the game action

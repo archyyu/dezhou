@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.archy.texasholder.GameCmdException;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 import com.archy.texasholder.entity.User;
@@ -75,8 +76,8 @@ public class PukerGameTest {
 
     private void setUpTestRoom() {
         // Create a Texas Hold'em room
-        RoomDB roomDB = RoomDB.builder()
-                .id(1)
+        GameRoomDB roomDB = GameRoomDB.builder()
+                .gameroomid(1)
                 .bbet(Bbet)
                 .name("beginner")
                 .minbuy(1000)

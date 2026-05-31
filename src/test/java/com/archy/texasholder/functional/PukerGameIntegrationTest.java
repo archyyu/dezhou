@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.archy.texasholder.entity.ApiResponse;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 import com.archy.texasholder.entity.User;
@@ -140,8 +141,8 @@ class PukerGameIntegrationTest {
     }
 
     private PukerGame createTestRoomForMultiplePlayers() {
-        RoomDB roomDB = RoomDB.builder()
-                .id(200)
+        GameRoomDB roomDB = GameRoomDB.builder()
+                .gameroomid(200)
                 .name("multiplayer-test")
                 .roomtype("public")
                 .bbet(10)

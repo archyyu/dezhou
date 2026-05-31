@@ -1,18 +1,26 @@
 package com.archy.texasholder.service;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.archy.texasholder.entity.GameActionDB;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 import com.archy.texasholder.entity.puker.PukerHelp;
 import com.archy.texasholder.entity.room.GameRoom;
 import com.archy.texasholder.entity.room.PukerGame;
+import com.archy.texasholder.repo.GameActionDBRepository;
+import com.archy.texasholder.repo.GameRoomDBRepository;
 import com.archy.texasholder.repo.RoomDBRepository;
 
 import jakarta.annotation.Resource;
@@ -24,17 +32,25 @@ public class RoomService{
     private RoomDBRepository roomDBRepository;
 
 	@Resource
+	private GameRoomDBRepository gameRoomDBRepository;
+
+	@Resource
+	private GameActionDBRepository gameActionDBRepository;
+
+	@Resource
 	private PukerHelp pukerHelp;
 
 	@Resource
 	private WebSocketService webSocketService;
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private Map<Integer,PukerGame> roomsMap = new ConcurrentHashMap<Integer,PukerGame>();
 	
 	private Map<Integer, Player> usersMap = new ConcurrentHashMap<Integer, Player>();
 
-	public RoomDB getRoomById(int roomId){
-        return roomDBRepository.findById(roomId).orElse(null);
+	public Optional<RoomDB> getRoomById(int roomId){
+        return roomDBRepository.findById(roomId);
     }
 
 	public List<RoomDB> getRoomTypeList() {
@@ -63,7 +79,18 @@ public class RoomService{
 
 		RoomDB roomDB = this.roomDBRepository.findById(roomTypeId).orElse(null);
 
-		PukerGame gameRoom = new PukerGame(roomDB, this.webSocketService, this.pukerHelp);
+		GameRoomDB gameRoomDB = GameRoomDB.builder().build();
+		try {
+			BeanUtils.copyProperties(gameRoomDB, roomDB);
+		} catch (Exception ex) {
+			logger.info("creategameroom", ex);
+		}
+
+		gameRoomDB.setAccount(userName);
+		gameRoomDB.setCreatetime(System.currentTimeMillis()/1000);
+		this.gameRoomDBRepository.save(gameRoomDB);
+
+		PukerGame gameRoom = new PukerGame(gameRoomDB, this.webSocketService, this.pukerHelp);
 		gameRoom.setCreator(userName);
 		gameRoom.setName(roomName);
 
@@ -71,6 +98,8 @@ public class RoomService{
 
 		return gameRoom;
 	}
+
+
 	
 	public void addRoom(PukerGame room)
 	{

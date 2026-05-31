@@ -12,4 +12,6 @@ public interface GameCommand {
 
     boolean execute(PukerGame gameRoom, Player player, Map<String,String> params) throws GameCmdException;
 
+    default int getBet() { return 0;}
+
 }

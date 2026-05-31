@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.archy.texasholder.GameCmdException;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 import com.archy.texasholder.entity.User;
@@ -17,7 +18,7 @@ import com.archy.texasholder.entity.room.GameRoom;
 public class GameRoomTest {
 
 
-    private RoomDB roomDB = null;
+    private GameRoomDB roomDB = null;
 
     private GameRoom gameRoom = null;
 
@@ -37,8 +38,8 @@ public class GameRoomTest {
         player.setActive(true);
         player.setReady(true);
 
-        roomDB = RoomDB.builder()
-                .id(1)
+        roomDB = GameRoomDB.builder()
+                .gameroomid(1)
                 .bbet(10)
                 .name("beginner")
                 .minbuy(1000)

@@ -6,8 +6,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="dezhou_gameaction")
 public class GameActionDB {
 
@@ -16,8 +24,8 @@ public class GameActionDB {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "game_id")
-    private Integer gameId;
+    @Column(name = "gameroom_id")
+    private Integer gameroomId;
 
     @Column(name = "timestamp")
     private Long timestamp;
