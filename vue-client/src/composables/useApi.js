@@ -7,7 +7,7 @@ import { useAuthStore } from '@/stores/authStore'
 export function useApi() {
   // Create axios instance
   // Hardcoded to use localhost:30081 for production
-  const apiBaseURL = 'http://localhost:30081'
+  const apiBaseURL = 'http://localhost:8080'
   console.log('API Base URL:', apiBaseURL) // Debug logging
   
   const api = axios.create({

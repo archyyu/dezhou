@@ -4,23 +4,27 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "dezhou_room")
-public class RoomDB {
+@Entity
+@Table(name = "dezhou_gameroom")
+public class GameRoomDB {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "gameroomid")
+    private Integer gameroomid;
+
+    @Column(name = "roomid")
     private Integer roomid;
 
     @Column(name = "showname")
@@ -43,5 +47,14 @@ public class RoomDB {
 
     @Column(name = "roomtype")
     private String roomtype;
+
+    @Column(name = "creator")
+    private String account;
+
+    @Column(name = "createtime")
+    private Long createtime;
+
+    @Column(name = "releasetime")
+    private Long releasetime;
 
 }

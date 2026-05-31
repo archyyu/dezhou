@@ -18,7 +18,7 @@ public class CheckCommand implements GameCommand{
 
     @Override
     public boolean execute(PukerGame gameRoom, Player player, Map<String, String> params) {
-        return gameRoom.playerCheck(player);
+        return gameRoom.playerCheck(player).result();
     }
     
 }

@@ -17,7 +17,9 @@ import com.archy.texasholder.service.WebSocketService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.archy.texasholder.GameCmdException;
 import com.archy.texasholder.beans.GameState;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.HeartTimer;
+import com.archy.texasholder.entity.MoneyResult;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.Puke;
 import com.archy.texasholder.entity.RoomDB;
@@ -72,7 +74,7 @@ public class PukerGame extends GameRoom
 
 	private WebSocketService webSocketService;
 	
-	public PukerGame(RoomDB roomDB, WebSocketService webSocketService, PukerHelp pukerHelp)
+	public PukerGame(GameRoomDB roomDB, WebSocketService webSocketService, PukerHelp pukerHelp)
 	{
 		super(roomDB);
 		this.webSocketService = webSocketService;
@@ -202,7 +204,7 @@ public class PukerGame extends GameRoom
 		List<Player> tempPlayerMap = this.getPlayers();
 		for(Player entry : tempPlayerMap)
 		{
-			if(entry.getRmoney() < this.getBbet())
+			if(entry.getRoommoney() < this.getBbet())
 			{
 				this.playerStandUp(entry);
 			}
@@ -814,7 +816,7 @@ public class PukerGame extends GameRoom
 		return result + this.currentRoundBet;
 	}
 	
-	public boolean playerAddBet(Player player,int bet)
+	public MoneyResult playerAddBet(Player player,int bet)
 	{
 		if(this.isYouTurn(player) == false)
 		{
@@ -823,14 +825,14 @@ public class PukerGame extends GameRoom
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return false;
+			return new MoneyResult(0, false);
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_ADD_BET);
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		if(bet < 2 * (this.maxBet - player.getTempBet()))
@@ -840,7 +842,7 @@ public class PukerGame extends GameRoom
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " add bet error bet: " + bet);
 			
-			return false;
+			return new MoneyResult(0, false);
 		}
 		
 		this.addPoolBet(bet);
@@ -859,23 +861,23 @@ public class PukerGame extends GameRoom
 		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " add " + bet  );
 		this.settleRoundPlayersOnAddBet(player);
 		this.turnOverHandle();
-		return true;
+		return new MoneyResult(bet, true);
 	}
 
-	public boolean playerFollow(Player player) {
+	public MoneyResult playerFollow(Player player) {
 		int bet = this.maxBet - player.getTempBet();
 		return this.playerFollowBet(player, bet);
 	}
 
-	public boolean playerCheck(Player player) {
+	public MoneyResult playerCheck(Player player) {
 		return this.playerFollowBet(player, 0);
 	}
 
-	public boolean playerRaise(Player player, int bet) {
+	public MoneyResult playerRaise(Player player, int bet) {
 		return this.playerFollowBet(player, bet);
 	}
 	
-	public boolean playerFollowBet(Player player,int bet)
+	public MoneyResult playerFollowBet(Player player,int bet)
 	{
 		if(this.isYouTurn(player) == false)
 		{			
@@ -883,14 +885,14 @@ public class PukerGame extends GameRoom
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return false;
+			return MoneyResult.failed();
 		}
 		
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_FOLLOW_BET);
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		if(player.getTempBet() + bet < this.maxBet)
@@ -899,7 +901,7 @@ public class PukerGame extends GameRoom
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " call error,bet: " + bet);
 			
-			return false;
+			return MoneyResult.failed();
 		}
 		
 		this.addPoolBet(bet);
@@ -920,7 +922,7 @@ public class PukerGame extends GameRoom
 		// this.notifyRoom(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.notifyPlayer(player.toPlayerState());
 		this.turnOverHandle();
-		return true;
+		return MoneyResult.success(bet);
 	}
 
 	public int getMaxBet() {
@@ -960,7 +962,7 @@ public class PukerGame extends GameRoom
 	}
 	
 	
-	public boolean playerAllIn(Player player,int bet)
+	public MoneyResult playerAllIn(Player player,int bet)
 	{
 		if(this.isYouTurn(player) == false)
 		{
@@ -968,12 +970,12 @@ public class PukerGame extends GameRoom
 					+ " seat : " + player.getSeatId() + " Id: "
 					+ player.getUid() + " not your turn ");
 			
-			return false;
+			return MoneyResult.failed();
 		}
 
-		if(bet > player.getRmoney())
+		if(bet > player.getRoommoney())
 		{
-			bet = player.getRmoney();
+			bet = player.getRoommoney();
 		}
 		
 		this.addPoolBet(bet);
@@ -995,7 +997,7 @@ public class PukerGame extends GameRoom
 		log.info("roomName: " + this.getName() + " seat : " + player.getSeatId() + " Id: " + player.getUid() + " all in " + bet );
 		// this.notifyRoomPlayerButOne(response, ConstList.MessageType.MESSAGE_NINE,player.getUid());
 		this.turnOverHandle();
-		return true;
+		return MoneyResult.success(bet);
 	}
 	
 	@Override
@@ -1013,7 +1015,7 @@ public class PukerGame extends GameRoom
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_STANDUP);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
-		player.addAmoney(player.getRmoney());
+		player.addAmoney(player.getRoommoney());
 		player.clearRoomMoney();
 
 		super.playerStandUp(player);
@@ -1069,7 +1071,7 @@ public class PukerGame extends GameRoom
 		player.setGameState(ConstList.PlayerGameState.GAME_STATE_LEAVE);
 		player.setPlayerState(ConstList.PlayerCareerState.PLAYER_STATE_LEAVE);
 
-		player.addAmoney(player.getRmoney());
+		player.addAmoney(player.getRoommoney());
 
 		player.setRoomId(-1);
 		player.setSeatId(-1);

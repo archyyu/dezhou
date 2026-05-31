@@ -6,7 +6,6 @@ import java.util.Map;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.Puke;
 import com.archy.texasholder.entity.room.PukerGame;
-import com.archy.texasholder.global.ConstList;
 
 import lombok.Data;
 

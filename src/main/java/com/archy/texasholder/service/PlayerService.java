@@ -5,7 +5,6 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import com.archy.texasholder.entity.Player;
@@ -27,7 +26,7 @@ public class PlayerService {
 
     public User NewUserInfoFromDb(String uid) {
         try {
-            return userService.getUserById(Integer.parseInt(uid));
+            return userService.getUserById(Integer.parseInt(uid)).orElse(null);
         } catch (Exception e) {
             return null;
         }
@@ -35,10 +34,10 @@ public class PlayerService {
 
     public boolean ifRegistered(String userName, String uid) {
         if (uid == null || uid.isEmpty()) {
-            return userService.getUserByAccount(userName) != null;
+            return userService.getUserByAccount(userName).isPresent();
         }
         try {
-            return userService.getUserById(Integer.parseInt(uid)) != null;
+            return userService.getUserById(Integer.parseInt(uid)).isPresent();
         } catch (Exception e) {
             return false;
         }
@@ -58,9 +57,9 @@ public class PlayerService {
 
         User user = new User();
         user.setAccount(userName);
-        user.setPassWord(password);
+        user.setPassword(password);
         user.setEmail(email);
-        user.setGendar(gendar);
+        user.setSex(gendar);
         user.setBirthday(birthday);
 
         try {
@@ -88,16 +87,16 @@ public class PlayerService {
 
         User insertUser = new User();
         insertUser.setAccount(userName);
-        insertUser.setPassWord(password);
+        insertUser.setPassword(password);
         insertUser.setEmail(email);
-        insertUser.setGendar(gendar);
+        insertUser.setSex(gendar);
         insertUser.setBirthday(birthday);
         insertUser.setMobile(userid);
 
         try {
             int inserted = userService.registerUser(insertUser);
             if (inserted > 0) {
-                User created = userService.getUserByAccount(userName);
+                User created = userService.getUserByAccount(userName).orElse(null);
                 if (created != null) {
                     userInfoMap.put("name", userName);
                     userInfoMap.put("uid", String.valueOf(created.getUid()));
@@ -114,7 +113,7 @@ public class PlayerService {
     public int CreateUserId() {
         int maxuid = 10001;
         try {
-            User user = userService.getUserByAccount("C10001");
+            User user = userService.getUserByAccount("C10001").orElse(null);
             if (user == null) {
                 maxuid = 10001;
             }
@@ -129,9 +128,9 @@ public class PlayerService {
             return false;
         }
 
-        User user = userService.getUserByAccount(email);
+        User user = userService.getUserByAccount(email).orElse(null);
         if (user == null) {
-            user = userService.getUserByAccount(safeDecode(email));
+            user = userService.getUserByAccount(safeDecode(email)).orElse(null);
         }
         if (user == null) {
             return false;
@@ -144,7 +143,7 @@ public class PlayerService {
 
     public String resetPasswd(User uinfo) {
         String resetpasswd = "a" + randomPassword(6);
-        uinfo.setPassWord(resetpasswd);
+        uinfo.setPassword(resetpasswd);
         userService.registerUser(uinfo);
         return resetpasswd;
     }
@@ -178,12 +177,12 @@ public class PlayerService {
     }
 
     public Player selectPlayerById(Integer uid) {
-        User user = userService.getUserById(uid);
+        User user = userService.getUserById(uid).orElse(null);
         return user == null ? null : new Player(user);
     }
 
     public Player selectPlayerByAccount(String account) {
-        User user = userService.getUserByAccount(account);
+        User user = userService.getUserByAccount(account).orElse(null);
         return user == null ? null : new Player(user);
     }
 
@@ -208,7 +207,7 @@ public class PlayerService {
 
     private String createAutoUsername() {
         String userName = "C" + System.currentTimeMillis();
-        if (userService.getUserByAccount(userName) != null) {
+        if (userService.getUserByAccount(userName).isPresent()) {
             userName = "A" + System.nanoTime();
         }
         return userName;

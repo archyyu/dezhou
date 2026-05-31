@@ -1,19 +1,28 @@
 package com.archy.texasholder.service;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.archy.texasholder.dao.RoomDBMapper;
+import com.archy.texasholder.entity.GameActionDB;
+import com.archy.texasholder.entity.GameRoomDB;
 import com.archy.texasholder.entity.Player;
 import com.archy.texasholder.entity.RoomDB;
 import com.archy.texasholder.entity.puker.PukerHelp;
 import com.archy.texasholder.entity.room.GameRoom;
 import com.archy.texasholder.entity.room.PukerGame;
+import com.archy.texasholder.repo.GameActionDBRepository;
+import com.archy.texasholder.repo.GameRoomDBRepository;
+import com.archy.texasholder.repo.RoomDBRepository;
 
 import jakarta.annotation.Resource;
 
@@ -21,7 +30,13 @@ import jakarta.annotation.Resource;
 public class RoomService{
 
     @Resource
-    private RoomDBMapper roomDBMapper;
+    private RoomDBRepository roomDBRepository;
+
+	@Resource
+	private GameRoomDBRepository gameRoomDBRepository;
+
+	@Resource
+	private GameActionDBRepository gameActionDBRepository;
 
 	@Resource
 	private PukerHelp pukerHelp;
@@ -29,16 +44,18 @@ public class RoomService{
 	@Resource
 	private WebSocketService webSocketService;
 
-    private Map<Integer,PukerGame> roomsMap = new HashMap<Integer,PukerGame>();
-	
-	private Map<Integer, Player> usersMap = new HashMap<Integer, Player>();
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public RoomDB getRoomById(int roomId){
-        return roomDBMapper.selectByPrimaryKey(roomId);
+    private Map<Integer,PukerGame> roomsMap = new ConcurrentHashMap<Integer,PukerGame>();
+	
+	private Map<Integer, Player> usersMap = new ConcurrentHashMap<Integer, Player>();
+
+	public Optional<RoomDB> getRoomById(int roomId){
+        return roomDBRepository.findById(roomId);
     }
 
 	public List<RoomDB> getRoomTypeList() {
-		return this.roomDBMapper.selectAllRooms();
+		return this.roomDBRepository.findAll();
 	}
 	
 	public PukerGame getRoom(Integer id)
@@ -61,15 +78,35 @@ public class RoomService{
 	
 	public GameRoom createGameRoom(String uid, String userName, int roomTypeId, String roomName) {
 
-		RoomDB roomDB = this.roomDBMapper.selectByPrimaryKey(roomTypeId);
+		RoomDB roomDB = this.roomDBRepository.findById(roomTypeId).orElse(null);
 
-		PukerGame gameRoom = new PukerGame(roomDB, this.webSocketService, this.pukerHelp);
+		GameRoomDB gameRoomDB = GameRoomDB.builder().build();
+		try {
+			BeanUtils.copyProperties(gameRoomDB, roomDB);
+		} catch (Exception ex) {
+			logger.info("creategameroom", ex);
+		}
+
+		gameRoomDB.setAccount(userName);
+		gameRoomDB.setCreatetime(System.currentTimeMillis()/1000);
+		this.gameRoomDBRepository.save(gameRoomDB);
+
+		PukerGame gameRoom = new PukerGame(gameRoomDB, this.webSocketService, this.pukerHelp);
 		gameRoom.setCreator(userName);
 		gameRoom.setName(roomName);
 
 		this.roomsMap.put(gameRoom.getRoomid(), gameRoom);
 
 		return gameRoom;
+	}
+
+	@Scheduled(fixedRate = 5000)
+	public void tickAllRoom() {
+
+		long now = System.currentTimeMillis();
+
+		this.roomsMap.values().forEach( item -> { item.beatHeart(now); });
+
 	}
 	
 	public void addRoom(PukerGame room)

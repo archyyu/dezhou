@@ -59,7 +59,7 @@ class RoomApiFunctionalTest {
     void testGetSpecificRoom() {
         // Test with beginner room (ID 1)
         ResponseEntity<ApiResponse> response = restTemplate.getForEntity(
-                "/api/v1/room/info/6", 
+                "/api/v1/room/info/1", 
                 ApiResponse.class);
 
         assertNotNull(response);

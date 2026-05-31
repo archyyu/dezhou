@@ -16,7 +16,7 @@
           <button 
             v-for="roomType in roomTypes" 
             :key="roomType.id" 
-            @click="selectRoomType(roomType.id)" 
+            @click="selectRoomType(roomType.roomid)" 
             class="btn me-2 mb-2" 
             :class="{
               'btn-primary': selectedRoomType === roomType.id,
@@ -93,7 +93,7 @@
             <div class="mb-3">
               <label class="form-label">Room Type</label>
               <select v-model="newRoomTypeId" class="form-select">
-                <option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id">
+                <option v-for="roomType in roomTypes" :key="roomType.roomid" :value="roomType.roomid">
                   {{ roomType.name }}
                 </option>
               </select>
@@ -162,7 +162,7 @@ const loadRoomTypes = async () => {
     
     // Select first room type by default
     if (roomTypes.value.length > 0) {
-      selectRoomType(roomTypes.value[0].id)
+      selectRoomType(roomTypes.value[0].roomid)
     }
   } catch (err) {
     error.value = 'Failed to load room types: ' + (err.response?.data?.message || err.message)

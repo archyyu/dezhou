@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 /**
  * Room API Controller - Replaces RoomListBacklet
  * Handles room listing, joining, and leaving functionality
@@ -111,7 +110,7 @@ public class RoomApiController extends BaseApiController {
             }
             
             // Leave old room if user is already in one
-            PukerGame oldRoom = this.roomService.getRoom(user.getRoomid());
+            PukerGame oldRoom = this.roomService.getRoom(user.getRoomId());
             if (oldRoom != null) {
                 oldRoom.playerLeave(user);
             }

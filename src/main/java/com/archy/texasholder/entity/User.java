@@ -1,6 +1,7 @@
 package com.archy.texasholder.entity;
 
-import java.util.logging.Logger;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,15 +10,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "dezhou_user")
 public class User {
-
-    @Transient
-    protected Logger log = Logger.getLogger(getClass().getName());
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,9 +79,6 @@ public class User {
     @Transient
     private Integer roomId;
 
-    public User() {
-    }
-
     public User(User user) {
         this.uid = user.getUid();
         this.account = user.getAccount();
@@ -92,36 +93,12 @@ public class User {
         this.level = user.getLevel();
     }
 
-    public Integer getRoomid() {
-        return roomId;
-    }
-
-    public void setRoomId(Integer roomId) {
-        this.roomId = roomId;
-    }
-
     public boolean isStandUpExpired(long time) {
         return false;
     }
 
     public boolean isLeaveExpired(long time) {
         return false;
-    }
-
-    public boolean isPlaying() {
-        return isPlaying;
-    }
-
-    public void setPlaying(boolean isPlaying) {
-        this.isPlaying = isPlaying;
-    }
-
-    public int getAMoney() {
-        return allmoney;
-    }
-
-    public void setAmoney(int mtmoneyoney) {
-        this.allmoney = mtmoneyoney;
     }
 
     public void addAmoney(int money) {
@@ -136,58 +113,6 @@ public class User {
         } else {
             this.allmoney = 0;
         }
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public String getPassWord() {
-        return password;
-    }
-
-    public void setPassWord(String password) {
-        this.password = password;
-    }
-
-    public void setUid(int uid) {
-        this.uid = uid;
-    }
-
-    public int getExprience() {
-        return exprience;
-    }
-
-    public void setExprience(int exprience) {
-        this.exprience = exprience;
-    }
-
-    public int getGold() {
-        return gold;
-    }
-
-    public void setGold(int gold) {
-        this.gold = gold;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public int getRmoney() {
-        return roommoney;
     }
 
     public void clearRoomMoney() {
@@ -211,106 +136,6 @@ public class User {
     }
 
     public void setBackupRmoney(int rmoney) {
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getGendar() {
-        return sex;
-    }
-
-    public void setGendar(String gendar) {
-        this.sex = gendar;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getLogintime() {
-        return logintime;
-    }
-
-    public void setLogintime(String logintime) {
-        this.logintime = logintime;
-    }
-
-    public long getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Long timeStamp) {
-        this.lastUpdateTime = timeStamp;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getRoommoney() {
-        return roommoney;
-    }
-
-    public void setRoommoney(int roommoney) {
-        this.roommoney = roommoney;
-    }
-
-    public int getAllmoney() {
-        return allmoney;
-    }
-
-    public void setAllmoney(int allmoney) {
-        this.allmoney = allmoney;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public void setSex(String sex) {
-        this.sex = sex;
-    }
-
-    public String getRegtime() {
-        return regtime;
-    }
-
-    public void setRegtime(String regtime) {
-        this.regtime = regtime;
-    }
-
-    public void setLastUpdateTime(long lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
     }
 
     @Override
