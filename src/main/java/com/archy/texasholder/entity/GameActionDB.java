@@ -19,6 +19,9 @@ public class GameActionDB {
     @Column(name = "game_id")
     private Integer gameId;
 
+    @Column(name = "timestamp")
+    private Long timestamp;
+
     @Column(name = "user_id")
     private Integer userId;
 
